@@ -14,14 +14,16 @@
       src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
       crossorigin
     ></script>
-    <!-- Babel para poder usar JSX en este mismo archivo -->
+    <!-- Babel para JSX inline -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Librería XLSX para leer Excels -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   </head>
   <body class="bg-gray-100">
     <div id="root"></div>
 
     <script type="text/babel" data-presets="env,react">
-      const { useState } = React;
+      const { useState, useEffect } = React;
 
       // ========= Checklist (mapa horizontal) =========
       const CHECKLIST = [
@@ -147,6 +149,16 @@
         return nombre.trim().toUpperCase();
       }
 
+      function normalizarDelegado(nombre) {
+        const trimmed = (nombre || "").trim();
+        if (!trimmed) return "";
+        return trimmed
+          .toLowerCase()
+          .split(/\s+/)
+          .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+          .join(" ");
+      }
+
       function createEmptyVisits() {
         return [1, 2, 3, 4].map((id) => ({
           id,
@@ -269,6 +281,13 @@
         return anyYes ? "Sí" : "No";
       }
 
+      function formatFechaHora(iso) {
+        if (!iso) return "Sin guardado";
+        const d = new Date(iso);
+        if (isNaN(d.getTime())) return "Sin guardado";
+        return d.toLocaleString("es-ES");
+      }
+
       // ========= Componente principal =========
 
       function App() {
@@ -293,6 +312,27 @@
         const [expandedStoreId, setExpandedStoreId] = useState(null);
         const [dashboardStoreId, setDashboardStoreId] = useState(null);
         const [showCarga, setShowCarga] = useState(false);
+        const [lastSavedAt, setLastSavedAt] = useState(null);
+
+        // Carga inicial desde "nube" (localStorage)
+        useEffect(() => {
+          try {
+            const raw = localStorage.getItem("seguimientoAudioV1");
+            if (!raw) return;
+            const parsed = JSON.parse(raw);
+            if (parsed.stores) {
+              const normalizedStores = parsed.stores.map((s, idx) => ({
+                ...s,
+                id: idx + 1,
+                centroRegional: normalizarDelegado(s.centroRegional || ""),
+              }));
+              setStores(normalizedStores);
+            }
+            if (parsed.lastSavedAt) setLastSavedAt(parsed.lastSavedAt);
+          } catch (e) {
+            console.error("Error al cargar de la nube/localStorage", e);
+          }
+        }, []);
 
         function handlePin() {
           if (pin.trim().toUpperCase() === "AR4321") setAuthorized(true);
@@ -316,6 +356,7 @@
               centroRegional = "",
             ] = parts;
             const provinciaInferida = inferProvincia(centro, provincia);
+            const delegadoNormalizado = normalizarDelegado(centroRegional);
             return {
               id: index + 1,
               raw,
@@ -324,7 +365,7 @@
               centro,
               provincia: provinciaInferida,
               correo,
-              centroRegional,
+              centroRegional: delegadoNormalizado,
               region: "",
               responsableAudio: "",
               centroAAR: "",
@@ -335,6 +376,137 @@
           setStores(newStores);
           setExpandedStoreId(null);
           setDashboardStoreId(null);
+        }
+
+        // Actualización de campos
+        function updateStoreField(id, field, value) {
+          setStores((prev) =>
+            prev.map((store) =>
+              store.id === id ? { ...store, [field]: value } : store
+            )
+          );
+        }
+
+        function updateVisitField(storeId, visitId, field, value) {
+          setStores((prev) =>
+            prev.map((store) => {
+              if (store.id !== storeId) return store;
+              return {
+                ...store,
+                visitas: store.visitas.map((visit) =>
+                  visit.id === visitId ? { ...visit, [field]: value } : visit
+                ),
+              };
+            })
+          );
+        }
+
+        // Leer Excel y extraer checklist % y HIT
+        function handleChecklistFileChange(storeId, visitId, event) {
+          const file = event.target.files?.[0];
+          if (!file) return;
+
+          // guardo nombre de archivo
+          updateVisitField(storeId, visitId, "excelName", file.name);
+
+          const reader = new FileReader();
+
+          reader.onload = (ev) => {
+            try {
+              const data = ev.target.result;
+              const isExcel =
+                file.name.toLowerCase().endsWith(".xlsx") ||
+                file.name.toLowerCase().endsWith(".xls");
+
+              if (isExcel && window.XLSX) {
+                const wb = XLSX.read(data, { type: "array" });
+                const sheetName = wb.SheetNames[0];
+                const sheet = wb.Sheets[sheetName];
+                const csv = XLSX.utils.sheet_to_csv(sheet);
+                parseTextForChecklistAndHit(csv);
+              } else {
+                const text =
+                  typeof data === "string"
+                    ? data
+                    : new TextDecoder("utf-8").decode(data);
+                parseTextForChecklistAndHit(text);
+              }
+            } catch (e) {
+              console.error("Error leyendo Excel de checklist", e);
+            }
+          };
+
+          const isExcel =
+            file.name.toLowerCase().endsWith(".xlsx") ||
+            file.name.toLowerCase().endsWith(".xls");
+          if (isExcel) {
+            reader.readAsArrayBuffer(file);
+          } else {
+            reader.readAsText(file);
+          }
+
+          function parseTextForChecklistAndHit(text) {
+            if (!text) return;
+
+            // Buscar "capacitacion ..." + porcentaje
+            const reCap =
+              /capacitaci[oó]n[^0-9%]{0,40}(\d{1,3})\s*%/i;
+            const mCap = text.match(reCap);
+            if (mCap) {
+              const num = Number(mCap[1]);
+              if (!isNaN(num)) {
+                updateVisitField(storeId, visitId, "checklist", num);
+              }
+            }
+
+            // Buscar HIT SI / NO
+            const reHit = /hit[^a-zA-Z0-9]{0,15}(s[ií]|no)/i;
+            const mHit = text.match(reHit);
+            if (mHit) {
+              const val = mHit[1].toLowerCase().startsWith("s")
+                ? "Sí"
+                : "No";
+              updateVisitField(storeId, visitId, "hit", val);
+            }
+          }
+        }
+
+        // Guardar / cargar en "nube" (localStorage)
+        function saveToCloud() {
+          try {
+            const payload = {
+              stores,
+              lastSavedAt: new Date().toISOString(),
+            };
+            localStorage.setItem(
+              "seguimientoAudioV1",
+              JSON.stringify(payload)
+            );
+            setLastSavedAt(payload.lastSavedAt);
+          } catch (e) {
+            console.error("Error al guardar en nube/localStorage", e);
+          }
+        }
+
+        function loadFromCloud() {
+          try {
+            const raw = localStorage.getItem("seguimientoAudioV1");
+            if (!raw) return;
+            const parsed = JSON.parse(raw);
+            if (parsed.stores) {
+              const normalizedStores = parsed.stores.map((s, idx) => ({
+                ...s,
+                id: idx + 1,
+                centroRegional: normalizarDelegado(s.centroRegional || ""),
+              }));
+              setStores(normalizedStores);
+              setExpandedStoreId(null);
+              setDashboardStoreId(null);
+            }
+            if (parsed.lastSavedAt) setLastSavedAt(parsed.lastSavedAt);
+          } catch (e) {
+            console.error("Error al leer de nube/localStorage", e);
+          }
         }
 
         // Filtro de centros
@@ -411,29 +583,6 @@
         const opcionesRespAudio = getUniqueSorted(
           stores.map((s) => s.responsableAudio)
         );
-
-        // Actualización de campos
-        function updateStoreField(id, field, value) {
-          setStores((prev) =>
-            prev.map((store) =>
-              store.id === id ? { ...store, [field]: value } : store
-            )
-          );
-        }
-
-        function updateVisitField(storeId, visitId, field, value) {
-          setStores((prev) =>
-            prev.map((store) => {
-              if (store.id !== storeId) return store;
-              return {
-                ...store,
-                visitas: store.visitas.map((visit) =>
-                  visit.id === visitId ? { ...visit, [field]: value } : visit
-                ),
-              };
-            })
-          );
-        }
 
         // ========= Métricas globales (cuenta visitas por Excel adjunto) =========
         const allVisits = stores.flatMap((s) => s.visitas);
@@ -526,9 +675,28 @@
                       Seguimiento de procesos de Audio
                     </h1>
                   </div>
-                  <button className="bg-white text-red-600 px-4 py-2 rounded-xl shadow font-semibold">
-                    Guardar
-                  </button>
+                  <div className="flex flex-col items-end gap-1">
+                    <div className="flex gap-2">
+                      <button
+                        onClick={saveToCloud}
+                        className="bg-white text-red-600 px-3 py-1 rounded-xl shadow text-xs font-semibold"
+                      >
+                        Guardar en nube
+                      </button>
+                      <button
+                        onClick={loadFromCloud}
+                        className="bg-red-500 text-white px-3 py-1 rounded-xl shadow text-xs font-semibold border border-white/40"
+                      >
+                        Actualizar desde nube
+                      </button>
+                    </div>
+                    <p className="text-[10px] text-white/80">
+                      Última actualización:{" "}
+                      <span className="font-semibold">
+                        {formatFechaHora(lastSavedAt)}
+                      </span>
+                    </p>
+                  </div>
                 </header>
 
                 {/* MAPA CHECKLIST + DASHBOARD */}
@@ -938,6 +1106,7 @@
                         <table className="w-full text-[11px] border-collapse">
                           <thead>
                             <tr className="bg-gray-50 border-b">
+                              <th className="text-left px-2 py-2">Nº</th>
                               <th className="text-left px-2 py-2">Código</th>
                               <th className="text-left px-2 py-2">
                                 Propietario
@@ -971,7 +1140,7 @@
                             </tr>
                           </thead>
                           <tbody>
-                            {filteredStores.map((store) => {
+                            {filteredStores.map((store, index) => {
                               const visitasConExcel = store.visitas.filter(
                                 (v) => v.excelName && v.excelName !== ""
                               );
@@ -987,6 +1156,9 @@
                               return (
                                 <React.Fragment key={store.id}>
                                   <tr className="border-b hover:bg-gray-50 align-top">
+                                    <td className="px-2 py-1">
+                                      {index + 1}
+                                    </td>
                                     <td className="px-2 py-1">
                                       <span className="font-semibold">
                                         {store.codigo || "-"}
@@ -1090,7 +1262,7 @@
                                   {isExpanded && (
                                     <tr className="bg-gray-50 border-b">
                                       <td
-                                        colSpan={12}
+                                        colSpan={13}
                                         className="px-3 py-3"
                                       >
                                         <div className="text-[11px]">
@@ -1159,18 +1331,13 @@
                                                     type="file"
                                                     accept=".xlsx,.xls,.csv"
                                                     className="hidden"
-                                                    onChange={(e) => {
-                                                      const file =
-                                                        e.target.files?.[0];
-                                                      if (file) {
-                                                        updateVisitField(
-                                                          store.id,
-                                                          visit.id,
-                                                          "excelName",
-                                                          file.name
-                                                        );
-                                                      }
-                                                    }}
+                                                    onChange={(e) =>
+                                                      handleChecklistFileChange(
+                                                        store.id,
+                                                        visit.id,
+                                                        e
+                                                      )
+                                                    }
                                                   />
                                                 </label>
                                                 <p className="text-[10px] text-gray-500 mb-1 truncate">
@@ -1275,6 +1442,14 @@
                                             que el dashboard global calcule
                                             medias y % de forma automática.
                                           </p>
+                                          <button
+                                            className="mt-3 text-[11px] px-3 py-1 rounded-full bg-red-600 text-white font-semibold"
+                                            onClick={() =>
+                                              setExpandedStoreId(null)
+                                            }
+                                          >
+                                            Guardar visitas de este centro
+                                          </button>
                                         </div>
                                       </td>
                                     </tr>
