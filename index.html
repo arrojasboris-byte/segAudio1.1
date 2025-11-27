@@ -164,6 +164,8 @@
           hit: "",
           checklist: null,
           centroAAR: "",
+          // % por etapa del checklist (HOLA, SOY ÚNICO, etc.)
+          stagePercents: null,
         }));
       }
 
@@ -303,6 +305,84 @@
         return "No";
       }
 
+      // Lee la fila de porcentajes por etapa desde el Excel
+      function extractStagePercentsFromRows(rows) {
+        if (!rows || !rows.length) return null;
+
+        // 1) Buscar fila que contenga un texto tipo "% de consecución / aplicación"
+        let percentRow = null;
+        for (let i = 0; i < rows.length; i++) {
+          const row = rows[i];
+          if (
+            row &&
+            row.some(
+              (cell) =>
+                typeof cell === "string" &&
+                /%.*(consecuci[oó]n|aplicaci[oó]n)/i.test(cell)
+            )
+          ) {
+            percentRow = row;
+            break;
+          }
+        }
+
+        // 2) Si no se encuentra, mirar las últimas filas en busca de muchas celdas con "%"
+        if (!percentRow) {
+          const start = Math.max(0, rows.length - 8);
+          for (let i = start; i < rows.length; i++) {
+            const row = rows[i];
+            if (
+              row &&
+              row.filter(
+                (cell) =>
+                  typeof cell === "string" && cell.includes("%")
+              ).length >= 3
+            ) {
+              percentRow = row;
+              break;
+            }
+          }
+        }
+
+        if (!percentRow) return null;
+
+        const numericValues = [];
+
+        for (let j = 0; j < percentRow.length; j++) {
+          const cell = percentRow[j];
+          if (cell === null || cell === undefined || cell === "") continue;
+
+          if (typeof cell === "number") {
+            let val = cell;
+            if (val <= 1) val = val * 100;
+            if (val >= 0 && val <= 100) numericValues.push(val);
+          } else if (typeof cell === "string") {
+            // Buscar número dentro del texto
+            const m = cell.replace(",", ".").match(/(\d{1,3}(?:\.\d+)?)/);
+            if (m) {
+              let val = parseFloat(m[1]);
+              if (val <= 1) val = val * 100;
+              if (val >= 0 && val <= 100) numericValues.push(val);
+            }
+          }
+        }
+
+        if (numericValues.length === 0) return null;
+
+        const stagePercents = {};
+        CHECKLIST.forEach((stage, idx) => {
+          stagePercents[stage.etapa] =
+            idx < numericValues.length ? numericValues[idx] : null;
+        });
+
+        const globalPercent =
+          numericValues.length > CHECKLIST.length
+            ? numericValues[numericValues.length - 1]
+            : numericValues[numericValues.length - 1];
+
+        return { stagePercents, globalPercent };
+      }
+
       // ============ COMPONENTE PRINCIPAL ============
 
       function App() {
@@ -327,7 +407,6 @@
         const [showCarga, setShowCarga] = useState(false);
         const [lastSavedAt, setLastSavedAt] = useState(null);
 
-        // Carga inicial desde "nube" (localStorage)
         useEffect(() => {
           try {
             const raw = localStorage.getItem("seguimientoAudioV1");
@@ -358,7 +437,6 @@
             .map((line) => line.trim())
             .filter(Boolean);
 
-          // Saltar cabecera típica
           if (
             lines.length > 0 &&
             lines[0].toUpperCase().includes("CODIGO") &&
@@ -422,7 +500,6 @@
           );
         }
 
-        // Leer Excel de checklist para sacar % final + HIT
         function handleChecklistFileChange(storeId, visitId, event) {
           const file = event.target.files?.[0];
           if (!file) return;
@@ -430,77 +507,91 @@
           updateVisitField(storeId, visitId, "excelName", file.name);
 
           const reader = new FileReader();
+          const isExcel =
+            file.name.toLowerCase().endsWith(".xlsx") ||
+            file.name.toLowerCase().endsWith(".xls");
 
           reader.onload = (ev) => {
             try {
               const data = ev.target.result;
-              const isExcel =
-                file.name.toLowerCase().endsWith(".xlsx") ||
-                file.name.toLowerCase().endsWith(".xls");
 
               if (isExcel && window.XLSX) {
                 const wb = XLSX.read(data, { type: "array" });
                 const sheetName = wb.SheetNames[0];
                 const sheet = wb.Sheets[sheetName];
+
+                const rows = XLSX.utils.sheet_to_json(sheet, {
+                  header: 1,
+                  raw: true,
+                });
                 const csv = XLSX.utils.sheet_to_csv(sheet);
-                parseTextForChecklistAndHit(csv);
+
+                parseFromTableAndText(rows, csv);
               } else {
                 const text =
                   typeof data === "string"
                     ? data
                     : new TextDecoder("utf-8").decode(data);
-                parseTextForChecklistAndHit(text);
+                parseFromTableAndText(null, text);
               }
             } catch (e) {
               console.error("Error leyendo Excel de checklist", e);
             }
           };
 
-          const isExcel =
-            file.name.toLowerCase().endsWith(".xlsx") ||
-            file.name.toLowerCase().endsWith(".xls");
           if (isExcel) {
             reader.readAsArrayBuffer(file);
           } else {
             reader.readAsText(file);
           }
 
-          function parseTextForChecklistAndHit(text) {
-            if (!text) return;
-
-            // 1º: patrón específico CAPACITACIÓN INICIAL / 6 MESES
-            let num = null;
-            const reCapDetallado =
-              /capacitaci[oó]n[^0-9%]{0,40}(inicial|6\s*meses)[^0-9%]{0,40}(\d{1,3})\s*%/i;
-            const mDet = text.match(reCapDetallado);
-            if (mDet) {
-              const n = Number(mDet[2]);
-              if (!isNaN(n)) num = n;
-            }
-
-            // 2º: si no encuentra, buscar cualquier "capacitacion ... XX%"
-            if (num === null) {
-              const reCapGenerico =
-                /capacitaci[oó]n[^0-9%]{0,80}(\d{1,3})\s*%/i;
-              const mGen = text.match(reCapGenerico);
-              if (mGen) {
-                const n = Number(mGen[1]);
-                if (!isNaN(n)) num = n;
+          function parseFromTableAndText(rows, text) {
+            // 1) Intentar sacar % por etapa y global desde la tabla
+            if (rows && rows.length) {
+              const stageInfo = extractStagePercentsFromRows(rows);
+              if (stageInfo) {
+                const { stagePercents, globalPercent } = stageInfo;
+                updateVisitField(storeId, visitId, "stagePercents", stagePercents);
+                if (typeof globalPercent === "number") {
+                  updateVisitField(storeId, visitId, "checklist", globalPercent);
+                }
               }
             }
 
-            if (num !== null) {
-              updateVisitField(storeId, visitId, "checklist", num);
-            }
+            // 2) Como respaldo, buscar un % global en el texto (por si falla lo anterior)
+            if (text) {
+              let num = null;
 
-            // HIT Sí / No
-            const reHit = /hit[^a-zA-Z0-9]{0,15}(s[ií]|no)/i;
-            const mHit = text.match(reHit);
-            if (mHit) {
-              const val = mHit[1].toLowerCase().startsWith("s")
-                ? "Sí"
-                : "No";
-              updateVisitField(storeId, visitId, "hit", val);
+              const reCapDetallado =
+                /capacitaci[oó]n[^0-9%]{0,40}(inicial|6\s*meses)[^0-9%]{0,40}(\d{1,3})\s*%/i;
+              const mDet = text.match(reCapDetallado);
+              if (mDet) {
+                const n = Number(mDet[2]);
+                if (!isNaN(n)) num = n;
+              }
+
+              if (num === null) {
+                const reCapGenerico =
+                  /capacitaci[oó]n[^0-9%]{0,80}(\d{1,3})\s*%/i;
+                const mGen = text.match(reCapGenerico);
+                if (mGen) {
+                  const n = Number(mGen[1]);
+                  if (!isNaN(n)) num = n;
+                }
+              }
+
+              if (num !== null) {
+                updateVisitField(storeId, visitId, "checklist", num);
+              }
+
+              const reHit = /hit[^a-zA-Z0-9]{0,15}(s[ií]|no)/i;
+              const mHit = text.match(reHit);
+              if (mHit) {
+                const val = mHit[1].toLowerCase().startsWith("s")
+                  ? "Sí"
+                  : "No";
+                updateVisitField(storeId, visitId, "hit", val);
+              }
             }
           }
         }
@@ -605,7 +696,6 @@
           return true;
         });
 
-        // Orden por delegado y luego por centro
         const sortedFilteredStores = [...filteredStores].sort((a, b) => {
           const da = (a.centroRegional || "").toLowerCase();
           const db = (b.centroRegional || "").toLowerCase();
@@ -659,6 +749,27 @@
           (v) => v.fecha && !isValidFecha(v.fecha)
         );
 
+        // % por etapa GLOBAL (media de todas las visitas que tienen stagePercents)
+        const stageKeys = CHECKLIST.map((s) => s.etapa);
+        const stageStatsGlobal = {};
+        stageKeys.forEach((etapa) => {
+          const vals = [];
+          stores.forEach((store) => {
+            store.visitas.forEach((v) => {
+              if (
+                v.stagePercents &&
+                typeof v.stagePercents[etapa] === "number"
+              ) {
+                vals.push(v.stagePercents[etapa]);
+              }
+            });
+          });
+          stageStatsGlobal[etapa] =
+            vals.length > 0
+              ? vals.reduce((a, b) => a + b, 0) / vals.length
+              : null;
+        });
+
         // Dashboard por centro
         const dashboardStore =
           stores.find((s) => s.id === dashboardStoreId) || stores[0] || null;
@@ -666,6 +777,7 @@
         let dashVisitasConExcel = [];
         let dashChecklistMedio = null;
         let dashAplicaHit = null;
+        const stageStatsStore = {};
 
         if (dashboardStore) {
           dashVisitasConExcel = dashboardStore.visitas.filter(
@@ -675,9 +787,24 @@
             dashVisitasConExcel.map((v) => v.checklist)
           );
           dashAplicaHit = aplicaHitTexto(dashVisitasConExcel);
+
+          stageKeys.forEach((etapa) => {
+            const vals = [];
+            dashboardStore.visitas.forEach((v) => {
+              if (
+                v.stagePercents &&
+                typeof v.stagePercents[etapa] === "number"
+              ) {
+                vals.push(v.stagePercents[etapa]);
+              }
+            });
+            stageStatsStore[etapa] =
+              vals.length > 0
+                ? vals.reduce((a, b) => a + b, 0) / vals.length
+                : null;
+          });
         }
 
-        // ------------ RENDER ------------
         return (
           <div className="min-h-screen bg-gray-100 font-sans">
             {!authorized ? (
@@ -848,6 +975,38 @@
                               )}
                             </p>
                           </div>
+
+                          {/* Checklist por etapa global */}
+                          <div className="mt-3">
+                            <p className="text-[10px] font-semibold mb-1">
+                              Checklist por etapa (media global)
+                            </p>
+                            <div className="flex flex-wrap gap-1">
+                              {CHECKLIST.map((stage) => {
+                                const val =
+                                  stageStatsGlobal[stage.etapa] ?? null;
+                                let cls =
+                                  "bg-gray-100 text-gray-700 border border-gray-200";
+                                if (val !== null) {
+                                  cls =
+                                    val >= 85
+                                      ? "bg-green-100 text-green-800 border border-green-200"
+                                      : "bg-red-100 text-red-700 border border-red-200";
+                                }
+                                return (
+                                  <span
+                                    key={stage.etapa}
+                                    className={`px-2 py-0.5 rounded-full text-[10px] ${cls}`}
+                                  >
+                                    {stage.etapa}:{" "}
+                                    {val !== null
+                                      ? `${val.toFixed(0)}%`
+                                      : "--"}
+                                  </span>
+                                );
+                              })}
+                            </div>
+                          </div>
                         </div>
 
                         {/* Por centro */}
@@ -901,42 +1060,76 @@
                             </div>
                           </div>
                           {dashboardStore ? (
-                            <div className="text-[10px] space-y-1">
-                              <p className="font-semibold">
-                                {dashboardStore.centro ||
-                                  dashboardStore.codigo}
-                              </p>
-                              <p>
-                                Provincia:{" "}
-                                <span
-                                  className="inline-block px-2 py-0.5 rounded-full"
-                                  style={delegadoColor(
-                                    dashboardStore.centroRegional
-                                  )}
-                                >
-                                  {dashboardStore.provincia ||
-                                    "Provincia sin definir"}
-                                </span>
-                              </p>
-                              <p>
-                                Nº visitas (Excels adjuntos):{" "}
-                                <strong>
-                                  {dashVisitasConExcel.length}
-                                </strong>
-                              </p>
-                              <p>
-                                % checklist medio:{" "}
-                                {dashChecklistMedio !== null
-                                  ? `${dashChecklistMedio.toFixed(0)}%`
-                                  : "-"}
-                              </p>
-                              <p>
-                                Aplica HIT:{" "}
-                                <strong>
-                                  {dashAplicaHit ? dashAplicaHit : "-"}
-                                </strong>
-                              </p>
-                            </div>
+                            <>
+                              <div className="text-[10px] space-y-1">
+                                <p className="font-semibold">
+                                  {dashboardStore.centro ||
+                                    dashboardStore.codigo}
+                                </p>
+                                <p>
+                                  Provincia:{" "}
+                                  <span
+                                    className="inline-block px-2 py-0.5 rounded-full"
+                                    style={delegadoColor(
+                                      dashboardStore.centroRegional
+                                    )}
+                                  >
+                                    {dashboardStore.provincia ||
+                                      "Provincia sin definir"}
+                                  </span>
+                                </p>
+                                <p>
+                                  Nº visitas (Excels adjuntos):{" "}
+                                  <strong>
+                                    {dashVisitasConExcel.length}
+                                  </strong>
+                                </p>
+                                <p>
+                                  % checklist medio:{" "}
+                                  {dashChecklistMedio !== null
+                                    ? `${dashChecklistMedio.toFixed(0)}%`
+                                    : "-"}
+                                </p>
+                                <p>
+                                  Aplica HIT:{" "}
+                                  <strong>
+                                    {dashAplicaHit ? dashAplicaHit : "-"}
+                                  </strong>
+                                </p>
+                              </div>
+
+                              {/* Checklist por etapa para el centro */}
+                              <div className="mt-3">
+                                <p className="text-[10px] font-semibold mb-1">
+                                  Checklist por etapa (centro)
+                                </p>
+                                <div className="flex flex-wrap gap-1">
+                                  {CHECKLIST.map((stage) => {
+                                    const val =
+                                      stageStatsStore[stage.etapa] ?? null;
+                                    let cls =
+                                      "bg-gray-100 text-gray-700 border border-gray-200";
+                                    if (val !== null) {
+                                      cls =
+                                        val >= 85
+                                          ? "bg-green-100 text-green-800 border border-green-200"
+                                          : "bg-red-100 text-red-700 border border-red-200";
+                                    }
+                                    return (
+                                      <span
+                                        key={stage.etapa}
+                                        className={`px-2 py-0.5 rounded-full text-[10px] ${cls}`}
+                                      >
+                                        {stage.etapa}:{" "}
+                                        {val !== null
+                                          ? `${val.toFixed(0)}%`
+                                          : "--"}
+                                      </span>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            </>
                           ) : (
                             <p className="text-[10px] text-gray-500">
                               Selecciona un centro en el desplegable para ver
@@ -1447,16 +1640,52 @@
                                                     </select>
                                                   </div>
                                                 </div>
+
+                                                {/* Opcional: mostrar % por etapa leídos del Excel */}
+                                                {visit.stagePercents && (
+                                                  <div className="mt-2">
+                                                    <p className="text-[10px] font-semibold mb-1">
+                                                      Checklist por etapa (esta
+                                                      visita)
+                                                    </p>
+                                                    <div className="flex flex-wrap gap-1">
+                                                      {CHECKLIST.map(
+                                                        (stage) => {
+                                                          const val =
+                                                            visit
+                                                              .stagePercents[
+                                                              stage.etapa
+                                                            ];
+                                                          if (
+                                                            val === null ||
+                                                            val === undefined
+                                                          )
+                                                            return null;
+                                                          return (
+                                                            <span
+                                                              key={stage.etapa}
+                                                              className="px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-700 border border-gray-200 text-[9px]"
+                                                            >
+                                                              {stage.etapa}:
+                                                              {" "}
+                                                              {val.toFixed(0)}%
+                                                            </span>
+                                                          );
+                                                        }
+                                                      )}
+                                                    </div>
+                                                  </div>
+                                                )}
                                               </div>
                                             ))}
                                           </div>
                                           <p className="text-[10px] text-gray-500">
                                             Indica las fechas, responsable,
                                             adjunta el Excel del checklist y
-                                            completa checklist %, HIT y Centro
-                                            AAR para que el dashboard global
-                                            calcule medias y % de forma
-                                            automática.
+                                            deja que la plataforma lea el %
+                                            global y por etapa. Puedes ajustar
+                                            manualmente Checklist %, HIT y
+                                            Centro AAR si es necesario.
                                           </p>
                                           <button
                                             className="mt-3 text-[11px] px-3 py-1 rounded-full bg-red-600 text-white font-semibold"
