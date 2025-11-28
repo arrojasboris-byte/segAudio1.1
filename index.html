@@ -177,7 +177,7 @@
       ];
 
       // =====================
-      // Tipos / modelos (JS simple)
+      // Utilidades / modelos
       // =====================
 
       function createEmptyVisits() {
@@ -187,9 +187,9 @@
           responsable: "",
           excelName: "",
           hit: "",
-          checklist: null, // % global procedente de F90
+          checklist: null,
           centroAAR: "",
-          stagePercents: null, // reservado para futuro por etapas
+          stagePercents: null,
         }));
       }
 
@@ -344,7 +344,9 @@
         const visitas = store.visitas || [];
         const valores = visitas
           .map((v) => v.centroAAR)
-          .filter((v) => v === "Sí" || v === "No" || v === "En formación");
+          .filter(
+            (v) => v === "Sí" || v === "No" || v === "En formación"
+          );
         if (valores.length === 0) return "";
         if (valores.includes("En formación")) return "En formación";
         if (valores.includes("Sí")) return "Sí";
@@ -384,7 +386,7 @@
         const [showCarga, setShowCarga] = useState(false);
         const [lastSavedAt, setLastSavedAt] = useState(null);
 
-        // datos de centros exclusivos (acciones, ventas, objetivos)
+        // datos de centros exclusivos (acciones, ventas, objetivos por mes)
         const [exclusiveData, setExclusiveData] = useState({});
         const [expandedExclusiveId, setExpandedExclusiveId] =
           useState(null);
@@ -484,6 +486,8 @@
           );
         }
 
+        // --------- CENTROS EXCLUSIVOS: datos de acciones ---------
+
         function ensureExclusiveEntry(storeId) {
           return (
             exclusiveData[storeId] || {
@@ -578,7 +582,6 @@
 
                 const sheet = wb.Sheets[sheetName];
 
-                // 1) Leer F90 -> % checklist global
                 let checklistF90 = null;
                 const cell = sheet["F90"];
                 if (cell && cell.v != null) {
@@ -1743,6 +1746,7 @@
                     </p>
                   ) : (
                     <>
+                      {/* Faldón resumen con acumulado y color rojo/verde */}
                       <div className="mb-4 text-[11px] bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3 flex flex-wrap gap-4 items-center">
                         <span>
                           Nº centros exclusivos:{" "}
@@ -1779,7 +1783,7 @@
                         >
                           <span className="w-2 h-2 rounded-full bg-current/70" />
                           <span>
-                            % resultado global:{" "}
+                            % resultado acumulado año:{" "}
                             {pctResultadoExcl !== null
                               ? `${pctResultadoExcl.toFixed(0)}%`
                               : "-"}
@@ -1914,206 +1918,251 @@
                                             {s.centro}
                                           </p>
                                           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-3">
-                                            {acciones.map((acc) => (
-                                              <div
-                                                key={acc.id}
-                                                className="border rounded-xl p-2 bg-white flex flex-col gap-2"
-                                              >
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                                  <div>
-                                                    <p className="text-[10px] mb-0.5">
-                                                      Acción
-                                                    </p>
-                                                    <select
-                                                      className="w-full border rounded px-2 py-1"
-                                                      value={acc.tipo}
-                                                      onChange={(e) =>
-                                                        updateExclusiveAction(
+                                            {acciones.map((acc) => {
+                                              const ventasNum =
+                                                Number(
+                                                  acc.ventasImporte || 0
+                                                ) || 0;
+                                              const objetivoNum =
+                                                Number(
+                                                  acc.objetivoImporte || 0
+                                                ) || 0;
+                                              const pctAcc =
+                                                objetivoNum > 0
+                                                  ? (ventasNum /
+                                                      objetivoNum) *
+                                                    100
+                                                  : null;
+                                              const resClass =
+                                                pctAcc === null
+                                                  ? "bg-gray-100 text-gray-700"
+                                                  : pctAcc >= 100
+                                                  ? "bg-green-100 text-green-800"
+                                                  : "bg-red-100 text-red-700";
+
+                                              return (
+                                                <div
+                                                  key={acc.id}
+                                                  className="border rounded-xl p-2 bg-white flex flex-col gap-2"
+                                                >
+                                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                                    <div>
+                                                      <p className="text-[10px] mb-0.5">
+                                                        Acción
+                                                      </p>
+                                                      <select
+                                                        className="w-full border rounded px-2 py-1"
+                                                        value={acc.tipo}
+                                                        onChange={(e) =>
+                                                          updateExclusiveAction(
+                                                            s.id,
+                                                            acc.id,
+                                                            "tipo",
+                                                            e.target.value
+                                                          )
+                                                        }
+                                                      >
+                                                        <option value="">
+                                                          Selecciona...
+                                                        </option>
+                                                        {ACTION_TYPES.map(
+                                                          (t) => (
+                                                            <option
+                                                              key={t}
+                                                              value={t}
+                                                            >
+                                                              {t}
+                                                            </option>
+                                                          )
+                                                        )}
+                                                      </select>
+                                                    </div>
+                                                    <div>
+                                                      <p className="text-[10px] mb-0.5">
+                                                        Fecha acción
+                                                      </p>
+                                                      <input
+                                                        type="date"
+                                                        className="w-full border rounded px-2 py-1"
+                                                        value={
+                                                          acc.fecha || ""
+                                                        }
+                                                        onChange={(e) =>
+                                                          updateExclusiveAction(
+                                                            s.id,
+                                                            acc.id,
+                                                            "fecha",
+                                                            e.target.value
+                                                          )
+                                                        }
+                                                      />
+                                                    </div>
+                                                  </div>
+
+                                                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                                    <div>
+                                                      <p className="text-[10px] mb-0.5">
+                                                        Derivaciones
+                                                      </p>
+                                                      <input
+                                                        type="number"
+                                                        min={0}
+                                                        className="w-full border rounded px-2 py-1"
+                                                        value={
+                                                          acc.derivaciones ||
+                                                          ""
+                                                        }
+                                                        onChange={(e) =>
+                                                          updateExclusiveAction(
+                                                            s.id,
+                                                            acc.id,
+                                                            "derivaciones",
+                                                            e.target.value
+                                                          )
+                                                        }
+                                                      />
+                                                    </div>
+
+                                                    <div>
+                                                      <p className="text-[10px] mb-0.5">
+                                                        Ventas mensuales
+                                                      </p>
+                                                      <div className="flex gap-1">
+                                                        <select
+                                                          className="border rounded px-1 py-1 text-[10px] flex-1"
+                                                          value={
+                                                            acc.ventasMes || ""
+                                                          }
+                                                          onChange={(e) =>
+                                                            updateExclusiveAction(
+                                                              s.id,
+                                                              acc.id,
+                                                              "ventasMes",
+                                                              e.target.value
+                                                            )
+                                                          }
+                                                        >
+                                                          <option value="">
+                                                            Mes
+                                                          </option>
+                                                          {EXCLUSIVE_MONTHS.map(
+                                                            (m) => (
+                                                              <option
+                                                                key={m.key}
+                                                                value={m.key}
+                                                              >
+                                                                {m.label}
+                                                              </option>
+                                                            )
+                                                          )}
+                                                        </select>
+                                                        <input
+                                                          type="number"
+                                                          min={0}
+                                                          className="border rounded px-1 py-1 w-24 text-right"
+                                                          value={
+                                                            acc.ventasImporte ||
+                                                            ""
+                                                          }
+                                                          onChange={(e) =>
+                                                            updateExclusiveAction(
+                                                              s.id,
+                                                              acc.id,
+                                                              "ventasImporte",
+                                                              e.target.value
+                                                            )
+                                                          }
+                                                        />
+                                                      </div>
+                                                    </div>
+
+                                                    <div>
+                                                      <p className="text-[10px] mb-0.5">
+                                                        Objetivo mensual
+                                                      </p>
+                                                      <div className="flex gap-1">
+                                                        <select
+                                                          className="border rounded px-1 py-1 text-[10px] flex-1"
+                                                          value={
+                                                            acc.objetivoMes ||
+                                                            ""
+                                                          }
+                                                          onChange={(e) =>
+                                                            updateExclusiveAction(
+                                                              s.id,
+                                                              acc.id,
+                                                              "objetivoMes",
+                                                              e.target.value
+                                                            )
+                                                          }
+                                                        >
+                                                          <option value="">
+                                                            Mes
+                                                          </option>
+                                                          {EXCLUSIVE_MONTHS.map(
+                                                            (m) => (
+                                                              <option
+                                                                key={m.key}
+                                                                value={m.key}
+                                                              >
+                                                                {m.label}
+                                                              </option>
+                                                            )
+                                                          )}
+                                                        </select>
+                                                        <input
+                                                          type="number"
+                                                          min={0}
+                                                          className="border rounded px-1 py-1 w-24 text-right"
+                                                          value={
+                                                            acc.objetivoImporte ||
+                                                            ""
+                                                          }
+                                                          onChange={(e) =>
+                                                            updateExclusiveAction(
+                                                              s.id,
+                                                              acc.id,
+                                                              "objetivoImporte",
+                                                              e.target.value
+                                                            )
+                                                          }
+                                                        />
+                                                      </div>
+                                                    </div>
+                                                  </div>
+
+                                                  <div className="flex items-center justify-between mt-1">
+                                                    <span
+                                                      className={
+                                                        "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] " +
+                                                        resClass
+                                                      }
+                                                    >
+                                                      <span className="w-2 h-2 rounded-full bg-current/70" />
+                                                      <span>
+                                                        Resultado % mes:{" "}
+                                                        {pctAcc === null
+                                                          ? "-"
+                                                          : `${pctAcc.toFixed(
+                                                              0
+                                                            )}%`}
+                                                      </span>
+                                                    </span>
+                                                    <button
+                                                      className="text-[10px] px-2 py-0.5 rounded-full border border-red-300 text-red-600 hover:bg-red-50"
+                                                      onClick={() =>
+                                                        removeExclusiveAction(
                                                           s.id,
-                                                          acc.id,
-                                                          "tipo",
-                                                          e.target.value
+                                                          acc.id
                                                         )
                                                       }
                                                     >
-                                                      <option value="">
-                                                        Selecciona...
-                                                      </option>
-                                                      {ACTION_TYPES.map(
-                                                        (t) => (
-                                                          <option
-                                                            key={t}
-                                                            value={t}
-                                                          >
-                                                            {t}
-                                                          </option>
-                                                        )
-                                                      )}
-                                                    </select>
-                                                  </div>
-                                                  <div>
-                                                    <p className="text-[10px] mb-0.5">
-                                                      Fecha acción
-                                                    </p>
-                                                    <input
-                                                      type="date"
-                                                      className="w-full border rounded px-2 py-1"
-                                                      value={acc.fecha || ""}
-                                                      onChange={(e) =>
-                                                        updateExclusiveAction(
-                                                          s.id,
-                                                          acc.id,
-                                                          "fecha",
-                                                          e.target.value
-                                                        )
-                                                      }
-                                                    />
+                                                      Eliminar
+                                                    </button>
                                                   </div>
                                                 </div>
-
-                                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                                                  <div>
-                                                    <p className="text-[10px] mb-0.5">
-                                                      Derivaciones
-                                                    </p>
-                                                    <input
-                                                      type="number"
-                                                      min={0}
-                                                      className="w-full border rounded px-2 py-1"
-                                                      value={
-                                                        acc.derivaciones || ""
-                                                      }
-                                                      onChange={(e) =>
-                                                        updateExclusiveAction(
-                                                          s.id,
-                                                          acc.id,
-                                                          "derivaciones",
-                                                          e.target.value
-                                                        )
-                                                      }
-                                                    />
-                                                  </div>
-
-                                                  <div>
-                                                    <p className="text-[10px] mb-0.5">
-                                                      Ventas mensuales
-                                                    </p>
-                                                    <div className="flex gap-1">
-                                                      <select
-                                                        className="border rounded px-1 py-1 text-[10px] flex-1"
-                                                        value={
-                                                          acc.ventasMes || ""
-                                                        }
-                                                        onChange={(e) =>
-                                                          updateExclusiveAction(
-                                                            s.id,
-                                                            acc.id,
-                                                            "ventasMes",
-                                                            e.target.value
-                                                          )
-                                                        }
-                                                      >
-                                                        <option value="">
-                                                          Mes
-                                                        </option>
-                                                        {EXCLUSIVE_MONTHS.map(
-                                                          (m) => (
-                                                            <option
-                                                              key={m.key}
-                                                              value={m.key}
-                                                            >
-                                                              {m.label}
-                                                            </option>
-                                                          )
-                                                        )}
-                                                      </select>
-                                                      <input
-                                                        type="number"
-                                                        min={0}
-                                                        className="border rounded px-1 py-1 w-24 text-right"
-                                                        value={
-                                                          acc.ventasImporte ||
-                                                          ""
-                                                        }
-                                                        onChange={(e) =>
-                                                          updateExclusiveAction(
-                                                            s.id,
-                                                            acc.id,
-                                                            "ventasImporte",
-                                                            e.target.value
-                                                          )
-                                                        }
-                                                      />
-                                                    </div>
-                                                  </div>
-
-                                                  <div>
-                                                    <p className="text-[10px] mb-0.5">
-                                                      Objetivo mensual
-                                                    </p>
-                                                    <div className="flex gap-1">
-                                                      <select
-                                                        className="border rounded px-1 py-1 text-[10px] flex-1"
-                                                        value={
-                                                          acc.objetivoMes || ""
-                                                        }
-                                                        onChange={(e) =>
-                                                          updateExclusiveAction(
-                                                            s.id,
-                                                            acc.id,
-                                                            "objetivoMes",
-                                                            e.target.value
-                                                          )
-                                                        }
-                                                      >
-                                                        <option value="">
-                                                          Mes
-                                                        </option>
-                                                        {EXCLUSIVE_MONTHS.map(
-                                                          (m) => (
-                                                            <option
-                                                              key={m.key}
-                                                              value={m.key}
-                                                            >
-                                                              {m.label}
-                                                            </option>
-                                                          )
-                                                        )}
-                                                      </select>
-                                                      <input
-                                                        type="number"
-                                                        min={0}
-                                                        className="border rounded px-1 py-1 w-24 text-right"
-                                                        value={
-                                                          acc.objetivoImporte ||
-                                                          ""
-                                                        }
-                                                        onChange={(e) =>
-                                                          updateExclusiveAction(
-                                                            s.id,
-                                                            acc.id,
-                                                            "objetivoImporte",
-                                                            e.target.value
-                                                          )
-                                                        }
-                                                      />
-                                                    </div>
-                                                  </div>
-                                                </div>
-
-                                                <button
-                                                  className="self-end mt-1 text-[10px] px-2 py-0.5 rounded-full border border-red-300 text-red-600 hover:bg-red-50"
-                                                  onClick={() =>
-                                                    removeExclusiveAction(
-                                                      s.id,
-                                                      acc.id
-                                                    )
-                                                  }
-                                                >
-                                                  Eliminar acción
-                                                </button>
-                                              </div>
-                                            ))}
+                                              );
+                                            })}
                                           </div>
 
                                           <button
