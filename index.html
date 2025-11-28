@@ -14,7 +14,7 @@
       src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
       crossorigin
     ></script>
-    <!-- Babel para interpretar JSX en el navegador -->
+    <!-- Babel para JSX en el navegador -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <!-- XLSX para leer Excels -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -27,7 +27,7 @@
       const { useState, useEffect } = React;
 
       /*************************************************
-       * 1. Definición del checklist (solo visual)
+       * 1. Checklist (solo visual)
        *************************************************/
       const CHECKLIST = [
         {
@@ -142,6 +142,19 @@
       /*************************************************
        * 2. Utilidades y modelos
        *************************************************/
+
+      const ACCION_OPTIONS = [
+        "STAND",
+        "MAILING",
+        "CASHBACK",
+        "AZAFATA CALLE",
+        "RULETA",
+        "ACCION COLECTIVO",
+        "CALL CENTER",
+        "ACCION DERIVACION TIENDA",
+        "DERIVACIÓN COLECTIVO",
+      ];
+
       function createEmptyVisits() {
         return [1, 2, 3, 4].map((id) => ({
           id,
@@ -149,9 +162,19 @@
           responsable: "",
           excelName: "",
           hit: "",
-          checklist: null, // % de F90
+          checklist: null, // % F90
           centroAAR: "",
         }));
+      }
+
+      function createEmptyAccion() {
+        return {
+          tipo: "",
+          fecha: "",
+          derivaciones: null,
+          ventas: null,
+          objetivo: null,
+        };
       }
 
       function normalizarDelegado(nombre) {
@@ -172,7 +195,7 @@
           .replace(/[\u0300-\u036f]/g, "");
       }
 
-      // *** LISTA DE PALABRAS CLAVE PARA CENTROS EXCLUSIVOS ***
+      // Palabras clave para centros exclusivos
       const EXCLUSIVE_KEYWORDS = [
         "exclusivo",
         "fuenlabrada paseo de la estacion",
@@ -190,9 +213,7 @@
         const centroNorm = normalizeBasic(store.centro);
         const propNorm = normalizeBasic(store.propietario);
         const combined = centroNorm + " " + propNorm;
-        return EXCLUSIVE_KEYWORDS.some((kw) =>
-          combined.includes(kw)
-        );
+        return EXCLUSIVE_KEYWORDS.some((kw) => combined.includes(kw));
       }
 
       function media(valores) {
@@ -295,7 +316,6 @@
         return v ? v.responsable : "";
       }
 
-      // AAR agregado: En formación > Sí > No
       function deriveCentroAAR(store) {
         const vals = (store.visitas || [])
           .map((v) => v.centroAAR)
@@ -308,6 +328,30 @@
         if (vals.includes("Sí")) return "Sí";
         if (vals.includes("No")) return "No";
         return "";
+      }
+
+      function sumVentas(hist) {
+        if (!Array.isArray(hist)) return 0;
+        return hist.reduce(
+          (acc, a) =>
+            acc +
+            (typeof a.ventas === "number" && !isNaN(a.ventas)
+              ? a.ventas
+              : 0),
+          0
+        );
+      }
+
+      function sumObjetivo(hist) {
+        if (!Array.isArray(hist)) return 0;
+        return hist.reduce(
+          (acc, a) =>
+            acc +
+            (typeof a.objetivo === "number" && !isNaN(a.objetivo)
+              ? a.objetivo
+              : 0),
+          0
+        );
       }
 
       /*************************************************
@@ -335,42 +379,81 @@
         const [fRespAudio, setFRespAudio] = useState("");
         const [fCentroAAR, setFCentroAAR] = useState("");
 
-        // Carga desde "nube" (localStorage)
+        // Carga desde localStorage
         useEffect(() => {
           try {
             const raw = localStorage.getItem("seguimientoAudioV1");
             if (!raw) return;
             const parsed = JSON.parse(raw);
             if (parsed.stores) {
-              setStores(
-                parsed.stores.map((s, idx) => ({
+              const normalized = parsed.stores.map((s, idx) => {
+                // compatibilidad antigua
+                let accionesHistorial = Array.isArray(
+                  s.accionesHistorial
+                )
+                  ? s.accionesHistorial.map((a) => ({
+                      tipo: a.tipo || "",
+                      fecha: a.fecha || "",
+                      derivaciones:
+                        typeof a.derivaciones === "number"
+                          ? a.derivaciones
+                          : a.derivaciones
+                          ? Number(a.derivaciones) || null
+                          : null,
+                      ventas:
+                        typeof a.ventas === "number"
+                          ? a.ventas
+                          : a.ventas
+                          ? Number(a.ventas) || null
+                          : null,
+                      objetivo:
+                        typeof a.objetivo === "number"
+                          ? a.objetivo
+                          : a.objetivo
+                          ? Number(a.objetivo) || null
+                          : null,
+                    }))
+                  : null;
+
+                // si veníamos del modelo antiguo (campos sueltos)
+                if (!accionesHistorial) {
+                  const anyOld =
+                    s.acciones ||
+                    s.fechaAcciones ||
+                    s.derivaciones ||
+                    s.ventasMensuales ||
+                    s.objetivoMensual;
+                  if (anyOld) {
+                    accionesHistorial = [
+                      {
+                        tipo: s.acciones || "",
+                        fecha: s.fechaAcciones || "",
+                        derivaciones: s.derivaciones
+                          ? Number(s.derivaciones) || null
+                          : null,
+                        ventas: s.ventasMensuales
+                          ? Number(s.ventasMensuales) || null
+                          : null,
+                        objetivo: s.objetivoMensual
+                          ? Number(s.objetivoMensual) || null
+                          : null,
+                      },
+                    ];
+                  } else {
+                    accionesHistorial = [createEmptyAccion()];
+                  }
+                }
+
+                return {
                   ...s,
                   id: idx + 1,
                   centroRegional: normalizarDelegado(
                     s.centroRegional || ""
                   ),
-                  acciones: s.acciones || "",
-                  fechaAcciones: s.fechaAcciones || "",
-                  derivaciones:
-                    typeof s.derivaciones === "number"
-                      ? s.derivaciones
-                      : s.derivaciones
-                      ? Number(s.derivaciones) || null
-                      : null,
-                  ventasMensuales:
-                    typeof s.ventasMensuales === "number"
-                      ? s.ventasMensuales
-                      : s.ventasMensuales
-                      ? Number(s.ventasMensuales) || null
-                      : null,
-                  objetivoMensual:
-                    typeof s.objetivoMensual === "number"
-                      ? s.objetivoMensual
-                      : s.objetivoMensual
-                      ? Number(s.objetivoMensual) || null
-                      : null,
-                }))
-              );
+                  accionesHistorial,
+                };
+              });
+              setStores(normalized);
             }
             if (parsed.lastSavedAt) setLastSavedAt(parsed.lastSavedAt);
           } catch (e) {
@@ -384,7 +467,7 @@
           }
         }
 
-        /*********** Lectura listado de centros (pegar desde Excel) ***********/
+        /*********** Listado de centros pegado desde Excel ***********/
         function handleApplyStores() {
           if (!storesInput.trim()) return;
           let lines = storesInput
@@ -392,7 +475,6 @@
             .map((l) => l.trim())
             .filter(Boolean);
 
-          // Quitar cabecera si viene
           if (
             lines.length > 0 &&
             lines[0].toUpperCase().includes("CODIGO") &&
@@ -425,12 +507,7 @@
               responsableAudio: "",
               centroAAR: "",
               visitas: createEmptyVisits(),
-              // campos centros exclusivos
-              acciones: "",
-              fechaAcciones: "",
-              derivaciones: null,
-              ventasMensuales: null,
-              objetivoMensual: null,
+              accionesHistorial: [createEmptyAccion()],
             };
           });
 
@@ -462,6 +539,35 @@
           );
         }
 
+        function updateAccionField(storeId, index, field, value) {
+          setStores((prev) =>
+            prev.map((s) => {
+              if (s.id !== storeId) return s;
+              const acciones = s.accionesHistorial || [];
+              const updated = acciones.map((a, i) =>
+                i === index ? { ...a, [field]: value } : a
+              );
+              return { ...s, accionesHistorial: updated };
+            })
+          );
+        }
+
+        function addAccion(storeId) {
+          setStores((prev) =>
+            prev.map((s) =>
+              s.id === storeId
+                ? {
+                    ...s,
+                    accionesHistorial: [
+                      ...(s.accionesHistorial || []),
+                      createEmptyAccion(),
+                    ],
+                  }
+                : s
+            )
+          );
+        }
+
         /*********** Lectura de Excel y F90 ***********/
         function handleChecklistFileChange(storeId, visitId, event) {
           const file = event.target.files?.[0];
@@ -482,25 +588,21 @@
               if (isExcel && window.XLSX) {
                 const wb = XLSX.read(data, { type: "array" });
 
-                // Buscar hoja "PROCESOS BÁSICOS" (nombre aproximado)
                 const targetSheetName =
                   wb.SheetNames.find((name) => {
                     const n = normalizeBasic(name);
-                    return (
-                      n.includes("proceso") && n.includes("basic")
-                    );
+                    return n.includes("proceso") && n.includes("basic");
                   }) || wb.SheetNames[0];
 
                 const sheet = wb.Sheets[targetSheetName];
                 if (sheet) {
-                  // Leer F90 = % checklist
                   const cell = sheet["F90"];
                   let checklistF90 = null;
                   if (cell && cell.v != null) {
                     let rawVal = cell.v;
                     if (typeof rawVal === "number") {
                       let v = rawVal;
-                      if (v <= 1) v = v * 100; // 0-1 -> 0-100
+                      if (v <= 1) v = v * 100;
                       checklistF90 = v;
                     } else if (typeof rawVal === "string") {
                       const m = rawVal
@@ -513,10 +615,7 @@
                       }
                     }
                   }
-                  if (
-                    checklistF90 !== null &&
-                    !isNaN(checklistF90)
-                  ) {
+                  if (checklistF90 !== null && !isNaN(checklistF90)) {
                     updateVisitField(
                       storeId,
                       visitId,
@@ -526,7 +625,6 @@
                     checklistFromF90Set = true;
                   }
 
-                  // texto para HIT y respaldo
                   const csv = XLSX.utils.sheet_to_csv(sheet);
                   parseFromText(csv, checklistFromF90Set);
                 }
@@ -551,7 +649,6 @@
           function parseFromText(text, checklistAlreadySet) {
             if (!text) return;
 
-            // HIT sí/no
             const reHit = /hit[^a-zA-Z0-9]{0,15}(s[ií]|no)/i;
             const mHit = text.match(reHit);
             if (mHit) {
@@ -561,7 +658,6 @@
               updateVisitField(storeId, visitId, "hit", val);
             }
 
-            // Respaldo para checklist si fallase F90
             if (!checklistAlreadySet) {
               const reCap =
                 /capacitaci[oó]n[^0-9%]{0,80}(\d{1,3})\s*%/i;
@@ -581,7 +677,7 @@
           }
         }
 
-        /*********** Guardar / cargar "nube" ***********/
+        /*********** Guardar / cargar nube ***********/
         function saveToCloud() {
           try {
             const payload = {
@@ -604,35 +700,46 @@
             if (!raw) return;
             const parsed = JSON.parse(raw);
             if (parsed.stores) {
-              setStores(
-                parsed.stores.map((s, idx) => ({
+              const normalized = parsed.stores.map((s, idx) => {
+                let accionesHistorial = Array.isArray(
+                  s.accionesHistorial
+                )
+                  ? s.accionesHistorial.map((a) => ({
+                      tipo: a.tipo || "",
+                      fecha: a.fecha || "",
+                      derivaciones:
+                        typeof a.derivaciones === "number"
+                          ? a.derivaciones
+                          : a.derivaciones
+                          ? Number(a.derivaciones) || null
+                          : null,
+                      ventas:
+                        typeof a.ventas === "number"
+                          ? a.ventas
+                          : a.ventas
+                          ? Number(a.ventas) || null
+                          : null,
+                      objetivo:
+                        typeof a.objetivo === "number"
+                          ? a.objetivo
+                          : a.objetivo
+                          ? Number(a.objetivo) || null
+                          : null,
+                    }))
+                  : [createEmptyAccion()];
+
+                return {
                   ...s,
                   id: idx + 1,
                   centroRegional: normalizarDelegado(
                     s.centroRegional || ""
                   ),
-                  acciones: s.acciones || "",
-                  fechaAcciones: s.fechaAcciones || "",
-                  derivaciones:
-                    typeof s.derivaciones === "number"
-                      ? s.derivaciones
-                      : s.derivaciones
-                      ? Number(s.derivaciones) || null
-                      : null,
-                  ventasMensuales:
-                    typeof s.ventasMensuales === "number"
-                      ? s.ventasMensuales
-                      : s.ventasMensuales
-                      ? Number(s.ventasMensuales) || null
-                      : null,
-                  objetivoMensual:
-                    typeof s.objetivoMensual === "number"
-                      ? s.objetivoMensual
-                      : s.objetivoMensual
-                      ? Number(s.objetivoMensual) || null
-                      : null,
-                }))
-              );
+                  accionesHistorial,
+                };
+              });
+              setStores(normalized);
+              setExpandedStoreId(null);
+              setDashboardStoreId(null);
             }
             if (parsed.lastSavedAt) setLastSavedAt(parsed.lastSavedAt);
           } catch (e) {
@@ -678,8 +785,7 @@
           if (fCentro && s.centro !== fCentro) return false;
           if (fProvincia && s.provincia !== fProvincia) return false;
           if (fCorreo && s.correo !== fCorreo) return false;
-          if (fDelegado && s.centroRegional !== fDelegado)
-            return false;
+          if (fDelegado && s.centroRegional !== fDelegado) return false;
           if (fRespAudio && respAudio !== fRespAudio) return false;
           if (fCentroAAR && centroAAR !== fCentroAAR) return false;
           return true;
@@ -716,7 +822,6 @@
           visitasConExcel.map((v) => v.hit)
         );
         const aplicaHitGlobal = aplicaHitTexto(visitasConExcel);
-
         const algunFechaInvalida = allVisits.some(
           (v) => v.fecha && !isValidFecha(v.fecha)
         );
@@ -766,25 +871,16 @@
 
         const totalExclusivos = exclusiveCenters.length;
         const totalVentasExclusivos = exclusiveCenters.reduce(
-          (acc, s) =>
-            acc +
-            (typeof s.ventasMensuales === "number"
-              ? s.ventasMensuales
-              : 0),
+          (acc, s) => acc + sumVentas(s.accionesHistorial),
           0
         );
         const totalObjetivoExclusivos = exclusiveCenters.reduce(
-          (acc, s) =>
-            acc +
-            (typeof s.objetivoMensual === "number"
-              ? s.objetivoMensual
-              : 0),
+          (acc, s) => acc + sumObjetivo(s.accionesHistorial),
           0
         );
         const pctObjetivoGlobalExclusivos =
           totalObjetivoExclusivos > 0
-            ? (totalVentasExclusivos / totalObjetivoExclusivos) *
-              100
+            ? (totalVentasExclusivos / totalObjetivoExclusivos) * 100
             : null;
 
         /*********** Sección AAR ***********/
@@ -840,13 +936,13 @@
                   >
                     Guardar en nube
                   </button>
-                  <button
-                    onClick={loadFromCloud}
-                    className="bg-red-500 text-white px-3 py-1 rounded-xl shadow text-xs font-semibold border border-white/40"
-                  >
-                    Actualizar desde nube
-                  </button>
                 </div>
+                <button
+                  onClick={loadFromCloud}
+                  className="bg-red-500 text-white px-3 py-1 rounded-xl shadow text-xs font-semibold border border-white/40"
+                >
+                  Actualizar desde nube
+                </button>
                 <p className="text-[10px] text-white/80">
                   Última actualización:{" "}
                   <span className="font-semibold">
@@ -1122,7 +1218,7 @@
                   </div>
                 )}
 
-                {/* Faldón filtros */}
+                {/* Filtros */}
                 <div className="bg-red-600 text-white rounded-2xl p-3">
                   <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
                     <div className="flex items-center gap-2 flex-1">
@@ -1627,8 +1723,7 @@
                                         plataforma lee automáticamente el %
                                         global desde la celda{" "}
                                         <strong>F90</strong> de la hoja tipo{" "}
-                                        <strong>PROCESOS BÁSICOS</strong> (0 =
-                                        no aplica, 1 = sí aplica cada criterio).
+                                        <strong>PROCESOS BÁSICOS</strong>.
                                       </p>
                                       <button
                                         className="mt-3 text-[11px] px-3 py-1 rounded-full bg-red-600 text-white font-semibold"
@@ -1678,8 +1773,7 @@
 
               {exclusiveCenters.length === 0 ? (
                 <p className="text-xs text-gray-500">
-                  No se han detectado centros exclusivos (se busca la palabra
-                  "EXCLUSIVO" o las ubicaciones indicadas).
+                  No se han detectado centros exclusivos.
                 </p>
               ) : (
                 <>
@@ -1728,9 +1822,7 @@
                         <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center">
                           <span>
                             {pctObjetivoGlobalExclusivos !== null
-                              ? `${pctObjetivoGlobalExclusivos.toFixed(
-                                  0
-                                )}%`
+                              ? `${pctObjetivoGlobalExclusivos.toFixed(0)}%`
                               : "--"}
                           </span>
                         </div>
@@ -1756,7 +1848,7 @@
                             Resp. audio
                           </th>
                           <th className="px-2 py-2 text-left">
-                            Acciones
+                            Acciones +
                           </th>
                           <th className="px-2 py-2 text-left">
                             Fecha acción
@@ -1778,18 +1870,17 @@
                       <tbody>
                         {exclusiveCenters.map((store, idx) => {
                           const respAudioCentro = deriveRespAudio(store);
-                          const ventas =
-                            typeof store.ventasMensuales === "number"
-                              ? store.ventasMensuales
-                              : null;
-                          const objetivo =
-                            typeof store.objetivoMensual === "number"
-                              ? store.objetivoMensual
-                              : null;
+                          const acciones = store.accionesHistorial || [
+                            createEmptyAccion(),
+                          ];
+
+                          const ventasCentro = sumVentas(acciones);
+                          const objetivoCentro = sumObjetivo(acciones);
                           const ratio =
-                            objetivo && objetivo > 0 && ventas !== null
-                              ? (ventas / objetivo) * 100
+                            objetivoCentro > 0
+                              ? (ventasCentro / objetivoCentro) * 100
                               : null;
+
                           let ratioClass = "";
                           if (ratio !== null) {
                             if (ratio >= 100)
@@ -1823,9 +1914,6 @@
                                 >
                                   {store.centro}
                                 </span>
-                                <span className="ml-1 inline-block px-2 py-0.5 rounded-full bg-amber-300 text-amber-900 text-[9px] font-semibold">
-                                  EXCLUSIVO
-                                </span>
                               </td>
                               <td className="px-2 py-1 align-top">
                                 <span
@@ -1858,95 +1946,146 @@
                                   {respAudioCentro || "-"}
                                 </span>
                               </td>
-                              <td className="px-2 py-1 align-top w-48">
-                                <textarea
-                                  className="w-full border rounded px-2 py-1"
-                                  rows={2}
-                                  value={store.acciones || ""}
-                                  onChange={(e) =>
-                                    updateStoreField(
-                                      store.id,
-                                      "acciones",
-                                      e.target.value
-                                    )
-                                  }
-                                ></textarea>
-                              </td>
+
+                              {/* Acciones */}
                               <td className="px-2 py-1 align-top">
-                                <input
-                                  type="text"
-                                  placeholder="dd/mm/aaaa"
-                                  className="w-full border rounded px-2 py-1"
-                                  value={store.fechaAcciones || ""}
-                                  onChange={(e) =>
-                                    updateStoreField(
-                                      store.id,
-                                      "fechaAcciones",
-                                      e.target.value
-                                    )
-                                  }
-                                />
+                                {acciones.map((a, i) => (
+                                  <div
+                                    key={i}
+                                    className="mb-1 flex items-center gap-1"
+                                  >
+                                    <select
+                                      className="w-full border rounded px-2 py-1"
+                                      value={a.tipo || ""}
+                                      onChange={(e) =>
+                                        updateAccionField(
+                                          store.id,
+                                          i,
+                                          "tipo",
+                                          e.target.value
+                                        )
+                                      }
+                                    >
+                                      <option value="">
+                                        Selecciona acción
+                                      </option>
+                                      {ACCION_OPTIONS.map((opt) => (
+                                        <option
+                                          key={opt}
+                                          value={opt}
+                                        >
+                                          {opt}
+                                        </option>
+                                      ))}
+                                    </select>
+                                  </div>
+                                ))}
+                                <button
+                                  className="mt-1 text-[10px] px-2 py-1 rounded-full border border-red-400 text-red-600 hover:bg-red-50"
+                                  onClick={() => addAccion(store.id)}
+                                >
+                                  + Añadir acción
+                                </button>
                               </td>
+
+                              {/* Fecha acción */}
+                              <td className="px-2 py-1 align-top">
+                                {acciones.map((a, i) => (
+                                  <div key={i} className="mb-1">
+                                    <input
+                                      type="text"
+                                      placeholder="dd/mm/aaaa"
+                                      className="w-full border rounded px-2 py-1"
+                                      value={a.fecha || ""}
+                                      onChange={(e) =>
+                                        updateAccionField(
+                                          store.id,
+                                          i,
+                                          "fecha",
+                                          e.target.value
+                                        )
+                                      }
+                                    />
+                                  </div>
+                                ))}
+                              </td>
+
+                              {/* Derivaciones */}
                               <td className="px-2 py-1 align-top text-right">
-                                <input
-                                  type="number"
-                                  className="w-full border rounded px-2 py-1 text-right"
-                                  value={
-                                    store.derivaciones ?? ""
-                                  }
-                                  onChange={(e) => {
-                                    const v =
-                                      e.target.value === ""
-                                        ? null
-                                        : Number(e.target.value);
-                                    updateStoreField(
-                                      store.id,
-                                      "derivaciones",
-                                      isNaN(v) ? null : v
-                                    );
-                                  }}
-                                />
+                                {acciones.map((a, i) => (
+                                  <div key={i} className="mb-1">
+                                    <input
+                                      type="number"
+                                      className="w-full border rounded px-2 py-1 text-right"
+                                      value={a.derivaciones ?? ""}
+                                      onChange={(e) => {
+                                        const v =
+                                          e.target.value === ""
+                                            ? null
+                                            : Number(e.target.value);
+                                        updateAccionField(
+                                          store.id,
+                                          i,
+                                          "derivaciones",
+                                          isNaN(v) ? null : v
+                                        );
+                                      }}
+                                    />
+                                  </div>
+                                ))}
                               </td>
+
+                              {/* Ventas */}
                               <td className="px-2 py-1 align-top text-right">
-                                <input
-                                  type="number"
-                                  className="w-full border rounded px-2 py-1 text-right"
-                                  value={
-                                    store.ventasMensuales ?? ""
-                                  }
-                                  onChange={(e) => {
-                                    const v =
-                                      e.target.value === ""
-                                        ? null
-                                        : Number(e.target.value);
-                                    updateStoreField(
-                                      store.id,
-                                      "ventasMensuales",
-                                      isNaN(v) ? null : v
-                                    );
-                                  }}
-                                />
+                                {acciones.map((a, i) => (
+                                  <div key={i} className="mb-1">
+                                    <input
+                                      type="number"
+                                      className="w-full border rounded px-2 py-1 text-right"
+                                      value={a.ventas ?? ""}
+                                      onChange={(e) => {
+                                        const v =
+                                          e.target.value === ""
+                                            ? null
+                                            : Number(e.target.value);
+                                        updateAccionField(
+                                          store.id,
+                                          i,
+                                          "ventas",
+                                          isNaN(v) ? null : v
+                                        );
+                                      }}
+                                    />
+                                  </div>
+                                ))}
                               </td>
+
+                              {/* Objetivo */}
                               <td className="px-2 py-1 align-top text-right">
-                                <input
-                                  type="number"
-                                  className="w-full border rounded px-2 py-1 text-right"
-                                  value={
-                                    store.objetivoMensual ?? ""
-                                  }
-                                  onChange={(e) => {
-                                    const v =
-                                      e.target.value === ""
-                                        ? null
-                                        : Number(e.target.value);
-                                    updateStoreField(
-                                      store.id,
-                                      "objetivoMensual",
-                                      isNaN(v) ? null : v
-                                    );
-                                  }}
-                                />
+                                {acciones.map((a, i) => (
+                                  <div key={i} className="mb-1">
+                                    <input
+                                      type="number"
+                                      className="w-full border rounded px-2 py-1 text-right"
+                                      value={a.objetivo ?? ""}
+                                      onChange={(e) => {
+                                        const v =
+                                          e.target.value === ""
+                                            ? null
+                                            : Number(e.target.value);
+                                        updateAccionField(
+                                          store.id,
+                                          i,
+                                          "objetivo",
+                                          isNaN(v) ? null : v
+                                        );
+                                      }}
+                                    />
+                                  </div>
+                                ))}
                               </td>
+
+                              {/* % resultado global del centro */}
                               <td className="px-2 py-1 align-top text-right">
                                 {ratio !== null ? (
                                   <span
