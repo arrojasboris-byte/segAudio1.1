@@ -172,6 +172,29 @@
           .replace(/[\u0300-\u036f]/g, "");
       }
 
+      // *** LISTA DE PALABRAS CLAVE PARA CENTROS EXCLUSIVOS ***
+      const EXCLUSIVE_KEYWORDS = [
+        "exclusivo",
+        "fuenlabrada paseo de la estacion",
+        "reina mercedes",
+        "delicias zaragoza",
+        "peñacastillo",
+        "penacastillo",
+        "torrelavega",
+        "los valles",
+        "santiago de compostela",
+        "pamplona",
+      ].map(normalizeBasic);
+
+      function isExclusiveStore(store) {
+        const centroNorm = normalizeBasic(store.centro);
+        const propNorm = normalizeBasic(store.propietario);
+        const combined = centroNorm + " " + propNorm;
+        return EXCLUSIVE_KEYWORDS.some((kw) =>
+          combined.includes(kw)
+        );
+      }
+
       function media(valores) {
         const nums = valores.filter(
           (v) => typeof v === "number" && !isNaN(v)
@@ -739,14 +762,7 @@
         );
 
         /*********** Centros exclusivos ***********/
-        const exclusiveCenters = stores.filter((s) => {
-          const centroNorm = normalizeBasic(s.centro);
-          const propNorm = normalizeBasic(s.propietario);
-          return (
-            centroNorm.includes("exclusivo") ||
-            propNorm.includes("exclusivo")
-          );
-        });
+        const exclusiveCenters = stores.filter(isExclusiveStore);
 
         const totalExclusivos = exclusiveCenters.length;
         const totalVentasExclusivos = exclusiveCenters.reduce(
@@ -1007,6 +1023,11 @@
                           <p className="font-semibold">
                             {dashboardStore.centro ||
                               dashboardStore.codigo}
+                            {isExclusiveStore(dashboardStore) && (
+                              <span className="ml-2 inline-block px-2 py-0.5 rounded-full bg-amber-300 text-amber-900 text-[9px] font-semibold">
+                                EXCLUSIVO
+                              </span>
+                            )}
                           </p>
                           <p>
                             Provincia:{" "}
@@ -1286,6 +1307,7 @@
                             deriveCentroAAR(store);
                           const isExpanded =
                             expandedStoreId === store.id;
+                          const isExclusive = isExclusiveStore(store);
 
                           const checklistBadge =
                             checklistMedioCentro !== null ? (
@@ -1331,6 +1353,11 @@
                                   >
                                     {store.centro || "-"}
                                   </span>
+                                  {isExclusive && (
+                                    <span className="ml-1 inline-block px-2 py-0.5 rounded-full bg-amber-300 text-amber-900 text-[9px] font-semibold">
+                                      EXCLUSIVO
+                                    </span>
+                                  )}
                                 </td>
                                 <td className="px-2 py-1">
                                   <span
@@ -1652,7 +1679,7 @@
               {exclusiveCenters.length === 0 ? (
                 <p className="text-xs text-gray-500">
                   No se han detectado centros exclusivos (se busca la palabra
-                  "EXCLUSIVO" en el nombre del centro o del propietario).
+                  "EXCLUSIVO" o las ubicaciones indicadas).
                 </p>
               ) : (
                 <>
@@ -1795,6 +1822,9 @@
                                   )}
                                 >
                                   {store.centro}
+                                </span>
+                                <span className="ml-1 inline-block px-2 py-0.5 rounded-full bg-amber-300 text-amber-900 text-[9px] font-semibold">
+                                  EXCLUSIVO
                                 </span>
                               </td>
                               <td className="px-2 py-1 align-top">
@@ -2044,6 +2074,11 @@
                               >
                                 {store.centro}
                               </span>
+                              {isExclusiveStore(store) && (
+                                <span className="ml-1 inline-block px-2 py-0.5 rounded-full bg-amber-300 text-amber-900 text-[9px] font-semibold">
+                                  EXCLUSIVO
+                                </span>
+                              )}
                             </td>
                             <td className="px-2 py-1">
                               <span
