@@ -177,9 +177,7 @@
           (v) => typeof v === "number" && !isNaN(v)
         );
         if (nums.length === 0) return null;
-        return (
-          nums.reduce((sum, v) => sum + v, 0) / nums.length
-        );
+        return nums.reduce((sum, v) => sum + v, 0) / nums.length;
       }
 
       function porcentajeSi(valores) {
@@ -210,6 +208,16 @@
           backgroundColor: `hsl(${hue}, 75%, 90%)`,
           color: `hsl(${hue}, 35%, 28%)`,
         };
+      }
+
+      function aarBadgeClass(status) {
+        if (status === "Sí")
+          return "bg-green-100 text-green-800 border border-green-300";
+        if (status === "No")
+          return "bg-red-100 text-red-700 border border-red-300";
+        if (status === "En formación")
+          return "bg-amber-100 text-amber-800 border border-amber-300";
+        return "bg-gray-100 text-gray-700 border border-gray-300";
       }
 
       function getUniqueSorted(values) {
@@ -264,12 +272,19 @@
         return v ? v.responsable : "";
       }
 
+      // AAR agregado: En formación > Sí > No
       function deriveCentroAAR(store) {
         const vals = (store.visitas || [])
           .map((v) => v.centroAAR)
-          .filter((v) => v === "Sí" || v === "No");
+          .filter(
+            (v) =>
+              v === "Sí" || v === "No" || v === "En formación"
+          );
         if (vals.length === 0) return "";
-        return vals.includes("Sí") ? "Sí" : "No";
+        if (vals.includes("En formación")) return "En formación";
+        if (vals.includes("Sí")) return "Sí";
+        if (vals.includes("No")) return "No";
+        return "";
       }
 
       /*************************************************
@@ -311,6 +326,26 @@
                   centroRegional: normalizarDelegado(
                     s.centroRegional || ""
                   ),
+                  acciones: s.acciones || "",
+                  fechaAcciones: s.fechaAcciones || "",
+                  derivaciones:
+                    typeof s.derivaciones === "number"
+                      ? s.derivaciones
+                      : s.derivaciones
+                      ? Number(s.derivaciones) || null
+                      : null,
+                  ventasMensuales:
+                    typeof s.ventasMensuales === "number"
+                      ? s.ventasMensuales
+                      : s.ventasMensuales
+                      ? Number(s.ventasMensuales) || null
+                      : null,
+                  objetivoMensual:
+                    typeof s.objetivoMensual === "number"
+                      ? s.objetivoMensual
+                      : s.objetivoMensual
+                      ? Number(s.objetivoMensual) || null
+                      : null,
                 }))
               );
             }
@@ -367,6 +402,12 @@
               responsableAudio: "",
               centroAAR: "",
               visitas: createEmptyVisits(),
+              // campos centros exclusivos
+              acciones: "",
+              fechaAcciones: "",
+              derivaciones: null,
+              ventasMensuales: null,
+              objetivoMensual: null,
             };
           });
 
@@ -547,6 +588,26 @@
                   centroRegional: normalizarDelegado(
                     s.centroRegional || ""
                   ),
+                  acciones: s.acciones || "",
+                  fechaAcciones: s.fechaAcciones || "",
+                  derivaciones:
+                    typeof s.derivaciones === "number"
+                      ? s.derivaciones
+                      : s.derivaciones
+                      ? Number(s.derivaciones) || null
+                      : null,
+                  ventasMensuales:
+                    typeof s.ventasMensuales === "number"
+                      ? s.ventasMensuales
+                      : s.ventasMensuales
+                      ? Number(s.ventasMensuales) || null
+                      : null,
+                  objetivoMensual:
+                    typeof s.objetivoMensual === "number"
+                      ? s.objetivoMensual
+                      : s.objetivoMensual
+                      ? Number(s.objetivoMensual) || null
+                      : null,
                 }))
               );
             }
@@ -677,6 +738,45 @@
           stores.map((s) => deriveRespAudio(s))
         );
 
+        /*********** Centros exclusivos ***********/
+        const exclusiveCenters = stores.filter((s) => {
+          const centroNorm = normalizeBasic(s.centro);
+          const propNorm = normalizeBasic(s.propietario);
+          return (
+            centroNorm.includes("exclusivo") ||
+            propNorm.includes("exclusivo")
+          );
+        });
+
+        const totalExclusivos = exclusiveCenters.length;
+        const totalVentasExclusivos = exclusiveCenters.reduce(
+          (acc, s) =>
+            acc +
+            (typeof s.ventasMensuales === "number"
+              ? s.ventasMensuales
+              : 0),
+          0
+        );
+        const totalObjetivoExclusivos = exclusiveCenters.reduce(
+          (acc, s) =>
+            acc +
+            (typeof s.objetivoMensual === "number"
+              ? s.objetivoMensual
+              : 0),
+          0
+        );
+        const pctObjetivoGlobalExclusivos =
+          totalObjetivoExclusivos > 0
+            ? (totalVentasExclusivos / totalObjetivoExclusivos) *
+              100
+            : null;
+
+        /*********** Sección AAR ***********/
+        const aarCenters = stores.filter((s) => {
+          const state = deriveCentroAAR(s);
+          return state === "Sí" || state === "En formación";
+        });
+
         /*********** Render ***********/
         if (!authorized) {
           return (
@@ -707,7 +807,7 @@
         }
 
         return (
-          <div className="min-h-screen bg-gray-100 font-sans p-6">
+          <div className="min-h-screen bg-gray-100 font-sans p-6 space-y-10">
             {/* HEADER */}
             <header className="bg-red-600 text-white p-5 rounded-2xl shadow flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -740,8 +840,8 @@
               </div>
             </header>
 
-            {/* MAPA CHECKLIST + DASHBOARD */}
-            <section className="mt-6 space-y-6">
+            {/* MAPA CHECKLIST + DASHBOARD GENERAL */}
+            <section className="space-y-6">
               {/* Mapa checklist */}
               <div className="bg-white p-6 rounded-2xl shadow">
                 <h2 className="font-bold text-lg mb-2">
@@ -849,6 +949,12 @@
                           )}
                         </p>
                       </div>
+                      {algunFechaInvalida && (
+                        <p className="text-[10px] text-red-500 mt-1">
+                          Hay fechas con formato incorrecto (usa{" "}
+                          <strong>dd/mm/aaaa</strong>).
+                        </p>
+                      )}
                     </div>
 
                     {/* Por centro */}
@@ -915,6 +1021,18 @@
                             </span>
                           </p>
                           <p>
+                            Delegado:{" "}
+                            <span
+                              className="inline-block px-2 py-0.5 rounded-full"
+                              style={delegadoColor(
+                                dashboardStore.centroRegional
+                              )}
+                            >
+                              {dashboardStore.centroRegional ||
+                                "Sin delegado"}
+                            </span>
+                          </p>
+                          <p>
                             Nº visitas (Excels adjuntos):{" "}
                             <strong>{dashVisitas.length}</strong>
                           </p>
@@ -939,18 +1057,11 @@
                     </div>
                   </div>
                 )}
-
-                {algunFechaInvalida && (
-                  <p className="text-xs text-red-500 mt-3">
-                    Hay fechas con formato incorrecto. Usa siempre el formato{" "}
-                    <strong>dd/mm/aaaa</strong>.
-                  </p>
-                )}
               </div>
             </section>
 
             {/* LISTADO DE CENTROS */}
-            <section className="mt-10 bg-white p-6 rounded-2xl shadow">
+            <section className="bg-white p-6 rounded-2xl shadow">
               <div className="flex flex-col gap-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <h3 className="font-bold text-lg bg-red-600 text-white inline-flex items-center px-4 py-2 rounded-2xl">
@@ -1110,11 +1221,12 @@
                       <option value="">Centro AAR (todos)</option>
                       <option value="Sí">Sí</option>
                       <option value="No">No</option>
+                      <option value="En formación">En formación</option>
                     </select>
                   </div>
                 </div>
 
-                {/* Tabla */}
+                {/* Tabla principal */}
                 {stores.length === 0 ? (
                   <p className="text-xs text-gray-500">
                     Aún no hay centros cargados. Pega el listado arriba y pulsa
@@ -1201,10 +1313,24 @@
                                   </span>
                                 </td>
                                 <td className="px-2 py-1">
-                                  {store.propietario || "-"}
+                                  <span
+                                    className="inline-block px-2 py-0.5 rounded-full"
+                                    style={delegadoColor(
+                                      store.centroRegional
+                                    )}
+                                  >
+                                    {store.propietario || "-"}
+                                  </span>
                                 </td>
                                 <td className="px-2 py-1">
-                                  {store.centro || "-"}
+                                  <span
+                                    className="inline-block px-2 py-0.5 rounded-full"
+                                    style={delegadoColor(
+                                      store.centroRegional
+                                    )}
+                                  >
+                                    {store.centro || "-"}
+                                  </span>
                                 </td>
                                 <td className="px-2 py-1">
                                   <span
@@ -1217,7 +1343,14 @@
                                   </span>
                                 </td>
                                 <td className="px-2 py-1 break-all">
-                                  {store.correo || "-"}
+                                  <span
+                                    className="inline-block px-2 py-0.5 rounded-full"
+                                    style={delegadoColor(
+                                      store.centroRegional
+                                    )}
+                                  >
+                                    {store.correo || "-"}
+                                  </span>
                                 </td>
                                 <td className="px-2 py-1">
                                   <span
@@ -1231,10 +1364,28 @@
                                   </span>
                                 </td>
                                 <td className="px-2 py-1">
-                                  {respAudioCentro || "-"}
+                                  <span
+                                    className="inline-block px-2 py-0.5 rounded-full"
+                                    style={delegadoColor(
+                                      store.centroRegional
+                                    )}
+                                  >
+                                    {respAudioCentro || "-"}
+                                  </span>
                                 </td>
                                 <td className="px-2 py-1">
-                                  {centroAARValor || "-"}
+                                  {centroAARValor ? (
+                                    <span
+                                      className={
+                                        "inline-block px-2 py-0.5 rounded-full " +
+                                        aarBadgeClass(centroAARValor)
+                                      }
+                                    >
+                                      {centroAARValor}
+                                    </span>
+                                  ) : (
+                                    "-"
+                                  )}
                                 </td>
                                 <td className="px-2 py-1 text-right">
                                   {visitasCentro.length}
@@ -1435,6 +1586,9 @@
                                                   <option value="No">
                                                     No
                                                   </option>
+                                                  <option value="En formación">
+                                                    En formación
+                                                  </option>
                                                 </select>
                                               </div>
                                             </div>
@@ -1445,7 +1599,7 @@
                                         Adjunta el Excel del checklist: la
                                         plataforma lee automáticamente el %
                                         global desde la celda{" "}
-                                        <strong>F90</strong> de la hoja{" "}
+                                        <strong>F90</strong> de la hoja tipo{" "}
                                         <strong>PROCESOS BÁSICOS</strong> (0 =
                                         no aplica, 1 = sí aplica cada criterio).
                                       </p>
@@ -1487,6 +1641,468 @@
                   </div>
                 )}
               </div>
+            </section>
+
+            {/* CENTROS EXCLUSIVOS */}
+            <section className="bg-white p-6 rounded-2xl shadow">
+              <h3 className="font-bold text-lg mb-3 text-red-700">
+                CENTROS EXCLUSIVOS
+              </h3>
+
+              {exclusiveCenters.length === 0 ? (
+                <p className="text-xs text-gray-500">
+                  No se han detectado centros exclusivos (se busca la palabra
+                  "EXCLUSIVO" en el nombre del centro o del propietario).
+                </p>
+              ) : (
+                <>
+                  {/* Dashboard centros exclusivos */}
+                  <div className="bg-gray-50 rounded-2xl px-4 py-3 border mb-4 text-[11px] flex flex-wrap gap-4 items-center justify-between">
+                    <div>
+                      <p className="font-semibold">
+                        Dashboard centros exclusivos
+                      </p>
+                      <p>
+                        Nº centros exclusivos:{" "}
+                        <strong>{totalExclusivos}</strong>
+                      </p>
+                      <p>
+                        Ventas mensuales totales:{" "}
+                        <strong>
+                          {totalVentasExclusivos.toLocaleString("es-ES", {
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 0,
+                          })}{" "}
+                          €
+                        </strong>
+                      </p>
+                      <p>
+                        Objetivo mensual total:{" "}
+                        <strong>
+                          {totalObjetivoExclusivos.toLocaleString(
+                            "es-ES",
+                            {
+                              minimumFractionDigits: 0,
+                              maximumFractionDigits: 0,
+                            }
+                          )}{" "}
+                          €
+                        </strong>
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-[10px] text-gray-600">
+                        % objetivo global
+                      </span>
+                      <div
+                        className="w-12 h-12 rounded-full flex items-center justify-center text-[10px] font-bold text-red-700"
+                        style={donutStyle(pctObjetivoGlobalExclusivos)}
+                      >
+                        <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center">
+                          <span>
+                            {pctObjetivoGlobalExclusivos !== null
+                              ? `${pctObjetivoGlobalExclusivos.toFixed(
+                                  0
+                                )}%`
+                              : "--"}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Tabla exclusivos */}
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-[11px] border-collapse">
+                      <thead>
+                        <tr className="bg-gray-50 border-b">
+                          <th className="px-2 py-2 text-left">Nº</th>
+                          <th className="px-2 py-2 text-left">Código</th>
+                          <th className="px-2 py-2 text-left">Centro</th>
+                          <th className="px-2 py-2 text-left">
+                            Provincia
+                          </th>
+                          <th className="px-2 py-2 text-left">
+                            Delegado
+                          </th>
+                          <th className="px-2 py-2 text-left">
+                            Resp. audio
+                          </th>
+                          <th className="px-2 py-2 text-left">
+                            Acciones
+                          </th>
+                          <th className="px-2 py-2 text-left">
+                            Fecha acción
+                          </th>
+                          <th className="px-2 py-2 text-right">
+                            Derivaciones
+                          </th>
+                          <th className="px-2 py-2 text-right">
+                            Ventas mensuales €
+                          </th>
+                          <th className="px-2 py-2 text-right">
+                            Objetivo mensual €
+                          </th>
+                          <th className="px-2 py-2 text-right">
+                            % resultado
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {exclusiveCenters.map((store, idx) => {
+                          const respAudioCentro = deriveRespAudio(store);
+                          const ventas =
+                            typeof store.ventasMensuales === "number"
+                              ? store.ventasMensuales
+                              : null;
+                          const objetivo =
+                            typeof store.objetivoMensual === "number"
+                              ? store.objetivoMensual
+                              : null;
+                          const ratio =
+                            objetivo && objetivo > 0 && ventas !== null
+                              ? (ventas / objetivo) * 100
+                              : null;
+                          let ratioClass = "";
+                          if (ratio !== null) {
+                            if (ratio >= 100)
+                              ratioClass =
+                                "bg-green-100 text-green-800";
+                            else if (ratio >= 70)
+                              ratioClass =
+                                "bg-amber-100 text-amber-800";
+                            else ratioClass = "bg-red-100 text-red-700";
+                          }
+
+                          return (
+                            <tr
+                              key={store.id}
+                              className="border-b hover:bg-gray-50 align-top"
+                            >
+                              <td className="px-2 py-1 align-top">
+                                {idx + 1}
+                              </td>
+                              <td className="px-2 py-1 align-top">
+                                <span className="font-semibold">
+                                  {store.codigo}
+                                </span>
+                              </td>
+                              <td className="px-2 py-1 align-top">
+                                <span
+                                  className="inline-block px-2 py-0.5 rounded-full"
+                                  style={delegadoColor(
+                                    store.centroRegional
+                                  )}
+                                >
+                                  {store.centro}
+                                </span>
+                              </td>
+                              <td className="px-2 py-1 align-top">
+                                <span
+                                  className="inline-block px-2 py-0.5 rounded-full"
+                                  style={delegadoColor(
+                                    store.centroRegional
+                                  )}
+                                >
+                                  {store.provincia}
+                                </span>
+                              </td>
+                              <td className="px-2 py-1 align-top">
+                                <span
+                                  className="inline-block px-2 py-0.5 rounded-full"
+                                  style={delegadoColor(
+                                    store.centroRegional
+                                  )}
+                                >
+                                  {store.centroRegional ||
+                                    "Sin delegado"}
+                                </span>
+                              </td>
+                              <td className="px-2 py-1 align-top">
+                                <span
+                                  className="inline-block px-2 py-0.5 rounded-full"
+                                  style={delegadoColor(
+                                    store.centroRegional
+                                  )}
+                                >
+                                  {respAudioCentro || "-"}
+                                </span>
+                              </td>
+                              <td className="px-2 py-1 align-top w-48">
+                                <textarea
+                                  className="w-full border rounded px-2 py-1"
+                                  rows={2}
+                                  value={store.acciones || ""}
+                                  onChange={(e) =>
+                                    updateStoreField(
+                                      store.id,
+                                      "acciones",
+                                      e.target.value
+                                    )
+                                  }
+                                ></textarea>
+                              </td>
+                              <td className="px-2 py-1 align-top">
+                                <input
+                                  type="text"
+                                  placeholder="dd/mm/aaaa"
+                                  className="w-full border rounded px-2 py-1"
+                                  value={store.fechaAcciones || ""}
+                                  onChange={(e) =>
+                                    updateStoreField(
+                                      store.id,
+                                      "fechaAcciones",
+                                      e.target.value
+                                    )
+                                  }
+                                />
+                              </td>
+                              <td className="px-2 py-1 align-top text-right">
+                                <input
+                                  type="number"
+                                  className="w-full border rounded px-2 py-1 text-right"
+                                  value={
+                                    store.derivaciones ?? ""
+                                  }
+                                  onChange={(e) => {
+                                    const v =
+                                      e.target.value === ""
+                                        ? null
+                                        : Number(e.target.value);
+                                    updateStoreField(
+                                      store.id,
+                                      "derivaciones",
+                                      isNaN(v) ? null : v
+                                    );
+                                  }}
+                                />
+                              </td>
+                              <td className="px-2 py-1 align-top text-right">
+                                <input
+                                  type="number"
+                                  className="w-full border rounded px-2 py-1 text-right"
+                                  value={
+                                    store.ventasMensuales ?? ""
+                                  }
+                                  onChange={(e) => {
+                                    const v =
+                                      e.target.value === ""
+                                        ? null
+                                        : Number(e.target.value);
+                                    updateStoreField(
+                                      store.id,
+                                      "ventasMensuales",
+                                      isNaN(v) ? null : v
+                                    );
+                                  }}
+                                />
+                              </td>
+                              <td className="px-2 py-1 align-top text-right">
+                                <input
+                                  type="number"
+                                  className="w-full border rounded px-2 py-1 text-right"
+                                  value={
+                                    store.objetivoMensual ?? ""
+                                  }
+                                  onChange={(e) => {
+                                    const v =
+                                      e.target.value === ""
+                                        ? null
+                                        : Number(e.target.value);
+                                    updateStoreField(
+                                      store.id,
+                                      "objetivoMensual",
+                                      isNaN(v) ? null : v
+                                    );
+                                  }}
+                                />
+                              </td>
+                              <td className="px-2 py-1 align-top text-right">
+                                {ratio !== null ? (
+                                  <span
+                                    className={
+                                      "inline-block min-w-[40px] px-2 py-0.5 rounded-full " +
+                                      ratioClass
+                                    }
+                                  >
+                                    {ratio.toFixed(0)}%
+                                  </span>
+                                ) : (
+                                  "-"
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
+              )}
+            </section>
+
+            {/* AUDIOLOGÍA AVANZADA REMOTO (AAR) */}
+            <section className="bg-white p-6 rounded-2xl shadow">
+              <h3 className="font-bold text-lg mb-3 text-red-700">
+                AUDIOLOGÍA AVANZADA REMOTO (AAR)
+              </h3>
+              <p className="text-xs text-gray-600 mb-3">
+                Se muestran todos los centros con AAR marcado como{" "}
+                <strong>Sí</strong> o <strong>En formación</strong>. Estado
+                Centro AAR:{" "}
+                <span className="inline-flex items-center gap-1 mr-2">
+                  <span className="w-3 h-3 rounded-full bg-green-500" />
+                  <span className="text-[10px]">Sí</span>
+                </span>
+                <span className="inline-flex items-center gap-1 mr-2">
+                  <span className="w-3 h-3 rounded-full bg-red-500" />
+                  <span className="text-[10px]">No</span>
+                </span>
+                <span className="inline-flex items-center gap-1">
+                  <span className="w-3 h-3 rounded-full bg-amber-400" />
+                  <span className="text-[10px]">En formación</span>
+                </span>
+              </p>
+
+              {aarCenters.length === 0 ? (
+                <p className="text-xs text-gray-500">
+                  No hay centros con AAR = Sí o En formación.
+                </p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-[11px] border-collapse">
+                    <thead>
+                      <tr className="bg-gray-50 border-b">
+                        <th className="px-2 py-2 text-left">Nº</th>
+                        <th className="px-2 py-2 text-left">Código</th>
+                        <th className="px-2 py-2 text-left">Centro</th>
+                        <th className="px-2 py-2 text-left">
+                          Provincia
+                        </th>
+                        <th className="px-2 py-2 text-left">
+                          Delegado
+                        </th>
+                        <th className="px-2 py-2 text-left">
+                          Resp. audio
+                        </th>
+                        <th className="px-2 py-2 text-left">
+                          Estado AAR
+                        </th>
+                        <th className="px-2 py-2 text-right">
+                          Nº visitas
+                        </th>
+                        <th className="px-2 py-2 text-right">
+                          Checklist medio %
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {aarCenters.map((store, idx) => {
+                        const visitasCentro = store.visitas.filter(
+                          (v) => v.excelName && v.excelName !== ""
+                        );
+                        const checklistMedioCentro = media(
+                          visitasCentro.map((v) => v.checklist)
+                        );
+                        const respAudioCentro =
+                          deriveRespAudio(store);
+                        const aarState = deriveCentroAAR(store);
+
+                        const checklistBadge =
+                          checklistMedioCentro !== null ? (
+                            <span
+                              className={
+                                "inline-block min-w-[40px] px-2 py-0.5 rounded-full " +
+                                (checklistMedioCentro >= 85
+                                  ? "bg-green-100 text-green-800"
+                                  : "bg-red-100 text-red-700")
+                              }
+                            >
+                              {checklistMedioCentro.toFixed(0)}%
+                            </span>
+                          ) : (
+                            "-"
+                          );
+
+                        return (
+                          <tr
+                            key={store.id}
+                            className="border-b hover:bg-gray-50"
+                          >
+                            <td className="px-2 py-1">{idx + 1}</td>
+                            <td className="px-2 py-1">
+                              <span className="font-semibold">
+                                {store.codigo}
+                              </span>
+                            </td>
+                            <td className="px-2 py-1">
+                              <span
+                                className="inline-block px-2 py-0.5 rounded-full"
+                                style={delegadoColor(
+                                  store.centroRegional
+                                )}
+                              >
+                                {store.centro}
+                              </span>
+                            </td>
+                            <td className="px-2 py-1">
+                              <span
+                                className="inline-block px-2 py-0.5 rounded-full"
+                                style={delegadoColor(
+                                  store.centroRegional
+                                )}
+                              >
+                                {store.provincia}
+                              </span>
+                            </td>
+                            <td className="px-2 py-1">
+                              <span
+                                className="inline-block px-2 py-0.5 rounded-full"
+                                style={delegadoColor(
+                                  store.centroRegional
+                                )}
+                              >
+                                {store.centroRegional ||
+                                  "Sin delegado"}
+                              </span>
+                            </td>
+                            <td className="px-2 py-1">
+                              <span
+                                className="inline-block px-2 py-0.5 rounded-full"
+                                style={delegadoColor(
+                                  store.centroRegional
+                                )}
+                              >
+                                {respAudioCentro || "-"}
+                              </span>
+                            </td>
+                            <td className="px-2 py-1">
+                              {aarState ? (
+                                <span
+                                  className={
+                                    "inline-block px-2 py-0.5 rounded-full " +
+                                    aarBadgeClass(aarState)
+                                  }
+                                >
+                                  {aarState}
+                                </span>
+                              ) : (
+                                "-"
+                              )}
+                            </td>
+                            <td className="px-2 py-1 text-right">
+                              {visitasCentro.length}
+                            </td>
+                            <td className="px-2 py-1 text-right">
+                              {checklistBadge}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </section>
           </div>
         );
