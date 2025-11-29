@@ -28,6 +28,7 @@
 
       // =====================================
       // 1. CONFIGURACIÓN CHECKLIST PROCESOS
+      // (referencia visual de etapas, no se usa en los cálculos)
       // =====================================
 
       const CHECKLIST_ETAPAS = [
@@ -152,7 +153,7 @@
           excelName: "",
           excelUrl: null,
           hit: "",
-          checklist: null, // % global F90
+          checklist: null, // % global F90 / F104
           centroAAR: "",
           processPoints: [], // puntos 0/1 por criterio (para los gráficos de barras)
         }));
@@ -348,7 +349,7 @@
       }
 
       // =====================================
-      // 3. CENTROS EXCLUSIVOS
+      // 3. CENTROS EXCLUSIVOS (marcados por nombre)
       // =====================================
 
       const EXCLUSIVE_CENTER_NAMES = [
@@ -394,6 +395,7 @@
       //    (para gráficos de barras de procesos)
       // =====================================
 
+      // (4.1) Lee todos los criterios (B) y 0/1 (F) de todas las hojas
       function extractProcessPointsFromWorkbook(workbook) {
         if (!workbook || !workbook.SheetNames) return [];
         const puntos = [];
@@ -442,6 +444,7 @@
         return puntos;
       }
 
+      // (4.2) Agrega puntos por proceso para un grupo (exclusivos / no exclusivos)
       function computeProcessStats(stores, exclusiveGroup) {
         const stats = {};
         (stores || []).forEach((store) => {
@@ -462,12 +465,12 @@
         return stats;
       }
 
+      // (4.3) Construye datos ordenados y medias para los gráficos
       function buildProcessChartData(statsAAO, statsExclusive) {
         const keysAAO = Object.keys(statsAAO || {});
         const keysExcl = Object.keys(statsExclusive || {});
 
-        // Orden maestro: primero los procesos del checklist largo (exclusivos),
-        // luego, si hubiera alguno sólo de AAO, al final.
+        // Orden maestro: primero procesos del checklist largo (exclusivos)
         let globalOrder = [...keysExcl];
         keysAAO.forEach((k) => {
           if (!globalOrder.includes(k)) globalOrder.push(k);
@@ -517,6 +520,7 @@
         return { chartDataAAO, chartDataExclusive, avgAAO, avgExclusive };
       }
 
+      // (4.4) Exporta a CSV para Excel
       function exportProcessCsv(data, fileName) {
         if (!data || data.length === 0) return;
         const rows = [
@@ -557,6 +561,7 @@
       // 5. COMPONENTES PEQUEÑOS (gráficos)
       // =====================================
 
+      // (5.1) Barras 3D por proceso
       function Process3DBarChart({ data }) {
         if (!data || data.length === 0) {
           return (
@@ -613,11 +618,11 @@
         );
       }
 
+      // (5.2) Tarjeta de procesos con barras + tabla
       function ProcessCard({
         title,
         data,
         avg,
-        emptyMessage,
         showTable,
         onToggleTable,
         onExport,
@@ -689,6 +694,7 @@
         );
       }
 
+      // (5.3) Donut KPI
       function DonutCard({ title, percent, footer, neutral = false }) {
         const style = neutral
           ? donutStyleNeutral(percent ?? 0)
@@ -738,7 +744,7 @@
         const [showCarga, setShowCarga] = useState(false);
         const [lastSavedAt, setLastSavedAt] = useState(null);
 
-        // Centros exclusivos
+        // Centros exclusivos (para ventas/objetivos)
         const [expandedExclusiveId, setExpandedExclusiveId] = useState(null);
         const [selectedSalesMonth, setSelectedSalesMonth] = useState(
           EXCLUSIVE_MONTHS[0].key
@@ -751,7 +757,7 @@
         const [showAAOTable, setShowAAOTable] = useState(false);
         const [showExclusiveTable, setShowExclusiveTable] = useState(false);
 
-        // Cargar de "nube" (localStorage)
+        // 6.1 Cargar de "nube" (localStorage)
         useEffect(() => {
           try {
             const raw = localStorage.getItem("seguimientoAudioV1");
@@ -805,7 +811,7 @@
         }
 
         // ----------------------
-        // Carga listado de tiendas
+        // 6.2 Carga listado de tiendas (pegar desde Excel)
         // ----------------------
 
         function handleApplyStores() {
@@ -884,8 +890,7 @@
           );
         }
 
-        // ------- EXCEL Checklist (lee F90 y puntos 0/1) -------
-
+        // 6.3 Adjuntar Excel Checklist (lee F90/F104 + puntos 0/1)
         function handleChecklistFileChange(storeId, visitId, event) {
           const file = event.target.files && event.target.files[0];
           if (!file) return;
@@ -917,11 +922,11 @@
                   wb = XLSX.read(textData, { type: "string" });
                 }
 
-                // 1) Extraer puntos por proceso (B + F con 0/1)
+                // (1) Puntos 0/1 por criterio (B + F)
                 const puntos = extractProcessPointsFromWorkbook(wb);
                 updateVisitField(storeId, visitId, "processPoints", puntos);
 
-                // 2) Intentar leer F90 como % checklist global
+                // (2) Intentar leer F90 (o F104) como % checklist global
                 let sheetName = wb.SheetNames[0];
 
                 const preferredSheets = [
@@ -1015,7 +1020,7 @@
           }
         }
 
-        // Guardar / cargar "nube"
+        // 6.4 Guardar / cargar "nube" y export/print
         function saveToCloud() {
           try {
             const payload = {
@@ -1109,7 +1114,7 @@
         }
 
         // ----------------------
-        // FILTRADO LISTADO TIENDAS
+        // 6.5 FILTRADO LISTADO TIENDAS
         // ----------------------
 
         const filteredStores = stores.filter((store) => {
@@ -1219,7 +1224,7 @@
         );
 
         // ----------------------
-        // MÉTRICAS GLOBALES
+        // 6.6 MÉTRICAS GLOBALES GENERAL
         // ----------------------
 
         const allVisits = stores.flatMap((s) => s.visitas || []);
@@ -1265,49 +1270,77 @@
           dashAplicaHit = aplicaHitTexto(dashVisitasConExcel);
         }
 
-        // Métricas específicas para donuts
-        const visitasAAO = stores
-          .filter((s) => !s.isExclusive)
-          .flatMap((s) => s.visitas || [])
-          .filter((v) => v.checklist !== null && !isNaN(v.checklist));
-        const visitasExcl = stores
-          .filter((s) => s.isExclusive)
+        // ----------------------
+        // 6.7 CONJUNTOS DE CENTROS
+        // ----------------------
+
+        const centrosNoExcl = stores.filter((s) => !s.isExclusive);
+        const exclusiveStores = stores.filter((s) => s.isExclusive);
+
+        // ----------------------
+        // 6.8 DONUTS 1 Y 2 – PROMEDIO DE CUMPLIMIENTO DE PROCESOS (F90/F104)
+        // ----------------------
+
+        const visitasNoExcl = centrosNoExcl
           .flatMap((s) => s.visitas || [])
           .filter((v) => v.checklist !== null && !isNaN(v.checklist));
 
-        const checklistMediaAAO = media(visitasAAO.map((v) => v.checklist));
+        const visitasExcl = exclusiveStores
+          .flatMap((s) => s.visitas || [])
+          .filter((v) => v.checklist !== null && !isNaN(v.checklist));
+
+        const checklistMediaNoExcl = media(
+          visitasNoExcl.map((v) => v.checklist)
+        );
         const checklistMediaExcl = media(
           visitasExcl.map((v) => v.checklist)
         );
 
-        const totalCentrosAAO = stores.filter((s) => !s.isExclusive).length;
-        const centrosAAOAAR = stores.filter(
-          (s) => !s.isExclusive && deriveCentroAAR(s) === "Sí"
+        const totalCentrosNoExcl = centrosNoExcl.length;
+        const centrosNoExclConChecklist = centrosNoExcl.filter((s) =>
+          (s.visitas || []).some((v) => v.excelName && v.excelName !== "")
         ).length;
-        const pctCentrosAAR =
-          totalCentrosAAO > 0
-            ? (centrosAAOAAR / totalCentrosAAO) * 100
-            : null;
-
-        const totalConChecklistAAO = stores.filter((s) =>
-          !s.isExclusive
-            ? (s.visitas || []).some(
-                (v) => v.excelName && v.excelName !== ""
-              )
-            : false
-        ).length;
-        const pctTiendasAAOConChecklist =
-          totalCentrosAAO > 0
-            ? (totalConChecklistAAO / totalCentrosAAO) * 100
+        const pctCentrosNoExclConChecklist =
+          totalCentrosNoExcl > 0
+            ? (centrosNoExclConChecklist / totalCentrosNoExcl) * 100
             : 0;
 
-        const hitAplicacionVisitas = porcentajeSi(
-          allVisits.map((v) => v.hit)
-        );
+        // ----------------------
+        // 6.9 DONUT 3 – APLICACIÓN HIT POR CENTRO
+        // (%) centros que aplican HIT / nº total centros)
+        // ----------------------
 
-        // PROCESOS: estadísticas para gráficos
-        const statsAAO = computeProcessStats(stores, false);
-        const statsExclusive = computeProcessStats(stores, true);
+        const totalCentros = stores.length;
+        const centrosConHitSi = stores.filter((s) =>
+          (s.visitas || []).some((v) => v.hit === "Sí")
+        ).length;
+        const hitAplicacionCentros =
+          totalCentros > 0
+            ? (centrosConHitSi / totalCentros) * 100
+            : null;
+
+        // ----------------------
+        // 6.10 DONUT 4 – % CENTROS AAO (PROPIETARIO) CON AAR ACTIVO
+        // ----------------------
+
+        const centrosPropAAO = stores.filter((s) =>
+          (s.propietario || "").toUpperCase().includes("AAO")
+        );
+        const totalCentrosPropAAO = centrosPropAAO.length;
+        const centrosPropAAO_AAR = centrosPropAAO.filter(
+          (s) => deriveCentroAAR(s) === "Sí"
+        ).length;
+        const pctCentrosPropAAO_AAR =
+          totalCentrosPropAAO > 0
+            ? (centrosPropAAO_AAR / totalCentrosPropAAO) * 100
+            : null;
+
+        // ----------------------
+        // 6.11 PROCESOS – ESTADÍSTICAS PARA GRÁFICOS (AAO vs exclusivos)
+        // ----------------------
+
+        const statsAAO = computeProcessStats(stores, false); // no exclusivos
+        const statsExclusive = computeProcessStats(stores, true); // exclusivos
         const {
           chartDataAAO,
           chartDataExclusive,
@@ -1316,10 +1349,8 @@
         } = buildProcessChartData(statsAAO, statsExclusive);
 
         // ----------------------
-        // CENTROS EXCLUSIVOS: métricas anuales
+        // 6.12 CENTROS EXCLUSIVOS – MÉTRICAS ANUALES (ventas/objetivos)
         // ----------------------
-
-        const exclusiveStores = stores.filter((s) => s.isExclusive);
 
         function getExclusiveTotals(store) {
           const data = store.exclusiveData || defaultExclusiveData();
@@ -1354,7 +1385,6 @@
           return "bg-red-100 text-red-700";
         }
 
-        // Actualizar ventas/objetivos por mes
         function updateExclusiveMonthValue(storeId, field, monthKey, value) {
           setStores((prev) =>
             prev.map((s) => {
@@ -1374,7 +1404,6 @@
           );
         }
 
-        // Acciones / derivaciones en exclusivos
         const ACTION_TYPES = [
           "Stand",
           "Mailing",
@@ -1448,7 +1477,7 @@
         }
 
         // =====================================
-        // RENDER
+        // 7. RENDER
         // =====================================
 
         return (
@@ -1479,7 +1508,7 @@
               </div>
             ) : (
               <div className="p-6">
-                {/* HEADER */}
+                {/* HEADER / FALDÓN PRINCIPAL */}
                 <header className="bg-red-600 text-white p-5 rounded-2xl shadow flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <span className="text-3xl">🎧</span>
@@ -1537,13 +1566,14 @@
                   </div>
                 </header>
 
-                {/* CUADRO DE MANDO DE PROCESOS */}
+                {/* CUADRO DE MANDO (Barras procesos + donuts) */}
                 <section className="mt-6 space-y-4">
                   <h2 className="font-bold text-lg mb-2">Cuadro de mando</h2>
 
+                  {/* 1. y 2. % aplicación de procesos (barras 3D) */}
                   <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
                     <ProcessCard
-                      title="1. % aplicación de procesos – Centros AAO"
+                      title="1. % aplicación de procesos – Centros AAO (no exclusivos)"
                       data={chartDataAAO}
                       avg={avgAAO}
                       showTable={showAAOTable}
@@ -1553,7 +1583,7 @@
                       onExport={() =>
                         exportProcessCsv(
                           chartDataAAO,
-                          "procesos_centros_AAO.csv"
+                          "procesos_centros_AAO_no_exclusivos.csv"
                         )
                       }
                     />
@@ -1574,16 +1604,16 @@
                     />
                   </div>
 
-                  {/* Donuts de KPIs generales */}
+                  {/* 3. Donuts de KPIs generales */}
                   <div className="mt-4">
                     <h3 className="font-bold text-sm mb-3">
                       Dashboard general – KPIs
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
                       <DonutCard
-                        title="Checklist medio centros AAO"
-                        percent={checklistMediaAAO}
-                        footer={`Centros AAO: ${totalCentrosAAO} · con al menos 1 checklist: ${totalConChecklistAAO} (${pctTiendasAAOConChecklist.toFixed(
+                        title="Checklist medio centros AAO (no exclusivos)"
+                        percent={checklistMediaNoExcl}
+                        footer={`Centros no exclusivos: ${totalCentrosNoExcl} · con al menos 1 checklist: ${centrosNoExclConChecklist} (${pctCentrosNoExclConChecklist.toFixed(
                           0
                         )}%)`}
                       />
@@ -1593,15 +1623,15 @@
                         footer={`Centros exclusivos: ${exclusiveStores.length}`}
                       />
                       <DonutCard
-                        title="Aplicación HIT (visitas)"
-                        percent={hitAplicacionVisitas}
-                        footer={`Sobre el total de visitas con Excel adjunto`}
+                        title="Aplicación HIT (centros)"
+                        percent={hitAplicacionCentros}
+                        footer={`Centros que aplican HIT: ${centrosConHitSi}/${totalCentros}`}
                       />
                       <DonutCard
                         title="% centros AAR activos (AAO)"
-                        percent={pctCentrosAAR}
+                        percent={pctCentrosPropAAO_AAR}
                         neutral={true}
-                        footer={`Centros AAO AAR: ${centrosAAOAAR}/${totalCentrosAAO}`}
+                        footer={`Centros AAO con AAR: ${centrosPropAAO_AAR}/${totalCentrosPropAAO}`}
                       />
                     </div>
                   </div>
@@ -1614,7 +1644,7 @@
                   )}
                 </section>
 
-                {/* LISTADO DE CENTROS */}
+                {/* LISTADO DE CENTROS (sin cambios de lógica) */}
                 <section className="mt-10 bg-white p-6 rounded-2xl shadow">
                   <div className="flex flex-col gap-4">
                     <div className="flex flex-wrap items-center justify-between gap-3">
@@ -1784,7 +1814,7 @@
                       </div>
                     </div>
 
-                    {/* Tabla centros */}
+                    {/* Tabla de centros */}
                     {stores.length === 0 ? (
                       <p className="text-xs text-gray-500">
                         Aún no hay centros cargados. Pega el listado arriba y
@@ -2049,7 +2079,7 @@
                                                   <div className="grid grid-cols-3 gap-1 mt-2">
                                                     <div>
                                                       <p className="text-[10px] mb-0.5">
-                                                        Checklist % (F90)
+                                                        Checklist % (F90/F104)
                                                       </p>
                                                       <input
                                                         type="number"
@@ -2141,11 +2171,9 @@
                                           <p className="text-[10px] text-gray-500">
                                             Adjunta el Excel del checklist: la
                                             plataforma lee automáticamente el %
-                                            global desde la celda{" "}
-                                            <strong>F90</strong> (o F104) y
-                                            también los puntos 0/1 por
-                                            criterio para los gráficos de
-                                            procesos.
+                                            global desde F90/F104 y también los
+                                            puntos 0/1 por criterio para los
+                                            gráficos de procesos.
                                           </p>
                                         </div>
                                       </td>
@@ -2157,8 +2185,8 @@
                           </tbody>
                         </table>
 
-                        {/* KPIs globales */}
-                        <div className="mt-4 text-[11px] text-gray-600 flex flex-wrap gap-3">
+                        {/* KPIs globales (texto) */}
+                        <div className="mt-4 text-[11px] text-gray-600 وذلك flex flex-wrap gap-3">
                           <span>
                             Total tiendas: <strong>{totalTiendas}</strong>
                           </span>
@@ -2181,7 +2209,7 @@
                           >
                             <span className="w-2 h-2 rounded-full bg-current/70" />
                             <span>
-                              Checklist medio global (F90):{" "}
+                              Checklist medio global (F90/F104):{" "}
                               {checklistMediaGlobal !== null
                                 ? `${checklistMediaGlobal.toFixed(0)}%`
                                 : "-"}
@@ -2195,7 +2223,7 @@
                           >
                             <span className="w-2 h-2 rounded-full bg-current/70" />
                             <span>
-                              % aplicación HIT global:{" "}
+                              % aplicación HIT (visitas):{" "}
                               {hitMediaGlobal !== null
                                 ? `${hitMediaGlobal.toFixed(0)}%`
                                 : "-"}
@@ -2213,7 +2241,7 @@
                   </div>
                 </section>
 
-                {/* CENTROS EXCLUSIVOS */}
+                {/* CENTROS EXCLUSIVOS – BLOQUE DE VENTAS/OBJETIVOS */}
                 {exclusiveStores.length > 0 && (
                   <section className="mt-10 bg-white p-6 rounded-2xl shadow">
                     {/* Faldón resumen */}
@@ -2373,6 +2401,7 @@
                                           </p>
 
                                           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                                            {/* Ventas */}
                                             <div>
                                               <p className="text-[10px] mb-1 font-semibold">
                                                 Ventas mensuales €
@@ -2420,6 +2449,7 @@
                                               </div>
                                             </div>
 
+                                            {/* Objetivos */}
                                             <div>
                                               <p className="text-[10px] mb-1 font-semibold">
                                                 Objetivo mensual €
@@ -2468,6 +2498,7 @@
                                             </div>
                                           </div>
 
+                                          {/* Tabla mensual resumen */}
                                           <div className="overflow-x-auto">
                                             <table className="w-full text-[10px] border-collapse">
                                               <thead>
