@@ -13,7 +13,7 @@
       crossorigin
     ></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   </head>
   <body class="bg-gray-100">
     <div id="root"></div>
@@ -21,9 +21,9 @@
     <script type="text/babel" data-presets="env,react">
       const { useState, useEffect } = React;
 
-      // ============================================================
-      // 1. CHECKLIST (texto descriptivo – ya no se muestra como mapa)
-      // ============================================================
+      // =====================
+      // CHECKLIST (referencia)
+      // =====================
 
       const CHECKLIST = [
         {
@@ -135,9 +135,9 @@
         },
       ];
 
-      // ============================================================
-      // 2. UTILIDADES GENERALES
-      // ============================================================
+      // =====================
+      // Utilidades
+      // =====================
 
       function createEmptyVisits() {
         return [1, 2, 3, 4].map((id) => ({
@@ -148,7 +148,7 @@
           hit: "",
           checklist: null, // % global F90
           centroAAR: "",
-          points: {}, // resultados punto a punto (clave = nº proceso, valor 0/1)
+          points: {}, // resultados punto a punto: { nºProceso: 0/1 }
         }));
       }
 
@@ -244,6 +244,17 @@
         return (countSi / valid.length) * 100;
       }
 
+      // donut antiguo (se sigue usando en KPIs de listado)
+      function donutStyle(percent) {
+        const value = percent && percent > 0 ? Math.min(percent, 100) : 0;
+        const color =
+          percent !== null && percent >= 85 ? "#16a34a" : "#dc2626";
+        return {
+          background: `conic-gradient(${color} ${value * 3.6}deg, #e5e7eb 0deg)`,
+        };
+      }
+
+      // donut 3D para el cuadro de mando
       function donutStyle3D(percent) {
         const safe =
           typeof percent === "number" && !isNaN(percent) && percent > 0
@@ -255,6 +266,12 @@
           background: `conic-gradient(${color} ${safe * 3.6}deg, #e5e7eb 0deg)`,
           boxShadow: "0 14px 30px rgba(15,23,42,0.35)",
         };
+      }
+
+      function kpiBadgeClass(percent) {
+        if (percent === null) return "bg-gray-200 text-gray-700";
+        if (percent >= 85) return "bg-green-100 text-green-800";
+        return "bg-red-100 text-red-700";
       }
 
       function delegadoColor(delegado) {
@@ -321,9 +338,9 @@
         return "No";
       }
 
-      // ============================================================
-      // 3. CENTROS EXCLUSIVOS – configuración
-      // ============================================================
+      // =====================
+      // Centros exclusivos
+      // =====================
 
       const EXCLUSIVE_CENTER_NAMES = [
         "PAMPLONA C. EXCLUSIVO",
@@ -363,9 +380,9 @@
         };
       }
 
-      // ============================================================
-      // 4. BARRAS 3D POR PROCESO + TABLA EXCEL
-      // ============================================================
+      // =====================================
+      // Componentes gráficos nuevos (3D)
+      // =====================================
 
       function ChecklistBarChart3D({
         title,
@@ -392,21 +409,19 @@
               <button
                 className="flex items-center gap-1 text-[10px] px-2 py-1 rounded-full border border-sky-300 text-sky-700 hover:bg-sky-50 hover:shadow cursor-pointer"
                 onClick={onToggleTable}
-                title="Ver datos en formato tabla tipo Excel"
               >
-                📊 <span>{showTable ? "Ocultar tabla" : "Ver tabla"}</span>
+                📊 {showTable ? "Ocultar tabla" : "Ver tabla"}
               </button>
             </div>
 
             {stats.length === 0 ? (
               <p className="text-[10px] text-gray-500">
                 Aún no hay datos por proceso. Adjunta algún checklist
-                (con 0/1 en la columna F) para ver la aplicación del
-                checklist por proceso.
+                (columna F con 0/1) para ver la aplicación del checklist
+                por proceso.
               </p>
             ) : (
               <>
-                {/* Gráfico de barras 3D */}
                 <div className="mt-2 relative h-48">
                   {/* Eje Y */}
                   <div className="absolute left-0 top-1 bottom-6 w-8 flex flex-col justify-between text-[9px] text-gray-400">
@@ -436,7 +451,6 @@
                                 className="w-full rounded-t-md border border-sky-500 bg-gradient-to-tr from-sky-200 via-sky-400 to-sky-700 shadow-[3px_-3px_6px_rgba(15,23,42,0.28)] transition-transform group-hover:-translate-y-1"
                                 style={{ height: `${h}%` }}
                               >
-                                {/* Tooltip */}
                                 <div className="absolute -top-6 left-1/2 -translate-x-1/2 hidden group-hover:flex flex-col items-center text-[9px] bg-white px-1.5 py-0.5 rounded shadow-lg border border-gray-200">
                                   <span className="font-semibold">
                                     {s.percent.toFixed(0)}%
@@ -462,26 +476,21 @@
                   <span className="font-semibold">
                     {totalProcesos}
                   </span>
-                  . Pasa el ratón por encima de cada barra para ver el
-                  % y el nº de aplicaciones.
+                  . Pasa el ratón por cada barra para ver % y nº de
+                  aplicaciones.
                 </p>
               </>
             )}
 
-            {/* Tabla tipo Excel */}
             {showTable && stats.length > 0 && (
               <div className="mt-3 bg-white border rounded-xl p-2 text-[10px]">
                 <div className="flex items-center justify-between mb-1">
                   <p className="font-semibold">
-                    Tabla de procesos (para consulta / impresión)
+                    Tabla de procesos (consulta / impresión)
                   </p>
                   <button
                     className="px-2 py-1 rounded-full border border-gray-300 text-gray-700 hover:bg-gray-50 cursor-pointer"
-                    onClick={() => {
-                      if (typeof window !== "undefined") {
-                        window.print();
-                      }
-                    }}
+                    onClick={() => window.print()}
                   >
                     🖨 Imprimir
                   </button>
@@ -522,10 +531,6 @@
         );
       }
 
-      // ============================================================
-      // 5. DONUT KPI 3D
-      // ============================================================
-
       function KpiDonut3D({ label, percent }) {
         return (
           <div className="flex flex-col items-center justify-center text-center">
@@ -548,9 +553,9 @@
         );
       }
 
-      // ============================================================
-      // 6. COMPONENTE PRINCIPAL
-      // ============================================================
+      // =====================
+      // Componente principal
+      // =====================
 
       function App() {
         const [pin, setPin] = useState("");
@@ -571,12 +576,12 @@
         const [storesInput, setStoresInput] = useState("");
         const [stores, setStores] = useState([]);
         const [expandedStoreId, setExpandedStoreId] = useState(null);
+        const [dashboardStoreId, setDashboardStoreId] = useState(null); // ya no se usa, pero se mantiene por compatibilidad
         const [showCarga, setShowCarga] = useState(false);
         const [lastSavedAt, setLastSavedAt] = useState(null);
 
         // Centros exclusivos
-        const [expandedExclusiveId, setExpandedExclusiveId] =
-          useState(null);
+        const [expandedExclusiveId, setExpandedExclusiveId] = useState(null);
         const [selectedSalesMonth, setSelectedSalesMonth] = useState(
           EXCLUSIVE_MONTHS[0].key
         );
@@ -584,7 +589,7 @@
           EXCLUSIVE_MONTHS[0].key
         );
 
-        // Tablas Excel de gráficos
+        // Tablas de procesos por gráfico
         const [showTableAAO, setShowTableAAO] = useState(false);
         const [showTableExclusive, setShowTableExclusive] =
           useState(false);
@@ -619,14 +624,12 @@
                   isExclusive,
                   exclusiveData: isExclusive
                     ? {
-                        ventas:
-                          (s.exclusiveData && s.exclusiveData.ventas) || {},
-                        objetivos:
-                          (s.exclusiveData && s.exclusiveData.objetivos) ||
+                        ventas: (s.exclusiveData && s.exclusiveData.ventas) ||
                           {},
+                        objetivos:
+                          (s.exclusiveData && s.exclusiveData.objetivos) || {},
                         acciones:
-                          (s.exclusiveData && s.exclusiveData.acciones) ||
-                          [],
+                          (s.exclusiveData && s.exclusiveData.acciones) || [],
                       }
                     : undefined,
                 };
@@ -643,7 +646,9 @@
           if (pin.trim().toUpperCase() === "AR4321") setAuthorized(true);
         }
 
-        // ---------------------- Carga listado de tiendas ----------------------
+        // ----------------------
+        // Carga listado de tiendas
+        // ----------------------
 
         function handleApplyStores() {
           if (!storesInput.trim()) return;
@@ -696,6 +701,7 @@
 
           setStores(newStores);
           setExpandedStoreId(null);
+          setDashboardStoreId(null);
         }
 
         function updateStoreField(id, field, value) {
@@ -720,7 +726,7 @@
           );
         }
 
-        // ------- LECTURA EXCEL Checklist (F90 + puntos por proceso) -------
+        // ------- EXCEL Checklist (lee F90 y procesos punto a punto) -------
 
         function handleChecklistFileChange(storeId, visitId, event) {
           const file = event.target.files && event.target.files[0];
@@ -741,7 +747,7 @@
               if (isExcel && window.XLSX) {
                 const wb = XLSX.read(data, { type: "array" });
 
-                // 1) Buscar hoja para F90
+                // Hoja principal para F90
                 let sheetName = wb.SheetNames[0];
                 if (wb.SheetNames.includes("PROCESOS BASICOS")) {
                   sheetName = "PROCESOS BASICOS";
@@ -770,11 +776,16 @@
                 }
 
                 if (checklistF90 !== null && !isNaN(checklistF90)) {
-                  updateVisitField(storeId, visitId, "checklist", checklistF90);
+                  updateVisitField(
+                    storeId,
+                    visitId,
+                    "checklist",
+                    checklistF90
+                  );
                   checklistFromF90Set = true;
                 }
 
-                // 2) Buscar hoja con procesos (columna F con 0/1)
+                // Procesos punto a punto (B8–B... / F)
                 let sheetProcName = null;
                 if (wb.SheetNames.includes("PROCESOS BASICOS")) {
                   sheetProcName = "PROCESOS BASICOS";
@@ -788,7 +799,7 @@
                 if (sheetProcName) {
                   const sProc = wb.Sheets[sheetProcName];
                   const points = {};
-                  for (let row = 8; row <= 120; row++) {
+                  for (let row = 8; row <= 130; row++) {
                     const labelCell = sProc["B" + row];
                     if (!labelCell || labelCell.v == null) continue;
                     const valCell = sProc["F" + row];
@@ -801,7 +812,7 @@
                       value = 0;
                     }
                     if (value !== null) {
-                      const pointIndex = row - 7; // 8->1, 9->2...
+                      const pointIndex = row - 7; // 8->1, 9->2, etc.
                       points[pointIndex] = value;
                     }
                   }
@@ -810,7 +821,6 @@
                   }
                 }
 
-                // 3) Buscar HIT como apoyo
                 const csv = XLSX.utils.sheet_to_csv(sheet);
                 parseFromText(csv, checklistFromF90Set);
               } else {
@@ -858,8 +868,7 @@
           }
         }
 
-        // ---------------------- Guardar / cargar nube ----------------------
-
+        // Guardar / cargar "nube"
         function saveToCloud() {
           try {
             const payload = {
@@ -905,20 +914,19 @@
                   isExclusive,
                   exclusiveData: isExclusive
                     ? {
-                        ventas:
-                          (s.exclusiveData && s.exclusiveData.ventas) || {},
-                        objetivos:
-                          (s.exclusiveData && s.exclusiveData.objetivos) ||
+                        ventas: (s.exclusiveData && s.exclusiveData.ventas) ||
                           {},
+                        objetivos:
+                          (s.exclusiveData && s.exclusiveData.objetivos) || {},
                         acciones:
-                          (s.exclusiveData && s.exclusiveData.acciones) ||
-                          [],
+                          (s.exclusiveData && s.exclusiveData.acciones) || [],
                       }
                     : undefined,
                 };
               });
               setStores(normalizedStores);
               setExpandedStoreId(null);
+              setDashboardStoreId(null);
             }
             if (parsed.lastSavedAt) setLastSavedAt(parsed.lastSavedAt);
           } catch (e) {
@@ -926,7 +934,9 @@
           }
         }
 
-        // ---------------------- FILTRADO LISTADO TIENDAS ----------------------
+        // ----------------------
+        // FILTRADO LISTADO TIENDAS
+        // ----------------------
 
         const filteredStores = stores.filter((store) => {
           const respAudio = deriveRespAudio(store);
@@ -1034,22 +1044,41 @@
           stores.map((s) => deriveRespAudio(s))
         );
 
-        // ---------------------- MÉTRICAS GLOBALES PARA CUADRO DE MANDO ----------------------
+        // ----------------------
+        // MÉTRICAS GLOBALES GENERAL
+        // ----------------------
 
         const allVisits = stores.flatMap((s) => s.visitas || []);
+        const visitasValidasGlobal = allVisits.filter(
+          (v) => v.excelName && v.excelName !== ""
+        );
+        const totalVisitas = visitasValidasGlobal.length;
+        const totalTiendas = stores.length;
+        const tiendasConVisita = stores.filter((s) =>
+          (s.visitas || []).some((v) => v.excelName && v.excelName !== "")
+        ).length;
+        const porcentajeTiendasVisitadas =
+          totalTiendas > 0
+            ? (tiendasConVisita / totalTiendas) * 100
+            : 0;
+
+        const checklistMediaGlobal = media(
+          visitasValidasGlobal.map((v) => v.checklist)
+        );
+        const hitMediaGlobal = porcentajeSi(
+          visitasValidasGlobal.map((v) => v.hit)
+        );
+        const aplicaHitGlobal = aplicaHitTexto(visitasValidasGlobal);
+
         const algunFechaInvalida = allVisits.some(
           (v) => v.fecha && !isValidFecha(v.fecha)
         );
 
-        const visitsWithExcel = allVisits.filter(
-          (v) => v.excelName && v.excelName !== ""
-        );
-
+        // métricas específicas para cuadro de mando
         const visitsAAOWithExcel = stores
           .filter((s) => !s.isExclusive)
           .flatMap((s) => s.visitas || [])
           .filter((v) => v.excelName && v.excelName !== "");
-
         const visitsExclusiveWithExcel = stores
           .filter((s) => s.isExclusive)
           .flatMap((s) => s.visitas || [])
@@ -1061,11 +1090,9 @@
         const checklistMediaExclusive = media(
           visitsExclusiveWithExcel.map((v) => v.checklist)
         );
-
         const hitAplicacionGlobal = porcentajeSi(
-          visitsWithExcel.map((v) => v.hit)
+          visitasValidasGlobal.map((v) => v.hit)
         );
-
         const totalCentros = stores.length;
         const centrosAARSi = stores.filter(
           (s) => deriveCentroAAR(s) === "Sí"
@@ -1074,7 +1101,7 @@
           totalCentros > 0 ? (centrosAARSi / totalCentros) * 100 : null;
 
         function computePointStats(isExclusive) {
-          const map = new Map(); // point -> {applied, total}
+          const map = new Map(); // point -> {applied,total}
           stores.forEach((store) => {
             if (!!store.isExclusive !== isExclusive) return;
             (store.visitas || []).forEach((v) => {
@@ -1104,17 +1131,9 @@
         const pointStatsAAO = computePointStats(false);
         const pointStatsExclusive = computePointStats(true);
 
-        const totalTiendas = stores.length;
-        const tiendasConVisita = stores.filter((s) =>
-          (s.visitas || []).some((v) => v.excelName && v.excelName !== "")
-        ).length;
-        const totalVisitas = visitsWithExcel.length;
-        const porcentajeTiendasVisitadas =
-          totalTiendas > 0
-            ? (tiendasConVisita / totalTiendas) * 100
-            : 0;
-
-        // ---------------------- CENTROS EXCLUSIVOS: métricas anuales ----------------------
+        // ----------------------
+        // CENTROS EXCLUSIVOS: métricas anuales
+        // ----------------------
 
         const exclusiveStores = stores.filter((s) => s.isExclusive);
 
@@ -1170,6 +1189,7 @@
           );
         }
 
+        // Acciones / derivaciones en exclusivos
         const ACTION_TYPES = [
           "Stand",
           "Mailing",
@@ -1188,9 +1208,9 @@
               if (s.id !== storeId) return s;
               const data = s.exclusiveData || defaultExclusiveData();
               const nextId =
-                data.acciones && data.acciones.length
+                (data.acciones && data.acciones.length
                   ? Math.max(...data.acciones.map((a) => a.id || 0)) + 1
-                  : 1;
+                  : 1);
               const nueva = {
                 id: nextId,
                 tipo: "",
@@ -1242,16 +1262,13 @@
           );
         }
 
-        // -------- utilidades Cuadro de mando (PDF / imprimir) --------
         function printDashboard() {
-          if (typeof window !== "undefined") {
-            window.print(); // el usuario puede elegir impresora o "Guardar como PDF"
-          }
+          window.print();
         }
 
-        // ============================================================
+        // =====================
         // RENDER
-        // ============================================================
+        // =====================
 
         return (
           <div className="min-h-screen bg-gray-100 font-sans">
@@ -1281,7 +1298,7 @@
               </div>
             ) : (
               <div className="p-6">
-                {/* HEADER PRINCIPAL */}
+                {/* HEADER */}
                 <header className="bg-red-600 text-white p-5 rounded-2xl shadow flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <span className="text-3xl">🎧</span>
@@ -1313,7 +1330,7 @@
                   </div>
                 </header>
 
-                {/* =================== PANEL 1: DEPARTAMENTO + CUADRO DE MANDO =================== */}
+                {/* PANEL DEPARTAMENTO + CUADRO DE MANDO */}
                 <section className="mt-6 space-y-6">
                   {/* Faldón rojo Departamento Audiología */}
                   <div className="bg-red-600 text-white p-5 rounded-2xl shadow flex flex-col md:flex-row md:items-center md:justify-between gap-3">
@@ -1327,9 +1344,7 @@
                     </div>
                     <div className="text-[11px] md:text-xs">
                       <p>
-                        <span className="font-semibold">
-                          Director:
-                        </span>{" "}
+                        <span className="font-semibold">Director:</span>{" "}
                         David López
                       </p>
                       <p>
@@ -1355,8 +1370,8 @@
                           Cuadro de mando
                         </h3>
                         <p className="text-[11px] text-gray-500">
-                          Visión global de la aplicación de procesos y
-                          estado de la red de centros de audio.
+                          Aplicación de procesos y KPIs globales de la red
+                          de audio.
                         </p>
                       </div>
                       <div className="flex flex-wrap gap-2 justify-end">
@@ -1381,7 +1396,7 @@
                       </div>
                     </div>
 
-                    {/* 1 y 2. Gráficas de procesos */}
+                    {/* 1. y 2. Gráficas de procesos */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                       <ChecklistBarChart3D
                         title="1. % aplicación de procesos – Centros AAO"
@@ -1421,7 +1436,7 @@
                       />
                     </div>
 
-                    {/* Texto KPIs */}
+                    {/* KPIs numéricos */}
                     <div className="mt-1 text-[11px] text-gray-600 flex flex-wrap gap-3">
                       <span>
                         Centros totales:{" "}
@@ -1449,12 +1464,1036 @@
                   </div>
                 </section>
 
-                {/* =================== LISTADO DE CENTROS =================== */}
-                <!-- (RESTO DEL CÓDIGO: LISTADO DE CENTROS Y CENTROS EXCLUSIVOS
-                     SE MANTIENE EXACTAMENTE IGUAL QUE EN TU SCRIPT ANTERIOR) -->
-                <!-- ... AQUÍ PEGARÍAS SIN CAMBIOS TODO EL BLOQUE DE LISTADO DE CENTROS
-                     Y EL BLOQUE DE CENTROS EXCLUSIVOS TAL Y COMO YA LOS TENÍAS ... -->
+                {/* LISTADO DE CENTROS (SIN CAMBIOS EN LÓGICA) */}
+                <section className="mt-10 bg-white p-6 rounded-2xl shadow">
+                  <div className="flex flex-col gap-4">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <h3 className="font-bold text-lg bg-red-600 text-white inline-flex items-center px-4 py-2 rounded-2xl">
+                        LISTADO DE CENTROS
+                      </h3>
+                      <button
+                        className="text-xs px-3 py-1 rounded-full border border-red-300 text-red-700 bg-white/80 hover:bg-white"
+                        onClick={() => setShowCarga((p) => !p)}
+                      >
+                        {showCarga
+                          ? "Ocultar edición de listado"
+                          : "Cargar / editar listado desde Excel"}
+                      </button>
+                    </div>
 
+                    {showCarga && (
+                      <div className="bg-gray-50 border rounded-2xl p-3">
+                        <p className="text-xs text-gray-600 mb-2">
+                          Pega aquí el listado de centros desde Excel (una
+                          fila por línea, campos separados por tabulador):
+                          <br />
+                          <span className="font-semibold">
+                            CODIGO · PROPIETARIO · CENTRO · PROVINCIA ·
+                            CORREO · REGIONAL
+                          </span>
+                        </p>
+                        <textarea
+                          className="w-full p-2 border rounded mb-2 text-xs h-20"
+                          placeholder="Ejemplo:&#10;4ABB&#9;MAZA Oriol&#9;PAMPLONA C. Exclusivo&#9;NAVARRA&#9;navarra.pamplona.carrefour@afflelou.es&#9;Sonia Godino"
+                          value={storesInput}
+                          onChange={(e) => setStoresInput(e.target.value)}
+                        ></textarea>
+                        <button
+                          onClick={handleApplyStores}
+                          className="text-xs px-3 py-1 rounded-full bg-red-600 text-white font-semibold shadow"
+                        >
+                          Aplicar/actualizar listado
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Faldón rojo buscador + filtros */}
+                    <div className="bg-red-600 text-white rounded-2xl p-3">
+                      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+                        <div className="flex items-center gap-2 flex-1">
+                          <span className="text-xl">🔍</span>
+                          <input
+                            type="text"
+                            placeholder="Buscar en todos los campos..."
+                            className="flex-1 px-3 py-1 rounded text-xs text-gray-800"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                          />
+                        </div>
+                        <div className="text-[10px] opacity-90 lg:text-right">
+                          Filtros por columna: selecciona un valor en
+                          cualquier desplegable para filtrar el listado
+                          (como en Excel).
+                        </div>
+                      </div>
+
+                      <div className="mt-3 flex flex-nowrap gap-2 text-[11px] overflow-x-auto">
+                        <select
+                          className="bg-white text-red-700 rounded px-2 py-1 min-w-[110px]"
+                          value={filterCodigo}
+                          onChange={(e) => setFilterCodigo(e.target.value)}
+                        >
+                          <option value="">Código (todos)</option>
+                          {opcionesCodigo.map((op) => (
+                            <option key={op} value={op}>
+                              {op}
+                            </option>
+                          ))}
+                        </select>
+
+                        <select
+                          className="bg-white text-red-700 rounded px-2 py-1 min-w-[130px]"
+                          value={filterPropietario}
+                          onChange={(e) =>
+                            setFilterPropietario(e.target.value)
+                          }
+                        >
+                          <option value="">Propietario (todos)</option>
+                          {opcionesPropietario.map((op) => (
+                            <option key={op} value={op}>
+                              {op}
+                            </option>
+                          ))}
+                        </select>
+
+                        <select
+                          className="bg-white text-red-700 rounded px-2 py-1 min-w-[160px]"
+                          value={filterCentro}
+                          onChange={(e) => setFilterCentro(e.target.value)}
+                        >
+                          <option value="">Centro (todos)</option>
+                          {opcionesCentro.map((op) => (
+                            <option key={op} value={op}>
+                              {op}
+                            </option>
+                          ))}
+                        </select>
+
+                        <select
+                          className="bg-white text-red-700 rounded px-2 py-1 min-w-[140px]"
+                          value={filterProvincia}
+                          onChange={(e) => setFilterProvincia(e.target.value)}
+                        >
+                          <option value="">Provincia (todas)</option>
+                          {opcionesProvincia.map((op) => (
+                            <option key={op} value={op}>
+                              {op}
+                            </option>
+                          ))}
+                        </select>
+
+                        <select
+                          className="bg-white text-red-700 rounded px-2 py-1 min-w-[140px]"
+                          value={filterCorreo}
+                          onChange={(e) => setFilterCorreo(e.target.value)}
+                        >
+                          <option value="">Correo (todos)</option>
+                          {opcionesCorreo.map((op) => (
+                            <option key={op} value={op}>
+                              {op}
+                            </option>
+                          ))}
+                        </select>
+
+                        <select
+                          className="bg-white text-red-700 rounded px-2 py-1 min-w-[150px]"
+                          value={filterDelegado}
+                          onChange={(e) => setFilterDelegado(e.target.value)}
+                        >
+                          <option value="">Delegado (todos)</option>
+                          {opcionesDelegado.map((op) => (
+                            <option key={op} value={op}>
+                              {op || "Sin delegado"}
+                            </option>
+                          ))}
+                        </select>
+
+                        <select
+                          className="bg-white text-red-700 rounded px-2 py-1 min-w-[150px]"
+                          value={filterResponsableAudio}
+                          onChange={(e) =>
+                            setFilterResponsableAudio(e.target.value)
+                          }
+                        >
+                          <option value="">Resp. audio (todos)</option>
+                          {opcionesRespAudio.map((op) => (
+                            <option key={op} value={op}>
+                              {op}
+                            </option>
+                          ))}
+                        </select>
+
+                        <select
+                          className="bg-white text-red-700 rounded px-2 py-1 min-w-[120px]"
+                          value={filterCentroAAR}
+                          onChange={(e) => setFilterCentroAAR(e.target.value)}
+                        >
+                          <option value="">Centro AAR (todos)</option>
+                          <option value="Sí">Sí</option>
+                          <option value="No">No</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Tabla sin scroll horizontal */}
+                    {stores.length === 0 ? (
+                      <p className="text-xs text-gray-500">
+                        Aún no hay centros cargados. Pega el listado arriba
+                        y pulsa "Aplicar/actualizar listado".
+                      </p>
+                    ) : (
+                      <div className="overflow-y-auto">
+                        <table className="w-full text-[11px] border-collapse">
+                          <thead>
+                            <tr className="bg-gray-50 border-b">
+                              <th className="text-left px-2 py-2">Nº</th>
+                              <th className="text-left px-2 py-2">Código</th>
+                              <th className="text-left px-2 py-2">
+                                Propietario
+                              </th>
+                              <th className="text-left px-2 py-2">Centro</th>
+                              <th className="text-left px-2 py-2">
+                                Provincia
+                              </th>
+                              <th className="text-left px-2 py-2">Correo</th>
+                              <th className="text-left px-2 py-2">
+                                Delegado regional
+                              </th>
+                              <th className="text-left px-2 py-2">
+                                Resp. audio
+                              </th>
+                              <th className="text-left px-2 py-2">
+                                Centro AAR
+                              </th>
+                              <th className="text-right px-2 py-2">
+                                Nº visitas
+                              </th>
+                              <th className="text-right px-2 py-2">
+                                Checklist medio %
+                              </th>
+                              <th className="text-right px-2 py-2">
+                                Aplica HIT
+                              </th>
+                              <th className="text-center px-2 py-2">
+                                Visitas / checklist (4)
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {sortedFilteredStores.map((store, index) => {
+                              const visitasConExcel = (store.visitas || []).filter(
+                                (v) => v.excelName && v.excelName !== ""
+                              );
+                              const checklistMedioTienda = media(
+                                visitasConExcel.map((v) => v.checklist)
+                              );
+                              const aplicaHitTienda =
+                                aplicaHitTexto(visitasConExcel);
+
+                              const respAudioCentro = deriveRespAudio(store);
+                              const centroAARValor = deriveCentroAAR(store);
+                              const isExpanded =
+                                expandedStoreId === store.id;
+
+                              const checklistBadge =
+                                checklistMedioTienda !== null ? (
+                                  <span
+                                    className={
+                                      "inline-block min-w-[40px] px-2 py-0.5 rounded-full " +
+                                      (checklistMedioTienda >= 85
+                                        ? "bg-green-100 text-green-800"
+                                        : "bg-red-100 text-red-700")
+                                    }
+                                  >
+                                    {checklistMedioTienda.toFixed(0)}%
+                                  </span>
+                                ) : (
+                                  "-"
+                                );
+
+                              const rowBg = store.isExclusive
+                                ? "bg-amber-50"
+                                : "";
+
+                              return (
+                                <React.Fragment key={store.id}>
+                                  <tr
+                                    className={
+                                      "border-b hover:bg-gray-50 align-top " +
+                                      rowBg
+                                    }
+                                  >
+                                    <td className="px-2 py-1">
+                                      {index + 1}
+                                    </td>
+                                    <td className="px-2 py-1">
+                                      <span className="font-semibold">
+                                        {store.codigo || "-"}
+                                      </span>
+                                    </td>
+                                    <td className="px-2 py-1">
+                                      {store.propietario || "-"}
+                                    </td>
+                                    <td className="px-2 py-1">
+                                      {store.centro || "-"}
+                                    </td>
+                                    <td className="px-2 py-1">
+                                      <span
+                                        className="inline-block px-2 py-0.5 rounded-full"
+                                        style={delegadoColor(
+                                          store.centroRegional
+                                        )}
+                                      >
+                                        {store.provincia || "-"}
+                                      </span>
+                                    </td>
+                                    <td className="px-2 py-1 break-all">
+                                      {store.correo || "-"}
+                                    </td>
+                                    <td className="px-2 py-1">
+                                      <span
+                                        className="inline-block px-2 py-0.5 rounded-full"
+                                        style={delegadoColor(
+                                          store.centroRegional
+                                        )}
+                                      >
+                                        {store.centroRegional ||
+                                          "Sin delegado"}
+                                      </span>
+                                    </td>
+                                    <td className="px-2 py-1">
+                                      {respAudioCentro || "-"}
+                                    </td>
+                                    <td className="px-2 py-1">
+                                      {centroAARValor || "-"}
+                                    </td>
+                                    <td className="px-2 py-1 text-right">
+                                      {visitasConExcel.length}
+                                    </td>
+                                    <td className="px-2 py-1 text-right">
+                                      {checklistBadge}
+                                    </td>
+                                    <td className="px-2 py-1 text-right">
+                                      {aplicaHitTienda || "-"}
+                                    </td>
+                                    <td className="px-2 py-1 text-center">
+                                      <button
+                                        className="text-[10px] px-2 py-1 rounded-full border border-red-400 text-red-600 hover:bg-red-50 cursor-pointer"
+                                        onClick={() =>
+                                          setExpandedStoreId(
+                                            isExpanded ? null : store.id
+                                          )
+                                        }
+                                      >
+                                        {isExpanded
+                                          ? "Ocultar visitas"
+                                          : "Ver/editar visitas"}
+                                      </button>
+                                    </td>
+                                  </tr>
+
+                                  {isExpanded && (
+                                    <tr className="bg-gray-50 border-b">
+                                      <td
+                                        colSpan={13}
+                                        className="px-3 py-3"
+                                      >
+                                        <div className="text-[11px]">
+                                          <p className="font-semibold mb-2">
+                                            Visitas y checklist adjunto
+                                            (hasta 4) –{" "}
+                                            {store.centro || store.codigo}
+                                          </p>
+                                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-3">
+                                            {(store.visitas || []).map(
+                                              (visit) => (
+                                                <div
+                                                  key={visit.id}
+                                                  className="border rounded-xl p-2 bg-white"
+                                                >
+                                                  <p className="font-semibold mb-1">
+                                                    Visita {visit.id}
+                                                  </p>
+                                                  <input
+                                                    type="text"
+                                                    placeholder="dd/mm/aaaa"
+                                                    className={
+                                                      "w-full border rounded px-2 py-1 mb-1 " +
+                                                      (visit.fecha &&
+                                                      !isValidFecha(
+                                                        visit.fecha
+                                                      )
+                                                        ? "border-red-500 bg-red-50"
+                                                        : "")
+                                                    }
+                                                    value={visit.fecha}
+                                                    onChange={(e) =>
+                                                      updateVisitField(
+                                                        store.id,
+                                                        visit.id,
+                                                        "fecha",
+                                                        e.target.value
+                                                      )
+                                                    }
+                                                  />
+                                                  <select
+                                                    className="w-full border rounded px-2 py-1 mb-1"
+                                                    value={
+                                                      visit.responsable || ""
+                                                    }
+                                                    onChange={(e) =>
+                                                      updateVisitField(
+                                                        store.id,
+                                                        visit.id,
+                                                        "responsable",
+                                                        e.target.value
+                                                      )
+                                                    }
+                                                  >
+                                                    <option value="">
+                                                      Resp. audio
+                                                    </option>
+                                                    <option value="Sonia">
+                                                      Sonia
+                                                    </option>
+                                                    <option value="Ary Rojas">
+                                                      Ary Rojas
+                                                    </option>
+                                                  </select>
+
+                                                  <label className="inline-flex items-center px-3 py-1 rounded-xl border cursor-pointer hover:bg-gray-50 mb-1">
+                                                    <span className="text-[11px] font-semibold">
+                                                      Adjuntar Excel
+                                                      checklist
+                                                    </span>
+                                                    <input
+                                                      type="file"
+                                                      accept=".xlsx,.xls,.csv"
+                                                      className="hidden"
+                                                      onChange={(e) =>
+                                                        handleChecklistFileChange(
+                                                          store.id,
+                                                          visit.id,
+                                                          e
+                                                        )
+                                                      }
+                                                    />
+                                                  </label>
+                                                  <p className="text-[10px] text-gray-500 mb-1 truncate">
+                                                    {visit.excelName ||
+                                                      "Sin archivo"}
+                                                  </p>
+
+                                                  <div className="grid grid-cols-3 gap-1 mt-1">
+                                                    <div>
+                                                      <p className="text-[10px] mb-0.5">
+                                                        Checklist % (F90)
+                                                      </p>
+                                                      <input
+                                                        type="number"
+                                                        min={0}
+                                                        max={100}
+                                                        className="w-full border rounded px-1 py-0.5"
+                                                        value={
+                                                          visit.checklist ?? ""
+                                                        }
+                                                        onChange={(e) => {
+                                                          const val =
+                                                            e.target.value;
+                                                          const num =
+                                                            val === ""
+                                                              ? null
+                                                              : Number(val);
+                                                          updateVisitField(
+                                                            store.id,
+                                                            visit.id,
+                                                            "checklist",
+                                                            isNaN(num)
+                                                              ? null
+                                                              : num
+                                                          );
+                                                        }}
+                                                      />
+                                                    </div>
+                                                    <div>
+                                                      <p className="text-[10px] mb-0.5">
+                                                        HIT
+                                                      </p>
+                                                      <select
+                                                        className="w-full border rounded px-1 py-0.5"
+                                                        value={visit.hit || ""}
+                                                        onChange={(e) =>
+                                                          updateVisitField(
+                                                            store.id,
+                                                            visit.id,
+                                                            "hit",
+                                                            e.target.value
+                                                          )
+                                                        }
+                                                      >
+                                                        <option value="">
+                                                          -
+                                                        </option>
+                                                        <option value="Sí">
+                                                          Sí
+                                                        </option>
+                                                        <option value="No">
+                                                          No
+                                                        </option>
+                                                      </select>
+                                                    </div>
+                                                    <div>
+                                                      <p className="text-[10px] mb-0.5">
+                                                        Centro AAR
+                                                      </p>
+                                                      <select
+                                                        className="w-full border rounded px-1 py-0.5"
+                                                        value={
+                                                          visit.centroAAR || ""
+                                                        }
+                                                        onChange={(e) =>
+                                                          updateVisitField(
+                                                            store.id,
+                                                            visit.id,
+                                                            "centroAAR",
+                                                            e.target.value
+                                                          )
+                                                        }
+                                                      >
+                                                        <option value="">
+                                                          -
+                                                        </option>
+                                                        <option value="Sí">
+                                                          Sí
+                                                        </option>
+                                                        <option value="No">
+                                                          No
+                                                        </option>
+                                                      </select>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              )
+                                            )}
+                                          </div>
+                                          <p className="text-[10px] text-gray-500">
+                                            Adjunta el Excel del checklist:
+                                            la plataforma lee
+                                            automáticamente el % global
+                                            desde la celda{" "}
+                                            <strong>F90</strong> del libro{" "}
+                                            <strong>PROCESOS BASICOS</strong>.
+                                            Además, si la hoja contiene los
+                                            procesos punto a punto en
+                                            columna <strong>B</strong> y{" "}
+                                            <strong>F</strong> con 0/1, se
+                                            usan para las gráficas de
+                                            aplicación por proceso.
+                                          </p>
+                                        </div>
+                                      </td>
+                                    </tr>
+                                  )}
+                                </React.Fragment>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+
+                        {/* KPIs globales */}
+                        <div className="mt-4 text-[11px] text-gray-600 flex flex-wrap gap-3">
+                          <span>
+                            Total tiendas: <strong>{totalTiendas}</strong>
+                          </span>
+                          <span>
+                            Tiendas con al menos 1 visita (Excel):{" "}
+                            <strong>
+                              {tiendasConVisita} (
+                              {porcentajeTiendasVisitadas.toFixed(0)}%)
+                            </strong>
+                          </span>
+                          <span>
+                            Total visitas (Excels adjuntos):{" "}
+                            <strong>{totalVisitas}</strong>
+                          </span>
+                          <span
+                            className={
+                              "inline-flex items-center gap-1 px-2 py-0.5 rounded-full " +
+                              kpiBadgeClass(checklistMediaGlobal)
+                            }
+                          >
+                            <span className="w-2 h-2 rounded-full bg-current/70" />
+                            <span>
+                              Checklist medio global (F90):{" "}
+                              {checklistMediaGlobal !== null
+                                ? `${checklistMediaGlobal.toFixed(0)}%`
+                                : "-"}
+                            </span>
+                          </span>
+                          <span
+                            className={
+                              "inline-flex items-center gap-1 px-2 py-0.5 rounded-full " +
+                              kpiBadgeClass(hitMediaGlobal)
+                            }
+                          >
+                            <span className="w-2 h-2 rounded-full bg-current/70" />
+                            <span>
+                              % aplicación HIT global:{" "}
+                              {hitMediaGlobal !== null
+                                ? `${hitMediaGlobal.toFixed(0)}%`
+                                : "-"}
+                            </span>
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </section>
+
+                {/* CENTROS EXCLUSIVOS */}
+                {exclusiveStores.length > 0 && (
+                  <section className="mt-10 bg-white p-6 rounded-2xl shadow">
+                    {/* Faldón resumen */}
+                    <div className="mb-4 bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3 text-[11px] flex flex-wrap items-center gap-4">
+                      <span>
+                        Nº centros exclusivos:{" "}
+                        <strong>{exclusiveStores.length}</strong>
+                      </span>
+                      <span>
+                        Ventas acumuladas:{" "}
+                        <strong>{ventasAcumuladas.toFixed(0)}€</strong>
+                      </span>
+                      <span>
+                        Objetivo acumulado:{" "}
+                        <strong>{objetivosAcumulados.toFixed(0)}€</strong>
+                      </span>
+                      <span
+                        className={
+                          "px-3 py-1 rounded-full " +
+                          resultColorClass(pctAcumulado)
+                        }
+                      >
+                        % resultado acumulado año:{" "}
+                        {pctAcumulado !== null
+                          ? `${pctAcumulado.toFixed(1)}%`
+                          : "-"}
+                      </span>
+                    </div>
+
+                    <h3 className="font-bold text-lg mb-3">
+                      Centros exclusivos
+                    </h3>
+
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-[11px] border-collapse">
+                        <thead>
+                          <tr className="bg-amber-50 border-b">
+                            <th className="text-left px-2 py-2">Centro</th>
+                            <th className="text-left px-2 py-2">Provincia</th>
+                            <th className="text-left px-2 py-2">Delegado</th>
+                            <th className="text-right px-2 py-2">
+                              Ventas mensuales €
+                            </th>
+                            <th className="text-right px-2 py-2">
+                              Objetivo mensual €
+                            </th>
+                            <th className="text-right px-2 py-2">
+                              % resultado
+                            </th>
+                            <th className="text-center px-2 py-2">
+                              Acciones, meses y derivaciones (+)
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {exclusiveStores.map((store) => {
+                            const totals = getExclusiveTotals(store);
+                            const data =
+                              store.exclusiveData || defaultExclusiveData();
+                            const isRowExpanded =
+                              expandedExclusiveId === store.id;
+
+                            const toggleBase =
+                              "text-[10px] px-2 py-1 rounded-full border cursor-pointer transition-colors";
+                            const toggleClass = isRowExpanded
+                              ? `${toggleBase} border-red-500 bg-red-500 text-white hover:bg-red-600`
+                              : `${toggleBase} border-amber-400 text-amber-700 hover:bg-amber-50`;
+
+                            return (
+                              <React.Fragment key={store.id}>
+                                <tr className="border-b hover:bg-amber-50/80">
+                                  <td className="px-2 py-2 font-semibold">
+                                    {store.centro || store.codigo}
+                                  </td>
+                                  <td className="px-2 py-2">
+                                    <span
+                                      className="inline-block px-2 py-0.5 rounded-full"
+                                      style={delegadoColor(
+                                        store.centroRegional
+                                      )}
+                                    >
+                                      {store.provincia || "-"}
+                                    </span>
+                                  </td>
+                                  <td className="px-2 py-2">
+                                    <span
+                                      className="inline-block px-2 py-0.5 rounded-full"
+                                      style={delegadoColor(
+                                        store.centroRegional
+                                      )}
+                                    >
+                                      {store.centroRegional || "-"}
+                                    </span>
+                                  </td>
+                                  <td
+                                    className="px-2 py-2 text-right cursor-pointer"
+                                    onClick={() =>
+                                      setExpandedExclusiveId(
+                                        isRowExpanded ? null : store.id
+                                      )
+                                    }
+                                  >
+                                    {totals.ventasTotal.toFixed(0)}€
+                                  </td>
+                                  <td
+                                    className="px-2 py-2 text-right cursor-pointer"
+                                    onClick={() =>
+                                      setExpandedExclusiveId(
+                                        isRowExpanded ? null : store.id
+                                      )
+                                    }
+                                  >
+                                    {totals.objetivosTotal.toFixed(0)}€
+                                  </td>
+                                  <td className="px-2 py-2 text-right">
+                                    {totals.pct !== null ? (
+                                      <span
+                                        className={
+                                          "inline-block px-2 py-0.5 rounded-full " +
+                                          resultColorClass(totals.pct)
+                                        }
+                                      >
+                                        {totals.pct.toFixed(1)}%
+                                      </span>
+                                    ) : (
+                                      "-"
+                                    )}
+                                  </td>
+                                  <td className="px-2 py-2 text-center">
+                                    <button
+                                      className={toggleClass}
+                                      onClick={() =>
+                                        setExpandedExclusiveId(
+                                          isRowExpanded ? null : store.id
+                                        )
+                                      }
+                                    >
+                                      {isRowExpanded
+                                        ? "Ocultar"
+                                        : "Ver / añadir (+)"}
+                                    </button>
+                                  </td>
+                                </tr>
+
+                                {isRowExpanded && (
+                                  <tr className="bg-amber-50/40 border-b">
+                                    <td
+                                      colSpan={7}
+                                      className="px-3 py-3 text-[11px]"
+                                    >
+                                      <div className="grid lg:grid-cols-2 gap-4">
+                                        {/* Ventas / Objetivos mensuales */}
+                                        <div className="bg-white rounded-xl border px-3 py-2">
+                                          <p className="font-semibold mb-2">
+                                            Ventas y objetivos mensuales
+                                            (ago-2025 a jul-2026)
+                                          </p>
+
+                                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                                            {/* Ventas */}
+                                            <div>
+                                              <p className="text-[10px] mb-1 font-semibold">
+                                                Ventas mensuales €
+                                              </p>
+                                              <div className="flex gap-1 items-center">
+                                                <select
+                                                  className="border rounded px-2 py-1 text-[10px] flex-1"
+                                                  value={selectedSalesMonth}
+                                                  onChange={(e) =>
+                                                    setSelectedSalesMonth(
+                                                      e.target.value
+                                                    )
+                                                  }
+                                                >
+                                                  {EXCLUSIVE_MONTHS.map(
+                                                    (m) => (
+                                                      <option
+                                                        key={m.key}
+                                                        value={m.key}
+                                                      >
+                                                        {m.label}
+                                                      </option>
+                                                    )
+                                                  )}
+                                                </select>
+                                                <input
+                                                  type="number"
+                                                  className="w-24 border rounded px-2 py-1 text-right"
+                                                  value={
+                                                    data.ventas[
+                                                      selectedSalesMonth
+                                                    ] ?? ""
+                                                  }
+                                                  onChange={(e) =>
+                                                    updateExclusiveMonthValue(
+                                                      store.id,
+                                                      "ventas",
+                                                      selectedSalesMonth,
+                                                      Number(
+                                                        e.target.value || 0
+                                                      )
+                                                    )
+                                                  }
+                                                />
+                                              </div>
+                                            </div>
+
+                                            {/* Objetivos */}
+                                            <div>
+                                              <p className="text-[10px] mb-1 font-semibold">
+                                                Objetivo mensual €
+                                              </p>
+                                              <div className="flex gap-1 items-center">
+                                                <select
+                                                  className="border rounded px-2 py-1 text-[10px] flex-1"
+                                                  value={selectedTargetMonth}
+                                                  onChange={(e) =>
+                                                    setSelectedTargetMonth(
+                                                      e.target.value
+                                                    )
+                                                  }
+                                                >
+                                                  {EXCLUSIVE_MONTHS.map(
+                                                    (m) => (
+                                                      <option
+                                                        key={m.key}
+                                                        value={m.key}
+                                                      >
+                                                        {m.label}
+                                                      </option>
+                                                    )
+                                                  )}
+                                                </select>
+                                                <input
+                                                  type="number"
+                                                  className="w-24 border rounded px-2 py-1 text-right"
+                                                  value={
+                                                    data.objetivos[
+                                                      selectedTargetMonth
+                                                    ] ?? ""
+                                                  }
+                                                  onChange={(e) =>
+                                                    updateExclusiveMonthValue(
+                                                      store.id,
+                                                      "objetivos",
+                                                      selectedTargetMonth,
+                                                      Number(
+                                                        e.target.value || 0
+                                                      )
+                                                    )
+                                                  }
+                                                />
+                                              </div>
+                                            </div>
+                                          </div>
+
+                                          {/* Tabla mensual resumen */}
+                                          <div className="overflow-x-auto">
+                                            <table className="w-full text-[10px] border-collapse">
+                                              <thead>
+                                                <tr className="bg-gray-50 border-b">
+                                                  <th className="text-left px-2 py-1">
+                                                    Mes
+                                                  </th>
+                                                  <th className="text-right px-2 py-1">
+                                                    Ventas €
+                                                  </th>
+                                                  <th className="text-right px-2 py-1">
+                                                    Objetivo €
+                                                  </th>
+                                                  <th className="text-right px-2 py-1">
+                                                    % resultado
+                                                  </th>
+                                                </tr>
+                                              </thead>
+                                              <tbody>
+                                                {EXCLUSIVE_MONTHS.map(
+                                                  (m) => {
+                                                    const v =
+                                                      Number(
+                                                        data.ventas[m.key] || 0
+                                                      );
+                                                    const o =
+                                                      Number(
+                                                        data.objetivos[
+                                                          m.key
+                                                        ] || 0
+                                                      );
+                                                    const p =
+                                                      o > 0
+                                                        ? (v / o) * 100
+                                                        : null;
+                                                    return (
+                                                      <tr
+                                                        key={m.key}
+                                                        className="border-b"
+                                                      >
+                                                        <td className="px-2 py-1">
+                                                          {m.label}
+                                                        </td>
+                                                        <td className="px-2 py-1 text-right">
+                                                          {v.toFixed(0)}€
+                                                        </td>
+                                                        <td className="px-2 py-1 text-right">
+                                                          {o.toFixed(0)}€
+                                                        </td>
+                                                        <td className="px-2 py-1 text-right">
+                                                          {p !== null ? (
+                                                            <span
+                                                              className={
+                                                                "inline-block px-2 py-0.5 rounded-full " +
+                                                                resultColorClass(
+                                                                  p
+                                                                )
+                                                              }
+                                                            >
+                                                              {p.toFixed(1)}%
+                                                            </span>
+                                                          ) : (
+                                                            "-"
+                                                          )}
+                                                        </td>
+                                                      </tr>
+                                                    );
+                                                  }
+                                                )}
+                                              </tbody>
+                                            </table>
+                                          </div>
+                                        </div>
+
+                                        {/* Acciones / derivaciones */}
+                                        <div className="bg-white rounded-xl border px-3 py-2">
+                                          <div className="flex items-center justify-between mb-2">
+                                            <p className="font-semibold">
+                                              Acciones, fechas y
+                                              derivaciones
+                                            </p>
+                                            <button
+                                              className="text-[10px] px-2 py-1 rounded-full border border-amber-400 text-amber-700 hover:bg-amber-50 cursor-pointer"
+                                              onClick={() =>
+                                                addExclusiveAction(store.id)
+                                              }
+                                            >
+                                              + Añadir acción
+                                            </button>
+                                          </div>
+                                          {(data.acciones || []).length ===
+                                          0 ? (
+                                            <p className="text-[10px] text-gray-500">
+                                              Aún no hay acciones
+                                              registradas. Pulsa en
+                                              &quot;+ Añadir acción&quot;.
+                                            </p>
+                                          ) : (
+                                            <div className="space-y-2">
+                                              {data.acciones.map((a) => (
+                                                <div
+                                                  key={a.id}
+                                                  className="grid grid-cols-[1fr_110px_80px_26px] gap-2 items-center text-[10px]"
+                                                >
+                                                  <select
+                                                    className="border rounded px-2 py-1"
+                                                    value={a.tipo || ""}
+                                                    onChange={(e) =>
+                                                      updateExclusiveAction(
+                                                        store.id,
+                                                        a.id,
+                                                        "tipo",
+                                                        e.target.value
+                                                      )
+                                                    }
+                                                  >
+                                                    <option value="">
+                                                      Tipo de acción
+                                                    </option>
+                                                    {ACTION_TYPES.map(
+                                                      (t) => (
+                                                        <option
+                                                          key={t}
+                                                          value={t}
+                                                        >
+                                                          {t}
+                                                        </option>
+                                                      )
+                                                    )}
+                                                  </select>
+                                                  <input
+                                                    type="date"
+                                                    className="border rounded px-2 py-1"
+                                                    value={a.fecha || ""}
+                                                    onChange={(e) =>
+                                                      updateExclusiveAction(
+                                                        store.id,
+                                                        a.id,
+                                                        "fecha",
+                                                        e.target.value
+                                                      )
+                                                    }
+                                                  />
+                                                  <input
+                                                    type="number"
+                                                    min={0}
+                                                    className="border rounded px-2 py-1 text-right"
+                                                    placeholder="Deriv."
+                                                    value={a.derivaciones || ""}
+                                                    onChange={(e) =>
+                                                      updateExclusiveAction(
+                                                        store.id,
+                                                        a.id,
+                                                        "derivaciones",
+                                                        e.target.value
+                                                      )
+                                                    }
+                                                  />
+                                                  <button
+                                                    className="text-red-500 cursor-pointer"
+                                                    onClick={() =>
+                                                      removeExclusiveAction(
+                                                        store.id,
+                                                        a.id
+                                                      )
+                                                    }
+                                                  >
+                                                    ✕
+                                                  </button>
+                                                </div>
+                                              ))}
+                                            </div>
+                                          )}
+                                        </div>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                )}
+                              </React.Fragment>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </section>
+                )}
               </div>
             )}
           </div>
