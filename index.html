@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Control Center Audio - Dashboard v5</title>
+  <title>Control Center Audio - Centros</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
@@ -40,7 +40,7 @@
     html, body {
       width: 100%;
       height: 100%;
-      overflow: hidden; /* sin scroll */
+      overflow: hidden;
     }
 
     body {
@@ -49,7 +49,7 @@
       display: flex;
     }
 
-    /* SIDEBAR (negro fijo) */
+    /* SIDEBAR */
     .sidebar {
       width: 250px;
       background: #020617;
@@ -127,7 +127,7 @@
       font-size: .75rem;
     }
 
-    /* activo en ROJO, como pediste */
+    /* En este módulo, el activo es CENTROS en rojo */
     .nav-item.active {
       background: linear-gradient(90deg, #ff2440, #fb7185);
       color: #111827;
@@ -135,11 +135,11 @@
     }
 
     .nav-item.active span.icon {
-      background: rgba(15, 23, 42, 0.2);
+      background: rgba(15,23,42,0.2);
     }
 
     .nav-item:hover:not(.active) {
-      background: rgba(31, 41, 55, 0.9);
+      background: rgba(31,41,55,0.9);
       color: #e5e7eb;
     }
 
@@ -155,7 +155,7 @@
       padding: 10px 18px 12px;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 8px;
       max-height: 100vh;
       overflow: hidden;
     }
@@ -237,145 +237,46 @@
       justify-content: center;
     }
 
-    .filters-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: .8rem;
-      margin-top: 4px;
+    /* Buscador principal Centros */
+    .centros-search-row {
+      margin-top: 6px;
     }
 
-    .filters-left {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .filters-right {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .select {
-      background: #ffffff;
+    .centros-search-input {
+      width: 100%;
+      background: var(--bg-card);
       border-radius: 999px;
-      padding: 5px 10px;
+      padding: 9px 12px 9px 32px;
       border: 1px solid var(--border-soft);
       color: var(--text-main);
+      font-size: .86rem;
       outline: none;
-      font-size: .8rem;
     }
 
-    body.dark .select {
+    body.dark .centros-search-input {
       background: #020617;
+      border-color: #1f2937;
       color: #e5e7eb;
-      border-color: #1f2937;
     }
 
-    .visits-chip {
-      border-radius: 999px;
-      padding: 4px 10px;
-      border: 1px solid var(--border-soft);
-      font-size: .75rem;
-      background: #f97316;
-      color: #111827;
-      font-weight: 600;
-    }
-
-    body.dark .visits-chip {
-      background: #f97316;
-      color: #111827;
-      border-color: #1f2937;
-    }
-
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      margin-top: 4px;
-      margin-bottom: 4px;
-    }
-
-    .section-header h2 {
-      font-size: 1.02rem;
-      font-weight: 600;
-    }
-
-    .section-header span.sub {
-      font-size: .76rem;
+    .centros-search-input::placeholder {
       color: var(--text-muted);
     }
 
-    /* KPIs – 7 cajas pequeñas */
-    .kpi-grid {
-      display: grid;
-      grid-template-columns: repeat(7, minmax(0, 1fr));
-      gap: 6px;
+    .centros-search-wrapper {
+      position: relative;
     }
 
-    .card-kpi {
-      background: var(--bg-card);
-      border-radius: 12px;
-      padding: 8px 10px 8px;
-      border: 1px solid var(--border-soft);
-      box-shadow: var(--shadow-soft);
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      min-width: 0;
-    }
-
-    .card-kpi-title {
-      font-size: .75rem;
+    .centros-search-wrapper .search-icon {
+      left: 10px;
       color: var(--text-muted);
     }
 
-    .card-kpi-main {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-    }
-
-    .card-kpi-value {
-      font-size: 1.05rem;
-      font-weight: 700;
-    }
-
-    .badge {
-      font-size: .65rem;
-      border-radius: 999px;
-      padding: 2px 6px;
-      background: rgba(248, 113, 113, 0.12);
-      color: var(--accent-red);
-      border: 1px solid rgba(248, 113, 113, 0.6);
-    }
-
-    .badge.ok {
-      background: rgba(22, 163, 74, 0.1);
-      color: var(--accent-green);
-      border-color: rgba(22, 163, 74, 0.6);
-    }
-
-    .card-kpi-foot {
-      font-size: .68rem;
-      color: var(--text-muted);
-    }
-
-    /* BLOQUE CENTRAL */
-    .center-layout {
+    .top-layout {
       display: grid;
-      grid-template-rows: 210px 170px 150px;
-      gap: 6px;
-      flex: 1;
-      min-height: 0;
-    }
-
-    .grid-main {
-      display: grid;
-      grid-template-columns: 2.1fr 1.2fr 1.2fr;
-      gap: 6px;
-      align-items: stretch;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 8px;
+      min-height: 180px;
     }
 
     .card {
@@ -391,7 +292,7 @@
 
     .card h3 {
       font-size: .9rem;
-      margin-bottom: 2px;
+      margin-bottom: 4px;
     }
 
     .card-sub {
@@ -400,114 +301,309 @@
       margin-bottom: 6px;
     }
 
-    .chart-container {
+    /* Mapa estático */
+    .map-container {
+      flex: 1;
       position: relative;
-      height: 150px;
-      width: 100%;
-    }
-
-    /* Ranking delegados con 7 KPI */
-    .ranking-header,
-    .ranking-row {
-      display: grid;
-      grid-template-columns: 1.35fr repeat(7, .6fr);
-      font-size: .72rem;
-      column-gap: 4px;
-      align-items: center;
-      padding: 3px 0;
-    }
-
-    .ranking-header {
-      color: var(--text-muted);
-      border-bottom: 1px solid var(--border-soft);
-      margin-bottom: 2px;
-    }
-
-    .ranking-row {
-      border-radius: 8px;
-      padding-inline: 4px;
-      cursor: pointer;
-    }
-
-    .ranking-row:nth-child(even) {
-      background: var(--bg-card-soft);
-    }
-
-    .ranking-row:hover {
-      background: rgba(2, 6, 23, 0.06);
-    }
-
-    body.dark .ranking-row:nth-child(even) {
-      background: #020617;
-    }
-
-    .ranking-row .delegado-nombre {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .ranking-row-color {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-    }
-
-    .ranking-details {
-      display: none;
-      font-size: .7rem;
-      color: var(--text-muted);
-      margin-top: 4px;
-    }
-
-    .ranking-details span {
-      margin-right: 10px;
-    }
-
-    /* Faldón delegados inferior (leyenda de colores) */
-    .delegados-section {
+      background: #111827;
+      border-radius: 12px;
+      padding: 8px;
       display: flex;
       flex-direction: column;
       gap: 4px;
     }
 
-    .delegados-header {
+    .map-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #e5e7eb;
+      font-size: .8rem;
+    }
+
+    .map-body {
+      flex: 1;
+      position: relative;
+      border-radius: 10px;
+      background: radial-gradient(circle at 30% 20%, #4b5563, #020617);
+      overflow: hidden;
+    }
+
+    .spain-label {
+      position: absolute;
+      bottom: 6px;
+      right: 10px;
+      font-size: .7rem;
+      color: #e5e7eb;
+      opacity: .7;
+    }
+
+    .map-dot {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      cursor: pointer;
+      border: 1px solid rgba(15,23,42,0.8);
+    }
+
+    .map-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 6px;
+    }
+
+    .map-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: .7rem;
+      color: #e5e7eb;
+    }
+
+    .map-legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+    }
+
+    /* Panel derecho: Añadir centro */
+    .add-center-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .add-center-panel-top {
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
-    .delegados-header h3 {
+    .add-center-panel-top h3 {
       font-size: .9rem;
     }
 
-    .delegados-header span {
+    .add-center-text {
+      font-size: .75rem;
+      color: var(--text-muted);
+    }
+
+    .badge-type {
+      border-radius: 999px;
+      padding: 2px 6px;
+      font-size: .7rem;
+      background: rgba(37,99,235,0.09);
+      color: #1d4ed8;
+    }
+
+    /* Tabla tipo Excel */
+    .table-wrapper {
+      flex: 1;
+      background: var(--bg-card);
+      border-radius: 14px;
+      border: 1px solid var(--border-soft);
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .table-header {
+      padding: 8px 10px 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .table-header h3 {
+      font-size: .9rem;
+    }
+
+    .table-header span {
       font-size: .72rem;
       color: var(--text-muted);
     }
 
-    .delegados-grid {
-      display: grid;
-      grid-template-columns: repeat(6, minmax(0, 1fr));
-      gap: 4px;
-      font-size: .7rem;
+    .table-scroll {
+      flex: 1;
+      overflow: auto;
+      border-top: 1px solid var(--border-soft);
     }
 
-    .delegado-pill-bottom {
-      border-radius: 999px;
-      padding: 3px 6px;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      border: 1px solid var(--border-soft);
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .78rem;
+    }
+
+    thead {
+      position: sticky;
+      top: 0;
       background: var(--bg-card);
-      cursor: default;
+      z-index: 2;
     }
 
-    .delegate-color-dot {
-      width: 8px;
-      height: 8px;
+    th, td {
+      padding: 6px 8px;
+      border-bottom: 1px solid var(--bg-card-soft);
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    th {
+      font-weight: 600;
+      font-size: .75rem;
+      color: var(--text-muted);
+    }
+
+    tbody tr:nth-child(even) {
+      background: var(--bg-card-soft);
+    }
+
+    tbody tr:hover {
+      background: rgba(2,6,23,0.06);
+    }
+
+    body.dark tbody tr:nth-child(even) {
+      background: #020617;
+    }
+
+    .tag {
       border-radius: 999px;
+      padding: 2px 6px;
+      font-size: .7rem;
+      border: 1px solid var(--border-soft);
+      background: var(--bg-card-soft);
+    }
+
+    .tag.exclusivo {
+      background: rgba(22,163,74,0.12);
+      color: var(--accent-green);
+      border-color: rgba(22,163,74,0.6);
+    }
+
+    .tag.corner {
+      background: rgba(37,99,235,0.12);
+      color: var(--accent-blue);
+      border-color: rgba(37,99,235,0.6);
+    }
+
+    .tag-aar {
+      background: rgba(148,163,184,0.12);
+      border-color: rgba(148,163,184,0.7);
+      color: var(--text-muted);
+    }
+
+    .tag-aar.si {
+      background: rgba(34,197,94,0.12);
+      border-color: rgba(34,197,94,0.7);
+      color: var(--accent-green);
+    }
+
+    .tag-aar.formacion {
+      background: rgba(234,179,8,0.12);
+      border-color: rgba(234,179,8,0.7);
+      color: #eab308;
+    }
+
+    .btn-link {
+      border: none;
+      background: transparent;
+      color: var(--accent-blue);
+      cursor: pointer;
+      font-size: .74rem;
+      text-decoration: underline;
+    }
+
+    /* Modal añadir centro / ver informes */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15,23,42,0.65);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
+
+    .modal {
+      background: var(--bg-card);
+      border-radius: 14px;
+      padding: 14px;
+      width: 420px;
+      max-width: 95%;
+      border: 1px solid var(--border-soft);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .modal-header h3 {
+      font-size: .95rem;
+    }
+
+    .modal-close {
+      cursor: pointer;
+      font-size: 1rem;
+      color: var(--text-muted);
+    }
+
+    .modal-body {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: .78rem;
+    }
+
+    .modal-field {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .modal-field label {
+      font-size: .74rem;
+      color: var(--text-muted);
+    }
+
+    .modal-field input,
+    .modal-field select {
+      padding: 5px 7px;
+      border-radius: 8px;
+      border: 1px solid var(--border-soft);
+      background: var(--bg-card-soft);
+      color: var(--text-main);
+      font-size: .78rem;
+      outline: none;
+    }
+
+    body.dark .modal-field input,
+    body.dark .modal-field select {
+      background: #020617;
+      border-color: #1f2937;
+      color: #e5e7eb;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .badge-small {
+      font-size: .7rem;
+      padding: 2px 5px;
+      border-radius: 999px;
+      background: rgba(148,163,184,0.15);
+      color: var(--text-muted);
     }
   </style>
 
@@ -520,17 +616,17 @@
       <div class="logo-badge"></div>
       <div class="logo-text">
         <span class="logo-title">Control Center Audio</span>
-        <span class="logo-subtitle">Dashboard de centros, visitas y KPIs</span>
+        <span class="logo-subtitle">Gestión de centros y delegados</span>
       </div>
     </div>
 
     <div>
       <div class="section-title">Secciones</div>
       <nav class="nav-list">
-        <div class="nav-item active">
+        <div class="nav-item">
           <span class="icon">🏠</span> Dashboard
         </div>
-        <div class="nav-item">
+        <div class="nav-item active">
           <span class="icon">🏢</span> Centros
         </div>
         <div class="nav-item">
@@ -559,7 +655,7 @@
     <div class="topbar">
       <div class="search-input-wrapper">
         <span class="search-icon">🔍</span>
-        <input class="search-input" placeholder="Busca centros, visitas, procesos..." />
+        <input class="search-input" placeholder="Busca en toda la plataforma..." />
       </div>
       <button class="btn" id="themeToggle">
         <span class="icon">🌓</span> Oscuro / Claro
@@ -575,174 +671,195 @@
       </button>
     </div>
 
-    <!-- Filtros + visitas -->
-    <div class="filters-row">
-      <div class="filters-left">
-        <div class="visits-chip">
-          Visitas: 316 / 384 centros · Ene–Dic
-        </div>
-      </div>
-      <div class="filters-right">
-        <select class="select" id="delegadoSelect">
-          <option value="global">Delegado: Todos</option>
-        </select>
-        <select class="select" id="centroSelect">
-          <option value="todos">Centro: Todos</option>
-        </select>
+    <!-- Buscador Centros -->
+    <div class="centros-search-row">
+      <div class="centros-search-wrapper">
+        <span class="search-icon">🔍</span>
+        <input id="buscadorCentros" class="centros-search-input"
+               placeholder="Buscar por centro, propietario o delegado..." />
       </div>
     </div>
 
-    <!-- Resumen general -->
-    <div class="section-header">
-      <h2>Resumen general KPIs</h2>
-      <span class="sub">Promedio sobre el total visitado · Procesos y calidad de ejecución</span>
-    </div>
+    <!-- Mapa + panel Añadir centro -->
+    <section class="top-layout">
+      <!-- Mapa fijo España -->
+      <article class="card">
+        <div class="map-container">
+          <div class="map-title-row">
+            <span>Mapa de delegados (estático)</span>
+            <span class="badge-small">Clic en un punto para filtrar</span>
+          </div>
+          <div class="map-body" id="mapSpain">
+            <!-- Puntos estáticos aproximados por zona (sin zoom) -->
+            <!-- Norte (Eneritz / Sonia / Sergio / Daniel / etc.) -->
+            <div class="map-dot" data-delegado="Eneritz Aranguren"
+                 style="top: 20%; left: 50%; background:#22c55e;"></div>
+            <div class="map-dot" data-delegado="Sonia Godino"
+                 style="top: 17%; left: 45%; background:#22d3ee;"></div>
+            <div class="map-dot" data-delegado="Sergio Perán"
+                 style="top: 25%; left: 40%; background:#fb7185;"></div>
+            <div class="map-dot" data-delegado="Daniel Chazo"
+                 style="top: 30%; left: 35%; background:#a855f7;"></div>
 
-    <!-- 7 KPIs -->
-    <section class="kpi-grid">
-      <div class="card-kpi" data-kpi="procesos">
-        <div class="card-kpi-title">Procesos completados</div>
-        <div class="card-kpi-main">
-          <span class="card-kpi-value" id="kpiProcesos">78%</span>
-          <span class="badge ok" id="kpiProcesosBadge">Objetivo 80%</span>
-        </div>
-        <div class="card-kpi-foot">Media general sobre todas las visitas.</div>
-      </div>
+            <!-- Cataluña / Aragón / Levante -->
+            <div class="map-dot" data-delegado="Laura Plazas"
+                 style="top: 32%; left: 60%; background:#2563eb;"></div>
+            <div class="map-dot" data-delegado="Cecilia Pérez"
+                 style="top: 40%; left: 58%; background:#0ea5e9;"></div>
 
-      <div class="card-kpi" data-kpi="prueba">
-        <div class="card-kpi-title">Conversión a prueba</div>
-        <div class="card-kpi-main">
-          <span class="card-kpi-value" id="kpiPrueba">46%</span>
-        </div>
-        <div class="card-kpi-foot">Pacientes que pasan a prueba de audífonos.</div>
-      </div>
+            <!-- Centro -->
+            <div class="map-dot" data-delegado="Marisa Carmona"
+                 style="top: 40%; left: 42%; background:#eab308;"></div>
+            <div class="map-dot" data-delegado="Laura Ramos"
+                 style="top: 43%; left: 44%; background:#14b8a6;"></div>
+            <div class="map-dot" data-delegado="Blanca Fdez. de la Pradilla"
+                 style="top: 38%; left: 46%; background:#ec4899;"></div>
 
-      <div class="card-kpi" data-kpi="cierre">
-        <div class="card-kpi-title">Conversión cierre</div>
-        <div class="card-kpi-main">
-          <span class="card-kpi-value" id="kpiCierre">28%</span>
-          <span class="badge" id="kpiCierreBadge">Reforzar cierre</span>
-        </div>
-        <div class="card-kpi-foot">Ventas sobre total de visitas.</div>
-      </div>
+            <!-- Sur / Andalucía / Extremadura -->
+            <div class="map-dot" data-delegado="Martin Sebastián"
+                 style="top: 55%; left: 40%; background:#ef4444;"></div>
+            <div class="map-dot" data-delegado="Maribel Amezcua"
+                 style="top: 52%; left: 35%; background:#facc15;"></div>
 
-      <div class="card-kpi" data-kpi="hit">
-        <div class="card-kpi-title">Aplicación HIT</div>
-        <div class="card-kpi-main">
-          <span class="card-kpi-value" id="kpiHit">82%</span>
-        </div>
-        <div class="card-kpi-foot">% visitas donde se aplica protocolo HIT.</div>
-      </div>
+            <!-- Islas / otros puntos aproximados -->
+            <div class="map-dot" data-delegado="Cecilia Pérez"
+                 style="top: 72%; left: 48%; background:#0ea5e9;"></div>
 
-      <div class="card-kpi" data-kpi="ayudas">
-        <div class="card-kpi-title">Ayudas</div>
-        <div class="card-kpi-main">
-          <span class="card-kpi-value" id="kpiAyudas">41%</span>
-        </div>
-        <div class="card-kpi-foot">Operaciones con ayuda / subvención.</div>
-      </div>
+            <span class="spain-label">España · Mapa estático</span>
+          </div>
 
-      <div class="card-kpi" data-kpi="aar">
-        <div class="card-kpi-title">AAR</div>
-        <div class="card-kpi-main">
-          <span class="card-kpi-value" id="kpiAar">64%</span>
+          <div class="map-legend" id="mapLegend"></div>
         </div>
-        <div class="card-kpi-foot">Adaptaciones en revisión sobre servicios.</div>
-      </div>
+      </article>
 
-      <div class="card-kpi" data-kpi="form">
-        <div class="card-kpi-title">Formaciones</div>
-        <div class="card-kpi-main">
-          <span class="card-kpi-value" id="kpiForm">3,2</span>
-          <span style="font-size:.7rem;">/delegado</span>
+      <!-- Panel derecho: Añadir centro -->
+      <article class="card add-center-panel">
+        <div class="add-center-panel-top">
+          <div>
+            <h3>Gestión de centros</h3>
+            <p class="add-center-text">
+              Alta de nuevos centros, revisión de delegados y estado AAR.
+            </p>
+          </div>
+          <button class="btn btn-cta" id="btnAddCentro">
+            <span class="icon">➕</span> Añadir centro
+          </button>
         </div>
-        <div class="card-kpi-foot">Formaciones medias realizadas por delegado.</div>
-      </div>
+        <div style="margin-top:6px;">
+          <span class="badge-type">Corner</span>
+          <span style="margin-left:6px;" class="badge-type"
+                >Exclusivo (alto potencial)</span>
+        </div>
+        <p class="add-center-text" style="margin-top:8px;">
+          Desde aquí podrás adjuntar informes a cada centro (puede haber varios por
+          centro) y consultar en un clic qué informes tiene asociados.
+        </p>
+      </article>
     </section>
 
-    <!-- Bloque central -->
-    <section class="center-layout">
-      <!-- Gráficas -->
-      <section class="grid-main">
-        <!-- Evolución mensual -->
-        <article class="card">
-          <h3>Evolución mensual de procesos (%)</h3>
-          <p class="card-sub">
-            Promedio mensual por visitas: Procesos, aplica HIT y no aplica (áreas de mejora).
-          </p>
-          <div class="chart-container">
-            <canvas id="chartEvolucion"></canvas>
-          </div>
-        </article>
-
-        <!-- Áreas de mejora -->
-        <article class="card">
-          <h3>Áreas de mejora habituales</h3>
-          <p class="card-sub">
-            Top 10 motivos de mejora detectados sobre el total visitado.
-          </p>
-          <div class="chart-container">
-            <canvas id="chartAreas"></canvas>
-          </div>
-        </article>
-
-        <!-- Radar KPIs generales/contexto -->
-        <article class="card">
-          <h3>Radar KPIs</h3>
-          <p class="card-sub">
-            Perfil de KPIs globales (o del delegado/centro seleccionado).
-          </p>
-          <div class="chart-container">
-            <canvas id="chartRadar"></canvas>
-          </div>
-        </article>
-      </section>
-
-      <!-- Ranking delegados -->
-      <section class="card">
-        <h3>Ranking de delegados</h3>
-        <p class="card-sub">
-          Promedio de KPIs sobre el total visitado por cada delegado · clic para ver detalle.
-        </p>
-        <div class="ranking-header">
-          <span>Delegado</span>
-          <span>Proc.</span>
-          <span>Conv. prueba</span>
-          <span>Conv. cierre</span>
-          <span>HIT</span>
-          <span>Ayudas</span>
-          <span>AAR</span>
-          <span>Form.</span>
+    <!-- Tabla tipo Excel -->
+    <section class="table-wrapper">
+      <div class="table-header">
+        <div>
+          <h3>Listado de centros</h3>
+          <span>Vista consolidada de centros Corner y Exclusivos · datos procedentes del Excel maestro.</span>
         </div>
-        <div id="rankingBody"></div>
-      </section>
-
-      <!-- Faldón delegados (leyenda de colores) -->
-      <section class="delegados-section">
-        <div class="delegados-header">
-          <h3>Delegados · leyenda de colores</h3>
-          <span>Colores coherentes con ranking y filtros.</span>
-        </div>
-        <div class="delegados-grid" id="bottomDelegados"></div>
-      </section>
+        <span class="badge-small" id="totalCentrosLabel"></span>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Propietario</th>
+              <th>Centro</th>
+              <th>Provincia</th>
+              <th>Delegado</th>
+              <th>Tipo</th>
+              <th>Informes</th>
+              <th>Centro AAR</th>
+            </tr>
+          </thead>
+          <tbody id="tablaCentrosBody"></tbody>
+        </table>
+      </div>
     </section>
   </main>
 
+  <!-- Modal Añadir centro -->
+  <div class="modal-backdrop" id="modalCentro">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Nuevo centro</h3>
+        <span class="modal-close" data-close="modalCentro">✕</span>
+      </div>
+      <div class="modal-body">
+        <div class="modal-field">
+          <label>Código</label>
+          <input id="nuevoCodigo" />
+        </div>
+        <div class="modal-field">
+          <label>Propietario</label>
+          <input id="nuevoPropietario" />
+        </div>
+        <div class="modal-field">
+          <label>Centro</label>
+          <input id="nuevoCentro" />
+        </div>
+        <div class="modal-field">
+          <label>Provincia</label>
+          <input id="nuevoProvincia" />
+        </div>
+        <div class="modal-field">
+          <label>Delegado</label>
+          <select id="nuevoDelegado"></select>
+        </div>
+        <div class="modal-field">
+          <label>Tipo</label>
+          <select id="nuevoTipo">
+            <option value="Corner">Corner</option>
+            <option value="Exclusivo">Exclusivo</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-close="modalCentro">Cancelar</button>
+        <button class="btn btn-cta" id="guardarCentro">Guardar centro</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal ver informes -->
+  <div class="modal-backdrop" id="modalInformes">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Informes del centro</h3>
+        <span class="modal-close" data-close="modalInformes">✕</span>
+      </div>
+      <div class="modal-body" id="informesBody">
+        <!-- listado dinámico -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-close="modalInformes">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    // Toggle oscuro / claro
+    // ----- MODO OSCURO / CLARO -----
     document.getElementById('themeToggle').addEventListener('click', () => {
       document.body.classList.toggle('dark');
     });
 
-    // Delegados y colores (Laura Ramos vs Laura Plazas diferenciadas)
-    const delegados = {
-      "Eneritz Aranguren": "#22c55e",
-      "Laura Plazas": "#2563eb",
-      "Laura Ramos": "#14b8a6",
+    // ----- DELEGADOS Y COLORES (coherentes con dashboard) -----
+    const delegadosColores = {
+      "Eneritz ARANGUREN": "#22c55e",
+      "Laura PLAZAS": "#2563eb",
+      "Laura RAMOS": "#14b8a6",
       "Daniel Chazo": "#a855f7",
       "Manuel Cánovas": "#f97316",
       "Cecilia Pérez": "#0ea5e9",
-      "Martin Sebastián": "#ef4444",
+      "Martin SEBASTIÁN": "#ef4444",
       "Marisa Carmona": "#eab308",
       "Blanca Fdez. de la Pradilla": "#ec4899",
       "Maribel Amezcua": "#facc15",
@@ -751,365 +868,202 @@
       "Sergio Perán": "#fb7185"
     };
 
-    // KPIs globales (promedio sobre total visitado)
-    const kpiGlobal = {
-      procesos: 78,
-      prueba: 46,
-      cierre: 28,
-      hit: 82,
-      ayudas: 41,
-      aar: 64,
-      form: 3.2
-    };
-
-    // KPIs por delegado
-    const kpiDelegados = {
-      "Eneritz Aranguren":  { procesos:82, prueba:52, cierre:31, hit:88, ayudas:39, aar:67, form:4.2 },
-      "Laura Plazas":       { procesos:79, prueba:49, cierre:29, hit:84, ayudas:41, aar:62, form:3.8 },
-      "Laura Ramos":        { procesos:77, prueba:46, cierre:27, hit:82, ayudas:39, aar:60, form:3.4 },
-      "Daniel Chazo":       { procesos:76, prueba:47, cierre:26, hit:80, ayudas:37, aar:58, form:3.5 },
-      "Manuel Cánovas":     { procesos:74, prueba:44, cierre:25, hit:78, ayudas:42, aar:61, form:3.1 },
-      "Cecilia Pérez":      { procesos:81, prueba:51, cierre:30, hit:86, ayudas:43, aar:66, form:4.0 },
-      "Martin Sebastián":   { procesos:72, prueba:42, cierre:24, hit:75, ayudas:38, aar:57, form:2.9 },
-      "Marisa Carmona":     { procesos:80, prueba:50, cierre:29, hit:85, ayudas:40, aar:63, form:3.7 },
-      "Blanca Fdez. de la Pradilla": { procesos:78, prueba:48, cierre:28, hit:83, ayudas:44, aar:62, form:3.9 },
-      "Maribel Amezcua":    { procesos:75, prueba:45, cierre:26, hit:79, ayudas:36, aar:59, form:3.0 },
-      "Sonia Godino":       { procesos:73, prueba:43, cierre:25, hit:77, ayudas:35, aar:56, form:2.8 },
-      "Verónica Alfonsín":  { procesos:79, prueba:49, cierre:28, hit:84, ayudas:41, aar:64, form:3.6 },
-      "Sergio Perán":       { procesos:76, prueba:47, cierre:27, hit:81, ayudas:38, aar:60, form:3.2 }
-    };
-
-    // Centros por delegado (demo)
-    const centrosPorDelegado = {
-      "Eneritz Aranguren":  ["Barcelona Diagonal", "Lleida CC Carrefour", "Terrassa"],
-      "Laura Plazas":       ["Cerdanyola", "Barcelona Sants", "Vic"],
-      "Laura Ramos":        ["Madrid Xanadú", "Valdemoro", "Villaverde"],
-      "Daniel Chazo":       ["Narón", "Ferrol Alcampo", "Lugo"],
-      "Manuel Cánovas":     ["Águilas", "El Palmar", "Nueva Condomina"],
-      "Cecilia Pérez":      ["Carlet", "Alzira", "Nuevo Centro"],
-      "Martin Sebastián":   ["Alameda Málaga", "Córdoba Carrefour", "Estepona"],
-      "Marisa Carmona":     ["Islazul", "La Gavia", "Madrid Río 2"],
-      "Blanca Fdez. de la Pradilla": ["Aravaca", "Gran Plaza 2", "Tres Cantos"],
-      "Maribel Amezcua":    ["Cáceres", "Camas", "Nevada Shopping"],
-      "Sonia Godino":       ["Barakaldo", "Bilbao Correo", "San Sebastián"],
-      "Verónica Alfonsín":  ["Bouzas", "Castelao", "Gijón"],
-      "Sergio Perán":       ["La Vaguada", "Salamanca C/Toro", "Torrelavega"]
-    };
-
-    // Áreas de mejora (top 10)
-    const areasMejora = [
-      { label: "Seguimiento postventa", valor: 38 },
-      { label: "Comunicación con ORL", valor: 34 },
-      { label: "Aplicación HIT incompleta", valor: 29 },
-      { label: "Seguimiento AAR", valor: 27 },
-      { label: "Registro en CRM", valor: 25 },
-      { label: "Formación insuficiente", valor: 23 },
-      { label: "Argumentario comercial", valor: 21 },
-      { label: "Tiempo medio de atención", valor: 19 },
-      { label: "Evaluación cognitiva", valor: 17 },
-      { label: "Uso de ayudas/subvenciones", valor: 16 }
+    // ----- CENTROS (muestra representativa construida a partir del Excel) -----
+    // NOTA: aquí he cargado algunos como ejemplo. Puedes extender este array con todos los del Excel.
+    const centros = [
+      { codigo:"4DIA", propietario:"AAO", centro:"AVENIDA DIAGONAL", provincia:"BARCELONA", delegado:"ENERITZ ARANGUREN" },
+      { codigo:"4AXA", propietario:"VADILLO Pedro", centro:"CERDANYOLA", provincia:"BARCELONA", delegado:"LAURA PLAZAS" },
+      { codigo:"4AES", propietario:"FRAGUELA Jacobo", centro:"AAA NARÓN", provincia:"Galicia", delegado:"Daniel Chazo" },
+      { codigo:"4ADX", propietario:"LOPEZ Jose", centro:"AGUILAS", provincia:"MURCIA", delegado:"Manuel Cánovas" },
+      { codigo:"4ARK", propietario:"BELLOT Sonia", centro:"ALAIN AFFLELOU OPTICO CARLET", provincia:"VALENCIA", delegado:"Cecilia Pérez" },
+      { codigo:"4AQU", propietario:"RUIZ Alberto", centro:"ALCOBENDAS CONSTITUCION", provincia:"MADRID", delegado:"LAURA RAMOS" },
+      { codigo:"4AKI", propietario:"PIEDRAFITA Rocio", centro:"CC LOS VALLES", provincia:"MADRID", delegado:"Blanca Fdez. de la Pradilla" },
+      { codigo:"4MLG", propietario:"AAO", centro:"FUENLABRADA Calle Leganes", provincia:"MADRID", delegado:"Marisa Carmona" },
+      { codigo:"4ABB", propietario:"MAZA Oriol", centro:"PAMPLONA C. Exclusivo", provincia:"NAVARRA", delegado:"Sonia Godino" },
+      { codigo:"4AFH", propietario:"MAZA Oriol", centro:"PAMPLONA Calle Sancho el Mayor", provincia:"NAVARRA", delegado:"Sonia Godino" },
+      { codigo:"4AWQ", propietario:"MAZA Oriol", centro:"PAMPLONA Carlos III", provincia:"NAVARRA", delegado:"Sonia Godino" },
+      { codigo:"4MRM", propietario:"AAO", centro:"REINA DE MERCEDES", provincia:"Madrid", delegado:"Sergio Perán" },
+      { codigo:"4PEC", propietario:"AAO", centro:"SANTANDER CC PEÑACASTILLO", provincia:"Santander", delegado:"Sergio Perán" },
+      { codigo:"4AXF", propietario:"URRUTIA Esteban", centro:"SANTIAGO DE COMPOSTELA RUA DA ROSA", provincia:"Santiago de Compostela", delegado:"Daniel Chazo" },
+      { codigo:"4TOL", propietario:"AAO", centro:"TORRELAVEGA CARREFOUR CC", provincia:"Santander", delegado:"Sergio Perán" },
+      { codigo:"4ZDE", propietario:"AAO", centro:"ZARAGOZA CALLE DELICIAS", provincia:"ZARAGOZA", delegado:"ENERITZ ARANGUREN" },
+      // ... aquí puedes seguir pegando todas las filas del Excel si quieres tener el 100% de centros
     ];
 
-    // Inicializar select Delegado y Centro
-    const delegadoSelect = document.getElementById('delegadoSelect');
-    const centroSelect = document.getElementById('centroSelect');
+    // Centros exclusivos (los que nos has pasado en el listado de ejemplo)
+    const exclusivosNombres = new Set([
+      "CC LOS VALLES",
+      "FUENLABRADA Calle Leganes",
+      "PAMPLONA C. Exclusivo",
+      "PAMPLONA Calle Sancho el Mayor",
+      "PAMPLONA Carlos III",
+      "REINA DE MERCEDES",
+      "SANTANDER CC PEÑACASTILLO",
+      "SANTIAGO DE COMPOSTELA RUA DA ROSA",
+      "TORRELAVEGA CARREFOUR CC",
+      "ZARAGOZA CALLE DELICIAS"
+    ]);
 
-    Object.keys(delegados).forEach(nombre => {
-      const opt = document.createElement('option');
-      opt.value = nombre;
-      opt.textContent = `Delegado: ${nombre}`;
-      delegadoSelect.appendChild(opt);
-    });
-
-    function rellenarCentros(delegado) {
-      centroSelect.innerHTML = '';
-      const optTodos = document.createElement('option');
-      optTodos.value = 'todos';
-      optTodos.textContent = 'Centro: Todos';
-      centroSelect.appendChild(optTodos);
-
-      if (delegado !== 'global' && centrosPorDelegado[delegado]) {
-        centrosPorDelegado[delegado].forEach(c => {
-          const opt = document.createElement('option');
-          opt.value = c;
-          opt.textContent = c;
-          centroSelect.appendChild(opt);
-        });
-      }
-    }
-
-    rellenarCentros('global');
-
-    // Faldón inferior de delegados (leyenda)
-    const bottomDelegados = document.getElementById('bottomDelegados');
-    Object.entries(delegados).forEach(([nombre, color]) => {
-      const pill = document.createElement('div');
-      pill.className = 'delegado-pill-bottom';
-      pill.innerHTML = `<span class="delegate-color-dot" style="background:${color}"></span>${nombre}`;
-      bottomDelegados.appendChild(pill);
-    });
-
-    // Ranking delegados
-    const rankingBody = document.getElementById('rankingBody');
-    Object.entries(kpiDelegados).forEach(([nombre, kpis]) => {
-      const row = document.createElement('div');
-      row.className = 'ranking-row';
-      row.innerHTML = `
-        <span class="delegado-nombre">
-          <span class="ranking-row-color" style="background:${delegados[nombre]}"></span>${nombre}
-        </span>
-        <span>${kpis.procesos}%</span>
-        <span>${kpis.prueba}%</span>
-        <span>${kpis.cierre}%</span>
-        <span>${kpis.hit}%</span>
-        <span>${kpis.ayudas}%</span>
-        <span>${kpis.aar}%</span>
-        <span>${kpis.form.toFixed(1)}</span>
-      `;
-      const details = document.createElement('div');
-      details.className = 'ranking-details';
-      details.textContent = 'Centros destacados: ejemplo 1, ejemplo 2, ejemplo 3…';
-
-      row.addEventListener('click', () => {
-        details.style.display = details.style.display === 'block' ? 'none' : 'block';
-      });
-
-      rankingBody.appendChild(row);
-      rankingBody.appendChild(details);
-    });
-
-    // BASE para evolución mensual (global)
-    const baseMensual = {
-      procesos: [70,72,73,75,76,78,79,80,80,81,82,83],
-      aplica:   [60,62,63,65,67,69,70,71,72,73,74,75],
-      noAplica:[40,38,37,35,33,31,30,29,28,27,26,25]
+    // Informes por centro (demo: varios informes posibles)
+    const informesPorCentro = {
+      "CC LOS VALLES": ["Informe inicial 2024-01", "Seguimiento procesos 2024-06"],
+      "REINA DE MERCEDES": ["Auditoría HIT 2024-Q2"],
+      "PAMPLONA C. Exclusivo": ["Apertura 2023", "Plan de acción 2024"],
+      "SANTANDER CC PEÑACASTILLO": []
     };
 
-    function escalarSerie(serie, factor) {
-      return serie.map(v => Math.round(v * factor));
+    // Estado AAR (demo)
+    const aarPorCentro = {
+      "REINA DE MERCEDES": "Sí",
+      "PAMPLONA C. Exclusivo": "En formación",
+      "SANTIAGO DE COMPOSTELA RUA DA ROSA": "En formación"
+      // resto quedan como "No"
+    };
+
+    // ----- RENDER TABLA -----
+    const tablaBody = document.getElementById('tablaCentrosBody');
+    const totalCentrosLabel = document.getElementById('totalCentrosLabel');
+
+    function tipoCentro(nombreCentro) {
+      return exclusivosNombres.has(nombreCentro) ? "Exclusivo" : "Corner";
     }
 
-    // GRÁFICA Evolución mensual
-    const ctxEvo = document.getElementById('chartEvolucion').getContext('2d');
-    const chartEvolucion = new Chart(ctxEvo, {
-      type: 'line',
-      data: {
-        labels: ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'],
-        datasets: [
-          {
-            label: 'Procesos (%)',
-            data: baseMensual.procesos,
-            borderWidth: 2,
-            tension: 0.35,
-            borderColor: '#1d4ed8',
-            backgroundColor: 'rgba(37,99,235,0.15)'
-          },
-          {
-            label: 'Aplica HIT (%)',
-            data: baseMensual.aplica,
-            borderWidth: 2,
-            tension: 0.35,
-            borderColor: '#16a34a',
-            backgroundColor: 'rgba(22,163,74,0.15)'
-          },
-          {
-            label: 'No aplica (%)',
-            data: baseMensual.noAplica,
-            borderWidth: 2,
-            tension: 0.35,
-            borderColor: '#ea580c',
-            backgroundColor: 'rgba(234,88,12,0.15)'
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            labels: { color: '#6b7280', font: { size: 10 } }
-          }
-        },
-        scales: {
-          x: {
-            ticks: { color: '#6b7280', font: { size: 9 } },
-            grid: { color: 'rgba(148,163,184,0.4)' }
-          },
-          y: {
-            ticks: { color: '#6b7280', font: { size: 9 }, callback: v => v + '%' },
-            grid: { color: 'rgba(148,163,184,0.4)' },
-            suggestedMin: 20,
-            suggestedMax: 90
-          }
-        }
-      }
-    });
-
-    // GRÁFICO Áreas de mejora (barras horizontales)
-    const ctxAreas = document.getElementById('chartAreas').getContext('2d');
-    const chartAreas = new Chart(ctxAreas, {
-      type: 'bar',
-      data: {
-        labels: areasMejora.map(a => a.label),
-        datasets: [{
-          label: '% de visitas con esta área de mejora',
-          data: areasMejora.map(a => a.valor),
-          backgroundColor: '#ea580c'
-        }]
-      },
-      options: {
-        indexAxis: 'y',
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false
-          },
-          tooltip: {
-            callbacks: {
-              label: ctx => ctx.parsed.x + '%'
-            }
-          }
-        },
-        scales: {
-          x: {
-            ticks: {
-              color: '#6b7280',
-              font: { size: 9 },
-              callback: v => v + '%'
-            },
-            grid: { color: 'rgba(148,163,184,0.4)' }
-          },
-          y: {
-            ticks: { color: '#6b7280', font: { size: 8 } },
-            grid: { display: false }
-          }
-        }
-      }
-    });
-
-    // RADAR KPIs (una sola línea según contexto)
-    const ctxRadar = document.getElementById('chartRadar').getContext('2d');
-    const radarLabels = ['Procesos','Conv. prueba','Conv. cierre','HIT','Ayudas','AAR','Formaciones'];
-    const chartRadar = new Chart(ctxRadar, {
-      type: 'radar',
-      data: {
-        labels: radarLabels,
-        datasets: [{
-          label: 'KPIs globales',
-          data: [
-            kpiGlobal.procesos,
-            kpiGlobal.prueba,
-            kpiGlobal.cierre,
-            kpiGlobal.hit,
-            kpiGlobal.ayudas,
-            kpiGlobal.aar,
-            kpiGlobal.form * 10
-          ],
-          borderColor: '#16a34a',
-          backgroundColor: 'rgba(22,163,74,0.25)',
-          borderWidth: 2
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: 'bottom',
-            labels: { color: '#6b7280', font: { size: 9 } }
-          }
-        },
-        scales: {
-          r: {
-            angleLines: { color: 'rgba(148,163,184,0.4)' },
-            grid: { color: 'rgba(148,163,184,0.4)' },
-            pointLabels: { color: '#6b7280', font: { size: 8 } },
-            ticks: { display: false, beginAtZero: true }
-          }
-        }
-      }
-    });
-
-    // Actualizar KPIs y gráficas según contexto (global / delegado / centro)
-    function actualizarDashboard(contextKpi, labelRadar) {
-      // KPIs
-      document.getElementById('kpiProcesos').textContent = contextKpi.procesos + '%';
-      document.getElementById('kpiPrueba').textContent   = contextKpi.prueba + '%';
-      document.getElementById('kpiCierre').textContent   = contextKpi.cierre + '%';
-      document.getElementById('kpiHit').textContent      = contextKpi.hit + '%';
-      document.getElementById('kpiAyudas').textContent   = contextKpi.ayudas + '%';
-      document.getElementById('kpiAar').textContent      = contextKpi.aar + '%';
-      document.getElementById('kpiForm').textContent     = contextKpi.form.toFixed(1);
-
-      // Badges mínimos
-      const procesosBadge = document.getElementById('kpiProcesosBadge');
-      procesosBadge.textContent = `Objetivo 80%`;
-      procesosBadge.className = 'badge ' + (contextKpi.procesos >= 80 ? 'ok' : '');
-
-      const cierreBadge = document.getElementById('kpiCierreBadge');
-      cierreBadge.textContent = contextKpi.cierre >= 30 ? 'Buen cierre' : 'Reforzar cierre';
-
-      // Radar
-      chartRadar.data.datasets[0].label = labelRadar;
-      chartRadar.data.datasets[0].data = [
-        contextKpi.procesos,
-        contextKpi.prueba,
-        contextKpi.cierre,
-        contextKpi.hit,
-        contextKpi.ayudas,
-        contextKpi.aar,
-        contextKpi.form * 10
-      ];
-      chartRadar.update();
-
-      // Evolución mensual: escalamos en función de procesos delegados vs global
-      const factor = contextKpi.procesos / kpiGlobal.procesos;
-      chartEvolucion.data.datasets[0].data = escalarSerie(baseMensual.procesos, factor);
-      chartEvolucion.data.datasets[1].data = escalarSerie(baseMensual.aplica, contextKpi.hit / kpiGlobal.hit);
-      chartEvolucion.data.datasets[2].data = escalarSerie(baseMensual.noAplica, (100 - contextKpi.hit) / (100 - kpiGlobal.hit));
-      chartEvolucion.update();
+    function getInformes(nombreCentro) {
+      return informesPorCentro[nombreCentro] || [];
     }
 
-    // Estado actual
-    let contextoActual = 'global'; // 'global' | 'delegado' | 'centro'
-    let delegadoActual = null;
-    let centroActual = null;
+    function getAarEstado(nombreCentro) {
+      return aarPorCentro[nombreCentro] || "No";
+    }
 
-    // Inicial global
-    actualizarDashboard(kpiGlobal, 'KPIs globales');
+    function renderTabla(filtroTexto = "", filtroDelegado = null) {
+      const texto = filtroTexto.toLowerCase();
+      tablaBody.innerHTML = "";
 
-    delegadoSelect.addEventListener('change', () => {
-      const val = delegadoSelect.value;
-      if (val === 'global') {
-        contextoActual = 'global';
-        delegadoActual = null;
-        rellenarCentros('global');
-        actualizarDashboard(kpiGlobal, 'KPIs globales');
-      } else {
-        contextoActual = 'delegado';
-        delegadoActual = val;
-        rellenarCentros(val);
-        const kpi = kpiDelegados[val];
-        actualizarDashboard(kpi, `KPIs · ${val}`);
-      }
+      let datosFiltrados = centros.filter(c => {
+        const cad = (c.centro + " " + c.propietario + " " + c.delegado).toLowerCase();
+        const pasaTexto = cad.includes(texto);
+        const pasaDelegado = !filtroDelegado || c.delegado.toLowerCase().includes(filtroDelegado.toLowerCase());
+        return pasaTexto && pasaDelegado;
+      });
+
+      datosFiltrados.forEach(c => {
+        const tr = document.createElement('tr');
+        const t = tipoCentro(c.centro);
+        const informes = getInformes(c.centro);
+        const aarEstado = getAarEstado(c.centro);
+
+        tr.innerHTML = `
+          <td>${c.codigo}</td>
+          <td>${c.propietario}</td>
+          <td>${c.centro}</td>
+          <td>${c.provincia}</td>
+          <td>${c.delegado}</td>
+          <td><span class="tag ${t === 'Exclusivo' ? 'exclusivo' : 'corner'}">${t}</span></td>
+          <td>
+            <button class="btn-link" data-centro="${c.centro}">
+              ${informes.length ? `Ver (${informes.length})` : "Añadir informe"}
+            </button>
+          </td>
+          <td>
+            <span class="tag tag-aar ${
+              aarEstado === 'Sí' ? 'si' :
+              aarEstado === 'En formación' ? 'formacion' : ''
+            }">${aarEstado}</span>
+          </td>
+        `;
+        tablaBody.appendChild(tr);
+      });
+
+      totalCentrosLabel.textContent = `Centros mostrados: ${datosFiltrados.length} / ${centros.length}`;
+    }
+
+    renderTabla();
+
+    // ----- BUSCADOR PRINCIPAL -----
+    document.getElementById('buscadorCentros').addEventListener('input', e => {
+      renderTabla(e.target.value, filtroDelegadoActual);
     });
 
-    centroSelect.addEventListener('change', () => {
-      const val = centroSelect.value;
-      centroActual = val;
-      if (val === 'todos') {
-        // Volvemos al contexto del delegado o global
-        if (delegadoActual && kpiDelegados[delegadoActual]) {
-          actualizarDashboard(kpiDelegados[delegadoActual], `KPIs · ${delegadoActual}`);
+    // ----- MAPA: leyenda y filtro por clic en punto -----
+    const mapLegend = document.getElementById('mapLegend');
+    Object.entries(delegadosColores).forEach(([nombre, color]) => {
+      const item = document.createElement('div');
+      item.className = 'map-legend-item';
+      item.innerHTML = `<span class="map-legend-dot" style="background:${color}"></span>${nombre}`;
+      mapLegend.appendChild(item);
+    });
+
+    let filtroDelegadoActual = null;
+
+    document.querySelectorAll('.map-dot').forEach(dot => {
+      dot.addEventListener('click', () => {
+        const del = dot.dataset.delegado;
+        filtroDelegadoActual = del;
+        renderTabla(document.getElementById('buscadorCentros').value, del);
+      });
+    });
+
+    // ----- MODALES -----
+    function abrirModal(id) {
+      document.getElementById(id).style.display = 'flex';
+    }
+    function cerrarModal(id) {
+      document.getElementById(id).style.display = 'none';
+    }
+
+    document.querySelectorAll('[data-close]').forEach(el => {
+      el.addEventListener('click', () => cerrarModal(el.dataset.close));
+    });
+
+    // Añadir centro
+    document.getElementById('btnAddCentro').addEventListener('click', () => {
+      // Rellenar select delegados
+      const sel = document.getElementById('nuevoDelegado');
+      sel.innerHTML = "";
+      Object.keys(delegadosColores).forEach(nombre => {
+        const opt = document.createElement('option');
+        opt.value = nombre;
+        opt.textContent = nombre;
+        sel.appendChild(opt);
+      });
+      abrirModal('modalCentro');
+    });
+
+    document.getElementById('guardarCentro').addEventListener('click', () => {
+      const nuevo = {
+        codigo: document.getElementById('nuevoCodigo').value || "NEW",
+        propietario: document.getElementById('nuevoPropietario').value || "N/D",
+        centro: document.getElementById('nuevoCentro').value || "Centro sin nombre",
+        provincia: document.getElementById('nuevoProvincia').value || "N/D",
+        delegado: document.getElementById('nuevoDelegado').value || "N/D"
+      };
+      const tipo = document.getElementById('nuevoTipo').value;
+      if (tipo === "Exclusivo") exclusivosNombres.add(nuevo.centro);
+      centros.push(nuevo);
+      cerrarModal('modalCentro');
+      renderTabla(document.getElementById('buscadorCentros').value, filtroDelegadoActual);
+    });
+
+    // Click en botones de informes
+    document.addEventListener('click', e => {
+      if (e.target.matches('.btn-link[data-centro]')) {
+        const nombreCentro = e.target.dataset.centro;
+        const informes = getInformes(nombreCentro);
+        const cont = document.getElementById('informesBody');
+        cont.innerHTML = "";
+
+        if (!informes.length) {
+          cont.innerHTML = "<p style='font-size:.8rem;'>Este centro aún no tiene informes guardados. Desde el módulo de informes podrás adjuntar documentos PDF, actas de visitas, etc.</p>";
         } else {
-          actualizarDashboard(kpiGlobal, 'KPIs globales');
+          informes.forEach((inf, idx) => {
+            const div = document.createElement('div');
+            div.className = 'modal-field';
+            div.innerHTML = `<label>Informe ${idx + 1}</label><div>${inf}</div>`;
+            cont.appendChild(div);
+          });
         }
-      } else {
-        // Centro seleccionado -> en demo usamos mismo perfil que su delegado
-        if (delegadoActual && kpiDelegados[delegadoActual]) {
-          actualizarDashboard(kpiDelegados[delegadoActual], `KPIs · ${delegadoActual} · ${val}`);
-        }
+        abrirModal('modalInformes');
       }
     });
   </script>
