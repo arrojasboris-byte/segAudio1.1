@@ -2,25 +2,33 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Control Center Audio - Dashboard</title>
+  <title>Control Center Audio - Dashboard v4</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- Fuente y estilos básicos -->
+
   <style>
     :root {
-      --bg: #050816;
-      --bg-sidebar: #060b26;
-      --bg-card: #0f172a;
-      --bg-card-soft: #111827;
-      --accent: #22c55e;
-      --accent-soft: #bbf7d0;
-      --accent-warn: #f97316;
-      --accent-danger: #ef4444;
+      /* Tema claro por defecto (main), sidebar siempre oscuro */
+      --bg-main: radial-gradient(circle at top left, #e5e7eb, #f9fafb 55%);
+      --bg-card: #ffffff;
+      --bg-card-soft: #f3f4f6;
+      --text-main: #020617;
+      --text-muted: #6b7280;
+      --border-soft: #d4d4d8;
+      --shadow-soft: 0 14px 30px rgba(15, 23, 42, 0.18);
+      --accent-red: #ff2440;
+      --accent-blue: #1d4ed8;
+      --accent-green: #16a34a;
+      --accent-orange: #ea580c;
+    }
+
+    body.dark {
+      --bg-main: radial-gradient(circle at top left, #1f2937, #020617 55%);
+      --bg-card: #0b1120;
+      --bg-card-soft: #020617;
       --text-main: #f9fafb;
       --text-muted: #9ca3af;
       --border-soft: #1f2937;
-      --radius-lg: 14px;
-      --radius-xl: 18px;
-      --shadow-soft: 0 14px 30px rgba(0,0,0,.45);
+      --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.65);
     }
 
     * {
@@ -30,22 +38,28 @@
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
     }
 
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden; /* sin scroll */
+    }
+
     body {
-      background: radial-gradient(circle at top left, #1f2937, #020617 45%);
+      background: var(--bg-main);
       color: var(--text-main);
-      min-height: 100vh;
       display: flex;
     }
 
-    /* Layout principal */
+    /* SIDEBAR (negro siempre) */
     .sidebar {
       width: 250px;
-      background: linear-gradient(180deg, #020617, #020617 40%, #020617);
-      border-right: 1px solid var(--border-soft);
+      background: #020617; /* negro casi puro */
+      border-right: 1px solid #111827;
       padding: 18px 18px 24px;
       display: flex;
       flex-direction: column;
       gap: 24px;
+      color: #e5e7eb;
     }
 
     .logo {
@@ -55,11 +69,11 @@
     }
 
     .logo-badge {
-      width: 32px;
-      height: 32px;
+      width: 34px;
+      height: 34px;
       border-radius: 999px;
-      background: radial-gradient(circle at 30% 20%, #fde68a, #22c55e);
-      box-shadow: 0 0 15px rgba(34,197,94,.5);
+      background: radial-gradient(circle at 30% 20%, #fee2e2, var(--accent-red));
+      box-shadow: 0 0 20px rgba(239, 68, 68, 0.75);
     }
 
     .logo-text {
@@ -74,13 +88,13 @@
 
     .logo-subtitle {
       font-size: .7rem;
-      color: var(--text-muted);
+      color: #9ca3af;
     }
 
     .section-title {
       font-size: .75rem;
       text-transform: uppercase;
-      color: var(--text-muted);
+      color: #6b7280;
       letter-spacing: .12em;
       margin-bottom: 8px;
     }
@@ -98,7 +112,7 @@
       padding: 8px 10px;
       border-radius: 999px;
       font-size: .88rem;
-      color: var(--text-muted);
+      color: #9ca3af;
       cursor: pointer;
       transition: all .18s ease;
     }
@@ -107,7 +121,7 @@
       width: 22px;
       height: 22px;
       border-radius: 999px;
-      background: #0f172a;
+      background: #020617;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -121,31 +135,32 @@
     }
 
     .nav-item.active span.icon {
-      background: rgba(15,23,42,.15);
+      background: rgba(15, 23, 42, 0.18);
     }
 
     .nav-item:hover:not(.active) {
-      background: rgba(15,23,42,.8);
+      background: rgba(31, 41, 55, 0.9);
       color: #e5e7eb;
     }
 
     .sidebar-footer {
       margin-top: auto;
       font-size: .78rem;
-      color: var(--text-muted);
+      color: #9ca3af;
     }
 
     .delegate-filters {
-      background: rgba(15,23,42,.9);
-      border-radius: var(--radius-lg);
+      background: #020617;
+      border-radius: 14px;
       padding: 12px;
       margin-top: 4px;
-      border: 1px solid rgba(148,163,184,.3);
+      border: 1px solid #1f2937;
     }
 
     .delegate-filters-title {
       font-size: .8rem;
       margin-bottom: 6px;
+      color: #e5e7eb;
     }
 
     .delegate-pills {
@@ -158,30 +173,37 @@
       font-size: .7rem;
       padding: 3px 7px;
       border-radius: 999px;
-      border: 1px solid rgba(148,163,184,.4);
+      border: 1px solid rgba(148, 163, 184, .6);
       cursor: pointer;
-      opacity: .7;
+      opacity: .85;
+      color: #e5e7eb;
+      background: #020617;
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
 
-    .delegate-pill.active {
-      border-color: #22c55e;
-      background: rgba(34,197,94,.12);
-      opacity: 1;
+    .delegate-color-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
     }
 
-    /* Contenido principal */
+    /* MAIN */
     .main {
       flex: 1;
-      padding: 18px 22px 26px;
+      padding: 10px 18px 12px;
       display: flex;
       flex-direction: column;
-      gap: 18px;
+      gap: 6px;
+      max-height: 100vh;
+      overflow: hidden;
     }
 
     .topbar {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 10px;
     }
 
     .search-input-wrapper {
@@ -191,13 +213,19 @@
 
     .search-input {
       width: 100%;
-      background: rgba(15,23,42,.95);
+      background: #ffffff;
       border-radius: 999px;
-      padding: 10px 12px 10px 34px;
+      padding: 8px 12px 8px 32px;
       border: 1px solid var(--border-soft);
       color: var(--text-main);
       font-size: .86rem;
       outline: none;
+    }
+
+    body.dark .search-input {
+      background: #020617;
+      border-color: #1f2937;
+      color: #e5e7eb;
     }
 
     .search-input::placeholder {
@@ -215,26 +243,28 @@
 
     .btn {
       border-radius: 999px;
-      padding: 8px 14px;
+      padding: 7px 12px;
       border: 1px solid transparent;
       font-size: .8rem;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: #0f172a;
-      color: var(--text-main);
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    body.dark .btn {
+      background: #020617;
+      border-color: #1f2937;
+      color: #e5e7eb;
     }
 
     .btn-cta {
-      background: linear-gradient(90deg, #22c55e, #4ade80);
-      color: #022c22;
+      background: linear-gradient(90deg, var(--accent-red), #fb7185);
+      color: #111827;
       font-weight: 600;
-      box-shadow: 0 10px 25px rgba(34,197,94,.35);
-    }
-
-    .btn-outline {
-      border-color: var(--border-soft);
+      box-shadow: 0 10px 24px rgba(248, 113, 113, 0.6);
     }
 
     .btn span.icon {
@@ -244,182 +274,251 @@
     .filters-row {
       display: flex;
       justify-content: flex-end;
-      gap: 10px;
+      gap: 8px;
       font-size: .8rem;
     }
 
     .select {
-      background: rgba(15,23,42,.95);
+      background: #ffffff;
       border-radius: 999px;
-      padding: 6px 12px;
+      padding: 5px 10px;
       border: 1px solid var(--border-soft);
       color: var(--text-main);
       outline: none;
       font-size: .8rem;
     }
 
+    body.dark .select {
+      background: #020617;
+      color: #e5e7eb;
+      border-color: #1f2937;
+    }
+
     .section-header {
       display: flex;
       justify-content: space-between;
       align-items: baseline;
+      margin-top: 4px;
+      margin-bottom: 4px;
     }
 
     .section-header h2 {
-      font-size: 1.08rem;
+      font-size: 1.02rem;
       font-weight: 600;
     }
 
     .section-header span.sub {
-      font-size: .78rem;
+      font-size: .76rem;
       color: var(--text-muted);
     }
 
+    /* KPIs – 7 cajas pequeñas */
     .kpi-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-      gap: 12px;
-    }
-
-    .card {
-      background: radial-gradient(circle at top left, #111827, #020617 55%);
-      border-radius: var(--radius-xl);
-      padding: 14px 14px 12px;
-      border: 1px solid rgba(15,23,42,.9);
-      box-shadow: var(--shadow-soft);
-    }
-
-    .card-header {
-      font-size: .8rem;
-      color: var(--text-muted);
-      margin-bottom: 6px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .kpi-main {
-      font-size: 1.4rem;
-      font-weight: 700;
-      display: flex;
-      align-items: baseline;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
       gap: 6px;
     }
 
-    .kpi-tag {
-      font-size: .72rem;
-      border-radius: 999px;
-      padding: 3px 8px;
-      background: rgba(34,197,94,.12);
-      color: #4ade80;
+    .card-kpi {
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 8px 10px 8px;
+      border: 1px solid var(--border-soft);
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
     }
 
-    .kpi-tag.warn {
-      background: rgba(234,179,8,.12);
-      color: #facc15;
-    }
-
-    .kpi-secondary {
-      font-size: .76rem;
+    .card-kpi-title {
+      font-size: .75rem;
       color: var(--text-muted);
-      margin-top: 4px;
     }
 
-    /* Grid central: gráficos + ranking */
+    .card-kpi-main {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+    }
+
+    .card-kpi-value {
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+
+    .badge {
+      font-size: .65rem;
+      border-radius: 999px;
+      padding: 2px 6px;
+      background: rgba(248, 113, 113, 0.12);
+      color: var(--accent-red);
+      border: 1px solid rgba(248, 113, 113, 0.6);
+    }
+
+    .badge.ok {
+      background: rgba(22, 163, 74, 0.1);
+      color: var(--accent-green);
+      border-color: rgba(22, 163, 74, 0.6);
+    }
+
+    .card-kpi-foot {
+      font-size: .68rem;
+      color: var(--text-muted);
+    }
+
+    /* BLOQUE CENTRAL (gráficas, ranking, delegados) */
+    .center-layout {
+      display: grid;
+      grid-template-rows: 210px 170px 150px;
+      gap: 6px;
+      flex: 1;
+      min-height: 0;
+    }
+
     .grid-main {
       display: grid;
-      grid-template-columns: minmax(0, 2fr) minmax(0, 1.4fr);
-      gap: 16px;
+      grid-template-columns: 2.1fr 1.2fr 1.2fr;
+      gap: 6px;
       align-items: stretch;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border-radius: 14px;
+      padding: 10px 10px 8px;
+      border: 1px solid var(--border-soft);
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
     }
 
     .card h3 {
       font-size: .9rem;
-      margin-bottom: 8px;
+      margin-bottom: 2px;
     }
 
     .card-sub {
-      font-size: .76rem;
+      font-size: .72rem;
       color: var(--text-muted);
-      margin-bottom: 10px;
+      margin-bottom: 6px;
     }
 
     .chart-container {
       position: relative;
-      height: 230px;
+      height: 150px;
       width: 100%;
     }
 
-    /* Ranking tabla */
-    .ranking-grid {
-      margin-top: 12px;
-    }
-
+    /* Ranking delegados */
     .ranking-header,
     .ranking-row {
       display: grid;
-      grid-template-columns: 2fr 1.2fr .8fr .8fr .9fr;
-      font-size: .76rem;
-      column-gap: 10px;
+      grid-template-columns: 1.2fr repeat(7, .6fr);
+      font-size: .72rem;
+      column-gap: 4px;
       align-items: center;
-      padding: 4px 0;
+      padding: 3px 0;
     }
 
     .ranking-header {
       color: var(--text-muted);
       border-bottom: 1px solid var(--border-soft);
-      margin-bottom: 4px;
+      margin-bottom: 2px;
     }
 
     .ranking-row {
-      border-radius: 9px;
-      padding-inline: 6px;
+      border-radius: 8px;
+      padding-inline: 4px;
+      cursor: pointer;
     }
 
     .ranking-row:nth-child(even) {
-      background: rgba(15,23,42,.6);
+      background: var(--bg-card-soft);
     }
 
-    .chip {
+    .ranking-row:hover {
+      background: rgba(2, 6, 23, 0.06);
+    }
+
+    body.dark .ranking-row:nth-child(even) {
+      background: #020617;
+    }
+
+    .ranking-row .delegado-nombre {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .ranking-row-color {
+      width: 8px;
+      height: 8px;
       border-radius: 999px;
-      padding: 2px 7px;
+    }
+
+    .ranking-details {
+      display: none;
       font-size: .7rem;
-      background: rgba(15,23,42,.9);
-      border: 1px solid rgba(148,163,184,.4);
+      color: var(--text-muted);
+      margin-top: 4px;
     }
 
-    .chip.success {
-      background: rgba(34,197,94,.12);
-      border-color: rgba(34,197,94,.6);
-      color: #4ade80;
+    .ranking-details span {
+      margin-right: 10px;
     }
 
-    .chip.warn {
-      background: rgba(234,179,8,.12);
-      border-color: rgba(234,179,8,.6);
-      color: #facc15;
+    /* Delegados – faldón inferior */
+    .delegados-section {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
     }
 
-    /* Responsivo */
-    @media (max-width: 960px) {
-      .sidebar {
-        display: none;
-      }
-      body {
-        display: block;
-      }
-      .main {
-        padding: 14px;
-      }
-      .grid-main {
-        grid-template-columns: 1fr;
-      }
+    .delegados-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .delegados-header h3 {
+      font-size: .9rem;
+    }
+
+    .delegados-header span {
+      font-size: .72rem;
+      color: var(--text-muted);
+    }
+
+    .delegados-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 4px;
+      font-size: .7rem;
+    }
+
+    .delegado-pill-bottom {
+      border-radius: 999px;
+      padding: 3px 6px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      border: 1px solid var(--border-soft);
+      background: var(--bg-card);
+      cursor: default;
+    }
+
+    /* Botón tema */
+    #themeToggle {
+      min-width: 110px;
+      justify-content: center;
     }
   </style>
 
-  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body>
+<body class="dark">
   <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="logo">
@@ -456,13 +555,8 @@
 
     <div class="sidebar-footer">
       <div class="delegate-filters">
-        <div class="delegate-filters-title">Filtros rápidos · Delegados</div>
-        <div class="delegate-pills">
-          <div class="delegate-pill active">Blanca</div>
-          <div class="delegate-pill">Cecilia</div>
-          <div class="delegate-pill">Daniel</div>
-          <div class="delegate-pill">Eneritz</div>
-        </div>
+        <div class="delegate-filters-title">Delegados</div>
+        <div class="delegate-pills" id="sidebarDelegados"></div>
       </div>
       <p style="margin-top:10px;">Versión demo · Datos ficticios</p>
     </div>
@@ -474,12 +568,15 @@
     <div class="topbar">
       <div class="search-input-wrapper">
         <span class="search-icon">🔍</span>
-        <input class="search-input" placeholder="Busca centros, visitas, servicios..." />
+        <input class="search-input" placeholder="Busca centros, visitas, procesos..." />
       </div>
-      <button class="btn btn-outline">
+      <button class="btn" id="themeToggle">
+        <span class="icon">🌓</span> Oscuro / Claro
+      </button>
+      <button class="btn">
         <span class="icon">💾</span> Guardar vista
       </button>
-      <button class="btn btn-outline">
+      <button class="btn">
         <span class="icon">⬇️</span> Exportar HTML
       </button>
       <button class="btn btn-cta">
@@ -491,7 +588,7 @@
     <div class="filters-row">
       <select class="select">
         <option>Periodo: Últimos 12 meses</option>
-        <option>Últimos 3 meses</option>
+        <option>Últimos 6 meses</option>
         <option>Último mes</option>
       </select>
       <select class="select">
@@ -502,166 +599,263 @@
     </div>
 
     <!-- Resumen general -->
-    <div>
-      <div class="section-header">
-        <h2>Resumen general KPIs</h2>
-        <span class="sub">Visión rápida de aplicaciones, visitas, servicios y ventas</span>
-      </div>
+    <div class="section-header">
+      <h2>Resumen general KPIs</h2>
+      <span class="sub">Promedio general sobre el total visitado · Procesos y calidad de ejecución</span>
     </div>
 
-    <!-- KPIs -->
+    <!-- 7 KPIs -->
     <section class="kpi-grid">
-      <article class="card">
-        <div class="card-header">
-          <span>Aplicaciones HIT (global)</span>
+      <div class="card-kpi">
+        <div class="card-kpi-title">Procesos completados</div>
+        <div class="card-kpi-main">
+          <span class="card-kpi-value">78%</span>
+          <span class="badge ok">Objetivo 80%</span>
         </div>
-        <div class="kpi-main">
-          <span>82%</span>
-          <span class="kpi-tag">Objetivo 90%</span>
-        </div>
-        <div class="kpi-secondary">
-          +4 pts vs periodo anterior
-        </div>
-      </article>
-
-      <article class="card">
-        <div class="card-header">
-          <span>Visitas realizadas / planificadas</span>
-        </div>
-        <div class="kpi-main">
-          <span>316</span>
-          <span style="font-size:.9rem; color:var(--text-muted)">/ 384</span>
-        </div>
-        <div class="kpi-secondary">
-          82% ejecución · 12 centros por debajo del 70%
-        </div>
-      </article>
-
-      <article class="card">
-        <div class="card-header">
-          <span>Servicios realizados</span>
-        </div>
-        <div class="kpi-main">
-          <span>497</span>
-          <span class="kpi-tag">+18% crecimiento</span>
-        </div>
-        <div class="kpi-secondary">
-          Revisiones 52% · Ajustes 31% · Otros 17%
-        </div>
-      </article>
-
-      <article class="card">
-        <div class="card-header">
-          <span>Conversión a venta</span>
-        </div>
-        <div class="kpi-main">
-          <span>27%</span>
-          <span class="kpi-tag warn">Potencial seguimiento</span>
-        </div>
-        <div class="kpi-secondary">
-          Ticket medio: 1.430 € · Devoluciones 3,2%
-        </div>
-      </article>
-    </section>
-
-    <!-- Gráficos y estado visitas -->
-    <section class="grid-main">
-      <!-- Evolución mensual -->
-      <article class="card">
-        <h3>Evolución mensual</h3>
-        <p class="card-sub">
-          Visitas, aplicaciones en prueba y conversión a venta
-        </p>
-        <div class="chart-container">
-          <canvas id="chartEvolucion"></canvas>
-        </div>
-      </article>
-
-      <!-- Estado visitas -->
-      <article class="card">
-        <h3>Estado de visitas</h3>
-        <p class="card-sub">
-          Distribución de visitas realizadas, pendientes y anuladas
-        </p>
-        <div class="chart-container">
-          <canvas id="chartVisitas"></canvas>
-        </div>
-      </article>
-    </section>
-
-    <!-- Ranking centros -->
-    <section class="card">
-      <h3>Ranking rápido de centros</h3>
-      <p class="card-sub">
-        Mejores conversiones a venta y aplicación de procesos
-      </p>
-      <div class="ranking-grid">
-        <div class="ranking-header">
-          <span>Centro</span>
-          <span>Delegado</span>
-          <span>Conv. prueba</span>
-          <span>Conv. venta</span>
-          <span>% Procesos</span>
-        </div>
-
-        <div class="ranking-row">
-          <span>Madrid · Reina Mercedes</span>
-          <span>Cecilia</span>
-          <span>64%</span>
-          <span><span class="chip success">34%</span></span>
-          <span>91%</span>
-        </div>
-        <div class="ranking-row">
-          <span>Madrid · Tetuán</span>
-          <span>Blanca</span>
-          <span>58%</span>
-          <span><span class="chip">29%</span></span>
-          <span>87%</span>
-        </div>
-        <div class="ranking-row">
-          <span>Sevilla · Nervión</span>
-          <span>Daniel</span>
-          <span>51%</span>
-          <span><span class="chip warn">22%</span></span>
-          <span>72%</span>
-        </div>
-        <div class="ranking-row">
-          <span>Bilbao · Gran Vía</span>
-          <span>Eneritz</span>
-          <span>47%</span>
-          <span><span class="chip">25%</span></span>
-          <span>69%</span>
-        </div>
+        <div class="card-kpi-foot">Media general sobre todas las visitas.</div>
       </div>
+
+      <div class="card-kpi">
+        <div class="card-kpi-title">Conversión a prueba</div>
+        <div class="card-kpi-main">
+          <span class="card-kpi-value">46%</span>
+        </div>
+        <div class="card-kpi-foot">Pacientes que pasan a prueba de audífonos.</div>
+      </div>
+
+      <div class="card-kpi">
+        <div class="card-kpi-title">Conversión cierre</div>
+        <div class="card-kpi-main">
+          <span class="card-kpi-value">28%</span>
+          <span class="badge">Reforzar cierre</span>
+        </div>
+        <div class="card-kpi-foot">Ventas sobre total de visitas.</div>
+      </div>
+
+      <div class="card-kpi">
+        <div class="card-kpi-title">Aplicación HIT</div>
+        <div class="card-kpi-main">
+          <span class="card-kpi-value">82%</span>
+        </div>
+        <div class="card-kpi-foot">% de visitas donde se aplica protocolo HIT.</div>
+      </div>
+
+      <div class="card-kpi">
+        <div class="card-kpi-title">Ayudas</div>
+        <div class="card-kpi-main">
+          <span class="card-kpi-value">41%</span>
+        </div>
+        <div class="card-kpi-foot">Operaciones con ayuda / subvención.</div>
+      </div>
+
+      <div class="card-kpi">
+        <div class="card-kpi-title">AAR</div>
+        <div class="card-kpi-main">
+          <span class="card-kpi-value">64%</span>
+        </div>
+        <div class="card-kpi-foot">Adaptaciones en revisión sobre servicios.</div>
+      </div>
+
+      <div class="card-kpi">
+        <div class="card-kpi-title">Formaciones</div>
+        <div class="card-kpi-main">
+          <span class="card-kpi-value">3,2</span>
+          <span style="font-size:.7rem;">/delegado</span>
+        </div>
+        <div class="card-kpi-foot">Formaciones medias realizadas por delegado.</div>
+      </div>
+    </section>
+
+    <!-- Bloque central: gráficas + ranking + delegados -->
+    <section class="center-layout">
+      <!-- Gráficas -->
+      <section class="grid-main">
+        <!-- Evolución mensual procesos / aplica / no aplica -->
+        <article class="card">
+          <h3>Evolución mensual de procesos</h3>
+          <p class="card-sub">
+            Promedio mensual por visitas: Procesos, aplica HIT y no aplica (áreas de mejora).
+          </p>
+          <div class="chart-container">
+            <canvas id="chartEvolucion"></canvas>
+          </div>
+        </article>
+
+        <!-- Donut coherente -->
+        <article class="card">
+          <h3>Distribución procesos</h3>
+          <p class="card-sub">
+            Resultado general sobre el total visitado.
+          </p>
+          <div class="chart-container">
+            <canvas id="chartDonut"></canvas>
+          </div>
+        </article>
+
+        <!-- Radar delegados -->
+        <article class="card">
+          <h3>Radar delegados</h3>
+          <p class="card-sub">
+            Media de KPIs por delegado (sobre sus visitas).
+          </p>
+          <div class="chart-container">
+            <canvas id="chartRadar"></canvas>
+          </div>
+        </article>
+      </section>
+
+      <!-- Ranking delegados -->
+      <section class="card">
+        <h3>Ranking de delegados</h3>
+        <p class="card-sub">
+          Promedio de KPIs sobre el total visitado por cada delegado · clic para ver detalle.
+        </p>
+        <div class="ranking-header">
+          <span>Delegado</span>
+          <span>Procesos</span>
+          <span>Conv. prueba</span>
+          <span>Conv. cierre</span>
+          <span>HIT</span>
+          <span>Ayudas</span>
+          <span>AAR</span>
+          <span>Form.</span>
+        </div>
+        <div id="rankingBody"></div>
+      </section>
+
+      <!-- Faldón delegados -->
+      <section class="delegados-section">
+        <div class="delegados-header">
+          <h3>Delegados · mapa de referencia</h3>
+          <span>Colores coherentes en filtros, radar y ranking.</span>
+        </div>
+        <div class="delegados-grid" id="bottomDelegados"></div>
+      </section>
     </section>
   </main>
 
   <script>
-    // Datos demo para la evolución mensual
+    // ----- TEMA OSCURO/CLARO -----
+    const themeToggle = document.getElementById('themeToggle');
+    themeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark');
+    });
+
+    // ----- CONFIGURACIÓN DELEGADOS Y COLORES -----
+    const delegados = {
+      "Eneritz Aranguren": "#22c55e",
+      "Laura Plazas": "#2563eb",
+      "Daniel Chazo": "#a855f7",
+      "Manuel Cánovas": "#f97316",
+      "Cecilia Pérez": "#0ea5e9",
+      "Martin Sebastián": "#ef4444",
+      "Marisa Carmona": "#eab308",
+      "Laura Ramos": "#14b8a6",
+      "Blanca Fdez. de la Pradilla": "#ec4899",
+      "Maribel Amezcua": "#facc15",
+      "Sonia Godino": "#22d3ee",
+      "Verónica Alfonsín": "#4ade80",
+      "Sergio Perán": "#fb7185"
+    };
+
+    // KPIs medios por delegado (datos demo coherentes)
+    const kpiDelegados = {
+      "Eneritz Aranguren":  { procesos:82, prueba:52, cierre:31, hit:88, ayudas:39, aar:67, form:4.2 },
+      "Laura Plazas":       { procesos:79, prueba:49, cierre:29, hit:84, ayudas:41, aar:62, form:3.8 },
+      "Daniel Chazo":       { procesos:76, prueba:47, cierre:26, hit:80, ayudas:37, aar:58, form:3.5 },
+      "Manuel Cánovas":     { procesos:74, prueba:44, cierre:25, hit:78, ayudas:42, aar:61, form:3.1 },
+      "Cecilia Pérez":      { procesos:81, prueba:51, cierre:30, hit:86, ayudas:43, aar:66, form:4.0 },
+      "Martin Sebastián":   { procesos:72, prueba:42, cierre:24, hit:75, ayudas:38, aar:57, form:2.9 },
+      "Marisa Carmona":     { procesos:80, prueba:50, cierre:29, hit:85, ayudas:40, aar:63, form:3.7 },
+      "Laura Ramos":        { procesos:77, prueba:46, cierre:27, hit:82, ayudas:39, aar:60, form:3.4 },
+      "Blanca Fdez. de la Pradilla": { procesos:78, prueba:48, cierre:28, hit:83, ayudas:44, aar:62, form:3.9 },
+      "Maribel Amezcua":    { procesos:75, prueba:45, cierre:26, hit:79, ayudas:36, aar:59, form:3.0 },
+      "Sonia Godino":       { procesos:73, prueba:43, cierre:25, hit:77, ayudas:35, aar:56, form:2.8 },
+      "Verónica Alfonsín":  { procesos:79, prueba:49, cierre:28, hit:84, ayudas:41, aar:64, form:3.6 },
+      "Sergio Perán":       { procesos:76, prueba:47, cierre:27, hit:81, ayudas:38, aar:60, form:3.2 }
+    };
+
+    // ----- PINTAR DELEGADOS EN SIDEBAR Y FALDÓN INFERIOR -----
+    const sidebarDelegados = document.getElementById('sidebarDelegados');
+    const bottomDelegados = document.getElementById('bottomDelegados');
+
+    Object.entries(delegados).forEach(([nombre, color]) => {
+      // Pills sidebar
+      const pill = document.createElement('div');
+      pill.className = 'delegate-pill';
+      pill.innerHTML = `<span class="delegate-color-dot" style="background:${color}"></span>${nombre.split(' ')[0]}`;
+      sidebarDelegados.appendChild(pill);
+
+      // Faldón inferior
+      const pillBottom = document.createElement('div');
+      pillBottom.className = 'delegado-pill-bottom';
+      pillBottom.innerHTML = `<span class="delegate-color-dot" style="background:${color}"></span>${nombre}`;
+      bottomDelegados.appendChild(pillBottom);
+    });
+
+    // ----- RANKING DELEGADOS (DESPLEGABLE) -----
+    const rankingBody = document.getElementById('rankingBody');
+
+    Object.entries(kpiDelegados).forEach(([nombre, kpis]) => {
+      const row = document.createElement('div');
+      row.className = 'ranking-row';
+
+      row.innerHTML = `
+        <span class="delegado-nombre">
+          <span class="ranking-row-color" style="background:${delegados[nombre]}"></span>${nombre}
+        </span>
+        <span>${kpis.procesos}%</span>
+        <span>${kpis.prueba}%</span>
+        <span>${kpis.cierre}%</span>
+        <span>${kpis.hit}%</span>
+        <span>${kpis.ayudas}%</span>
+        <span>${kpis.aar}%</span>
+        <span>${kpis.form.toFixed(1)}</span>
+      `;
+
+      const details = document.createElement('div');
+      details.className = 'ranking-details';
+      details.textContent = 'Centros destacados: ejemplo 1, ejemplo 2, ejemplo 3…';
+
+      row.addEventListener('click', () => {
+        const visible = details.style.display === 'block';
+        details.style.display = visible ? 'none' : 'block';
+      });
+
+      rankingBody.appendChild(row);
+      rankingBody.appendChild(details);
+    });
+
+    // ----- GRÁFICA MENSUAL (Procesos / Aplica / No aplica) -----
     const ctxEvo = document.getElementById('chartEvolucion').getContext('2d');
-    const chartEvolucion = new Chart(ctxEvo, {
+    new Chart(ctxEvo, {
       type: 'line',
       data: {
         labels: ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'],
         datasets: [
           {
-            label: 'Visitas realizadas',
-            data: [120,138,156,172,149,181,196,205,212,231,224,238],
+            label: 'Procesos',
+            data: [70,72,73,75,76,78,79,80,80,81,82,83],
             borderWidth: 2,
-            tension: 0.35
+            tension: 0.35,
+            borderColor: '#1d4ed8',
+            backgroundColor: 'rgba(37,99,235,0.15)'
           },
           {
-            label: '% Aplicaciones a prueba',
-            data: [32,34,35,37,39,40,41,43,44,43,42,44],
+            label: 'Aplica HIT',
+            data: [60,62,63,65,67,69,70,71,72,73,74,75],
             borderWidth: 2,
-            borderDash: [4,4],
-            tension: 0.35
+            tension: 0.35,
+            borderColor: '#16a34a',
+            backgroundColor: 'rgba(22,163,74,0.15)'
           },
           {
-            label: '% Conversión venta',
-            data: [21,22,23,24,25,26,27,28,29,27,26,27],
+            label: 'No aplica (áreas de mejora)',
+            data: [40,38,37,35,33,31,30,29,28,27,26,25],
             borderWidth: 2,
-            tension: 0.35
+            tension: 0.35,
+            borderColor: '#ea580c',
+            backgroundColor: 'rgba(234,88,12,0.15)'
           }
         ]
       },
@@ -670,34 +864,34 @@
         maintainAspectRatio: false,
         plugins: {
           legend: {
-            labels: {
-              color: '#e5e7eb',
-              font: { size: 11 }
-            }
+            labels: { color: '#6b7280', font: { size: 10 } }
           }
         },
         scales: {
           x: {
-            ticks: { color: '#9ca3af', font: { size: 10 } },
-            grid: { color: 'rgba(31,41,55,0.5)' }
+            ticks: { color: '#6b7280', font: { size: 9 } },
+            grid: { color: 'rgba(148,163,184,0.4)' }
           },
           y: {
-            ticks: { color: '#9ca3af', font: { size: 10 } },
-            grid: { color: 'rgba(31,41,55,0.5)' }
+            ticks: { color: '#6b7280', font: { size: 9 } },
+            grid: { color: 'rgba(148,163,184,0.4)' },
+            suggestedMin: 20,
+            suggestedMax: 90
           }
         }
       }
     });
 
-    // Donut estado de visitas
-    const ctxVis = document.getElementById('chartVisitas').getContext('2d');
-    const chartVisitas = new Chart(ctxVis, {
+    // ----- DONUT: distribución general Aplica / No aplica / Pendiente -----
+    const ctxDonut = document.getElementById('chartDonut').getContext('2d');
+    new Chart(ctxDonut, {
       type: 'doughnut',
       data: {
-        labels: ['Realizadas', 'Pendientes', 'Anuladas'],
+        labels: ['Aplica HIT', 'No aplica', 'Pendiente'],
         datasets: [{
-          data: [72, 19, 9],
-          borderWidth: 0
+          data: [68, 22, 10],
+          borderWidth: 0,
+          backgroundColor: ['#16a34a','#ea580c','#1d4ed8']
         }]
       },
       options: {
@@ -706,13 +900,44 @@
         plugins: {
           legend: {
             position: 'bottom',
-            labels: {
-              color: '#e5e7eb',
-              font: { size: 11 }
-            }
+            labels: { color: '#6b7280', font: { size: 10 } }
           }
         },
         cutout: '65%'
+      }
+    });
+
+    // ----- RADAR DELEGADOS (7 KPI) -----
+    const ctxRadar = document.getElementById('chartRadar').getContext('2d');
+    new Chart(ctxRadar, {
+      type: 'radar',
+      data: {
+        labels: ['Procesos','Conv. prueba','Conv. cierre','HIT','Ayudas','AAR','Formaciones'],
+        datasets: Object.entries(kpiDelegados).map(([nombre, kpis]) => ({
+          label: nombre.split(' ')[0], // nombre corto
+          data: [kpis.procesos, kpis.prueba, kpis.cierre, kpis.hit, kpis.ayudas, kpis.aar, kpis.form * 10],
+          borderColor: delegados[nombre],
+          backgroundColor: delegados[nombre] + '33',
+          borderWidth: 1
+        }))
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { color: '#6b7280', font: { size: 8 } }
+          }
+        },
+        scales: {
+          r: {
+            angleLines: { color: 'rgba(148,163,184,0.4)' },
+            grid: { color: 'rgba(148,163,184,0.4)' },
+            pointLabels: { color: '#6b7280', font: { size: 8 } },
+            ticks: { display: false, beginAtZero: true }
+          }
+        }
       }
     });
   </script>
