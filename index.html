@@ -2,12 +2,11 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Control Center Audio - Dashboard v4</title>
+  <title>Control Center Audio - Dashboard v5</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
     :root {
-      /* Tema claro por defecto (main), sidebar siempre oscuro */
       --bg-main: radial-gradient(circle at top left, #e5e7eb, #f9fafb 55%);
       --bg-card: #ffffff;
       --bg-card-soft: #f3f4f6;
@@ -50,10 +49,10 @@
       display: flex;
     }
 
-    /* SIDEBAR (negro siempre) */
+    /* SIDEBAR (negro fijo) */
     .sidebar {
       width: 250px;
-      background: #020617; /* negro casi puro */
+      background: #020617;
       border-right: 1px solid #111827;
       padding: 18px 18px 24px;
       display: flex;
@@ -128,14 +127,15 @@
       font-size: .75rem;
     }
 
+    /* activo en ROJO, como pediste */
     .nav-item.active {
-      background: linear-gradient(90deg, #22c55e, #4ade80);
-      color: #022c22;
+      background: linear-gradient(90deg, #ff2440, #fb7185);
+      color: #111827;
       font-weight: 600;
     }
 
     .nav-item.active span.icon {
-      background: rgba(15, 23, 42, 0.18);
+      background: rgba(15, 23, 42, 0.2);
     }
 
     .nav-item:hover:not(.active) {
@@ -147,46 +147,6 @@
       margin-top: auto;
       font-size: .78rem;
       color: #9ca3af;
-    }
-
-    .delegate-filters {
-      background: #020617;
-      border-radius: 14px;
-      padding: 12px;
-      margin-top: 4px;
-      border: 1px solid #1f2937;
-    }
-
-    .delegate-filters-title {
-      font-size: .8rem;
-      margin-bottom: 6px;
-      color: #e5e7eb;
-    }
-
-    .delegate-pills {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    .delegate-pill {
-      font-size: .7rem;
-      padding: 3px 7px;
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, .6);
-      cursor: pointer;
-      opacity: .85;
-      color: #e5e7eb;
-      background: #020617;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .delegate-color-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
     }
 
     /* MAIN */
@@ -252,6 +212,7 @@
       gap: 6px;
       background: #e5e7eb;
       color: #111827;
+      white-space: nowrap;
     }
 
     body.dark .btn {
@@ -271,11 +232,29 @@
       font-size: .85rem;
     }
 
+    #themeToggle {
+      min-width: 110px;
+      justify-content: center;
+    }
+
     .filters-row {
       display: flex;
-      justify-content: flex-end;
-      gap: 8px;
+      justify-content: space-between;
+      align-items: center;
       font-size: .8rem;
+      margin-top: 4px;
+    }
+
+    .filters-left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .filters-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .select {
@@ -291,6 +270,22 @@
     body.dark .select {
       background: #020617;
       color: #e5e7eb;
+      border-color: #1f2937;
+    }
+
+    .visits-chip {
+      border-radius: 999px;
+      padding: 4px 10px;
+      border: 1px solid var(--border-soft);
+      font-size: .75rem;
+      background: #f97316;
+      color: #111827;
+      font-weight: 600;
+    }
+
+    body.dark .visits-chip {
+      background: #f97316;
+      color: #111827;
       border-color: #1f2937;
     }
 
@@ -367,7 +362,7 @@
       color: var(--text-muted);
     }
 
-    /* BLOQUE CENTRAL (gráficas, ranking, delegados) */
+    /* BLOQUE CENTRAL */
     .center-layout {
       display: grid;
       grid-template-rows: 210px 170px 150px;
@@ -411,11 +406,11 @@
       width: 100%;
     }
 
-    /* Ranking delegados */
+    /* Ranking delegados con 7 KPI */
     .ranking-header,
     .ranking-row {
       display: grid;
-      grid-template-columns: 1.2fr repeat(7, .6fr);
+      grid-template-columns: 1.35fr repeat(7, .6fr);
       font-size: .72rem;
       column-gap: 4px;
       align-items: center;
@@ -469,7 +464,7 @@
       margin-right: 10px;
     }
 
-    /* Delegados – faldón inferior */
+    /* Faldón delegados inferior (leyenda de colores) */
     .delegados-section {
       display: flex;
       flex-direction: column;
@@ -509,10 +504,10 @@
       cursor: default;
     }
 
-    /* Botón tema */
-    #themeToggle {
-      min-width: 110px;
-      justify-content: center;
+    .delegate-color-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
     }
   </style>
 
@@ -554,11 +549,7 @@
     </div>
 
     <div class="sidebar-footer">
-      <div class="delegate-filters">
-        <div class="delegate-filters-title">Delegados</div>
-        <div class="delegate-pills" id="sidebarDelegados"></div>
-      </div>
-      <p style="margin-top:10px;">Versión demo · Datos ficticios</p>
+      <p>Versión demo · Datos ficticios</p>
     </div>
   </aside>
 
@@ -584,95 +575,98 @@
       </button>
     </div>
 
-    <!-- Filtros -->
+    <!-- Filtros + visitas -->
     <div class="filters-row">
-      <select class="select">
-        <option>Periodo: Últimos 12 meses</option>
-        <option>Últimos 6 meses</option>
-        <option>Último mes</option>
-      </select>
-      <select class="select">
-        <option>Tipo centro: Todos</option>
-        <option>Centro propio</option>
-        <option>Franquicia</option>
-      </select>
+      <div class="filters-left">
+        <div class="visits-chip">
+          Visitas: 316 / 384 centros · Ene–Dic
+        </div>
+      </div>
+      <div class="filters-right">
+        <select class="select" id="delegadoSelect">
+          <option value="global">Delegado: Todos</option>
+        </select>
+        <select class="select" id="centroSelect">
+          <option value="todos">Centro: Todos</option>
+        </select>
+      </div>
     </div>
 
     <!-- Resumen general -->
     <div class="section-header">
       <h2>Resumen general KPIs</h2>
-      <span class="sub">Promedio general sobre el total visitado · Procesos y calidad de ejecución</span>
+      <span class="sub">Promedio sobre el total visitado · Procesos y calidad de ejecución</span>
     </div>
 
     <!-- 7 KPIs -->
     <section class="kpi-grid">
-      <div class="card-kpi">
+      <div class="card-kpi" data-kpi="procesos">
         <div class="card-kpi-title">Procesos completados</div>
         <div class="card-kpi-main">
-          <span class="card-kpi-value">78%</span>
-          <span class="badge ok">Objetivo 80%</span>
+          <span class="card-kpi-value" id="kpiProcesos">78%</span>
+          <span class="badge ok" id="kpiProcesosBadge">Objetivo 80%</span>
         </div>
         <div class="card-kpi-foot">Media general sobre todas las visitas.</div>
       </div>
 
-      <div class="card-kpi">
+      <div class="card-kpi" data-kpi="prueba">
         <div class="card-kpi-title">Conversión a prueba</div>
         <div class="card-kpi-main">
-          <span class="card-kpi-value">46%</span>
+          <span class="card-kpi-value" id="kpiPrueba">46%</span>
         </div>
         <div class="card-kpi-foot">Pacientes que pasan a prueba de audífonos.</div>
       </div>
 
-      <div class="card-kpi">
+      <div class="card-kpi" data-kpi="cierre">
         <div class="card-kpi-title">Conversión cierre</div>
         <div class="card-kpi-main">
-          <span class="card-kpi-value">28%</span>
-          <span class="badge">Reforzar cierre</span>
+          <span class="card-kpi-value" id="kpiCierre">28%</span>
+          <span class="badge" id="kpiCierreBadge">Reforzar cierre</span>
         </div>
         <div class="card-kpi-foot">Ventas sobre total de visitas.</div>
       </div>
 
-      <div class="card-kpi">
+      <div class="card-kpi" data-kpi="hit">
         <div class="card-kpi-title">Aplicación HIT</div>
         <div class="card-kpi-main">
-          <span class="card-kpi-value">82%</span>
+          <span class="card-kpi-value" id="kpiHit">82%</span>
         </div>
-        <div class="card-kpi-foot">% de visitas donde se aplica protocolo HIT.</div>
+        <div class="card-kpi-foot">% visitas donde se aplica protocolo HIT.</div>
       </div>
 
-      <div class="card-kpi">
+      <div class="card-kpi" data-kpi="ayudas">
         <div class="card-kpi-title">Ayudas</div>
         <div class="card-kpi-main">
-          <span class="card-kpi-value">41%</span>
+          <span class="card-kpi-value" id="kpiAyudas">41%</span>
         </div>
         <div class="card-kpi-foot">Operaciones con ayuda / subvención.</div>
       </div>
 
-      <div class="card-kpi">
+      <div class="card-kpi" data-kpi="aar">
         <div class="card-kpi-title">AAR</div>
         <div class="card-kpi-main">
-          <span class="card-kpi-value">64%</span>
+          <span class="card-kpi-value" id="kpiAar">64%</span>
         </div>
         <div class="card-kpi-foot">Adaptaciones en revisión sobre servicios.</div>
       </div>
 
-      <div class="card-kpi">
+      <div class="card-kpi" data-kpi="form">
         <div class="card-kpi-title">Formaciones</div>
         <div class="card-kpi-main">
-          <span class="card-kpi-value">3,2</span>
+          <span class="card-kpi-value" id="kpiForm">3,2</span>
           <span style="font-size:.7rem;">/delegado</span>
         </div>
         <div class="card-kpi-foot">Formaciones medias realizadas por delegado.</div>
       </div>
     </section>
 
-    <!-- Bloque central: gráficas + ranking + delegados -->
+    <!-- Bloque central -->
     <section class="center-layout">
       <!-- Gráficas -->
       <section class="grid-main">
-        <!-- Evolución mensual procesos / aplica / no aplica -->
+        <!-- Evolución mensual -->
         <article class="card">
-          <h3>Evolución mensual de procesos</h3>
+          <h3>Evolución mensual de procesos (%)</h3>
           <p class="card-sub">
             Promedio mensual por visitas: Procesos, aplica HIT y no aplica (áreas de mejora).
           </p>
@@ -681,22 +675,22 @@
           </div>
         </article>
 
-        <!-- Donut coherente -->
+        <!-- Áreas de mejora -->
         <article class="card">
-          <h3>Distribución procesos</h3>
+          <h3>Áreas de mejora habituales</h3>
           <p class="card-sub">
-            Resultado general sobre el total visitado.
+            Top 10 motivos de mejora detectados sobre el total visitado.
           </p>
           <div class="chart-container">
-            <canvas id="chartDonut"></canvas>
+            <canvas id="chartAreas"></canvas>
           </div>
         </article>
 
-        <!-- Radar delegados -->
+        <!-- Radar KPIs generales/contexto -->
         <article class="card">
-          <h3>Radar delegados</h3>
+          <h3>Radar KPIs</h3>
           <p class="card-sub">
-            Media de KPIs por delegado (sobre sus visitas).
+            Perfil de KPIs globales (o del delegado/centro seleccionado).
           </p>
           <div class="chart-container">
             <canvas id="chartRadar"></canvas>
@@ -712,7 +706,7 @@
         </p>
         <div class="ranking-header">
           <span>Delegado</span>
-          <span>Procesos</span>
+          <span>Proc.</span>
           <span>Conv. prueba</span>
           <span>Conv. cierre</span>
           <span>HIT</span>
@@ -723,11 +717,11 @@
         <div id="rankingBody"></div>
       </section>
 
-      <!-- Faldón delegados -->
+      <!-- Faldón delegados (leyenda de colores) -->
       <section class="delegados-section">
         <div class="delegados-header">
-          <h3>Delegados · mapa de referencia</h3>
-          <span>Colores coherentes en filtros, radar y ranking.</span>
+          <h3>Delegados · leyenda de colores</h3>
+          <span>Colores coherentes con ranking y filtros.</span>
         </div>
         <div class="delegados-grid" id="bottomDelegados"></div>
       </section>
@@ -735,22 +729,21 @@
   </main>
 
   <script>
-    // ----- TEMA OSCURO/CLARO -----
-    const themeToggle = document.getElementById('themeToggle');
-    themeToggle.addEventListener('click', () => {
+    // Toggle oscuro / claro
+    document.getElementById('themeToggle').addEventListener('click', () => {
       document.body.classList.toggle('dark');
     });
 
-    // ----- CONFIGURACIÓN DELEGADOS Y COLORES -----
+    // Delegados y colores (Laura Ramos vs Laura Plazas diferenciadas)
     const delegados = {
       "Eneritz Aranguren": "#22c55e",
       "Laura Plazas": "#2563eb",
+      "Laura Ramos": "#14b8a6",
       "Daniel Chazo": "#a855f7",
       "Manuel Cánovas": "#f97316",
       "Cecilia Pérez": "#0ea5e9",
       "Martin Sebastián": "#ef4444",
       "Marisa Carmona": "#eab308",
-      "Laura Ramos": "#14b8a6",
       "Blanca Fdez. de la Pradilla": "#ec4899",
       "Maribel Amezcua": "#facc15",
       "Sonia Godino": "#22d3ee",
@@ -758,16 +751,27 @@
       "Sergio Perán": "#fb7185"
     };
 
-    // KPIs medios por delegado (datos demo coherentes)
+    // KPIs globales (promedio sobre total visitado)
+    const kpiGlobal = {
+      procesos: 78,
+      prueba: 46,
+      cierre: 28,
+      hit: 82,
+      ayudas: 41,
+      aar: 64,
+      form: 3.2
+    };
+
+    // KPIs por delegado
     const kpiDelegados = {
       "Eneritz Aranguren":  { procesos:82, prueba:52, cierre:31, hit:88, ayudas:39, aar:67, form:4.2 },
       "Laura Plazas":       { procesos:79, prueba:49, cierre:29, hit:84, ayudas:41, aar:62, form:3.8 },
+      "Laura Ramos":        { procesos:77, prueba:46, cierre:27, hit:82, ayudas:39, aar:60, form:3.4 },
       "Daniel Chazo":       { procesos:76, prueba:47, cierre:26, hit:80, ayudas:37, aar:58, form:3.5 },
       "Manuel Cánovas":     { procesos:74, prueba:44, cierre:25, hit:78, ayudas:42, aar:61, form:3.1 },
       "Cecilia Pérez":      { procesos:81, prueba:51, cierre:30, hit:86, ayudas:43, aar:66, form:4.0 },
       "Martin Sebastián":   { procesos:72, prueba:42, cierre:24, hit:75, ayudas:38, aar:57, form:2.9 },
       "Marisa Carmona":     { procesos:80, prueba:50, cierre:29, hit:85, ayudas:40, aar:63, form:3.7 },
-      "Laura Ramos":        { procesos:77, prueba:46, cierre:27, hit:82, ayudas:39, aar:60, form:3.4 },
       "Blanca Fdez. de la Pradilla": { procesos:78, prueba:48, cierre:28, hit:83, ayudas:44, aar:62, form:3.9 },
       "Maribel Amezcua":    { procesos:75, prueba:45, cierre:26, hit:79, ayudas:36, aar:59, form:3.0 },
       "Sonia Godino":       { procesos:73, prueba:43, cierre:25, hit:77, ayudas:35, aar:56, form:2.8 },
@@ -775,31 +779,81 @@
       "Sergio Perán":       { procesos:76, prueba:47, cierre:27, hit:81, ayudas:38, aar:60, form:3.2 }
     };
 
-    // ----- PINTAR DELEGADOS EN SIDEBAR Y FALDÓN INFERIOR -----
-    const sidebarDelegados = document.getElementById('sidebarDelegados');
-    const bottomDelegados = document.getElementById('bottomDelegados');
+    // Centros por delegado (demo)
+    const centrosPorDelegado = {
+      "Eneritz Aranguren":  ["Barcelona Diagonal", "Lleida CC Carrefour", "Terrassa"],
+      "Laura Plazas":       ["Cerdanyola", "Barcelona Sants", "Vic"],
+      "Laura Ramos":        ["Madrid Xanadú", "Valdemoro", "Villaverde"],
+      "Daniel Chazo":       ["Narón", "Ferrol Alcampo", "Lugo"],
+      "Manuel Cánovas":     ["Águilas", "El Palmar", "Nueva Condomina"],
+      "Cecilia Pérez":      ["Carlet", "Alzira", "Nuevo Centro"],
+      "Martin Sebastián":   ["Alameda Málaga", "Córdoba Carrefour", "Estepona"],
+      "Marisa Carmona":     ["Islazul", "La Gavia", "Madrid Río 2"],
+      "Blanca Fdez. de la Pradilla": ["Aravaca", "Gran Plaza 2", "Tres Cantos"],
+      "Maribel Amezcua":    ["Cáceres", "Camas", "Nevada Shopping"],
+      "Sonia Godino":       ["Barakaldo", "Bilbao Correo", "San Sebastián"],
+      "Verónica Alfonsín":  ["Bouzas", "Castelao", "Gijón"],
+      "Sergio Perán":       ["La Vaguada", "Salamanca C/Toro", "Torrelavega"]
+    };
 
-    Object.entries(delegados).forEach(([nombre, color]) => {
-      // Pills sidebar
-      const pill = document.createElement('div');
-      pill.className = 'delegate-pill';
-      pill.innerHTML = `<span class="delegate-color-dot" style="background:${color}"></span>${nombre.split(' ')[0]}`;
-      sidebarDelegados.appendChild(pill);
+    // Áreas de mejora (top 10)
+    const areasMejora = [
+      { label: "Seguimiento postventa", valor: 38 },
+      { label: "Comunicación con ORL", valor: 34 },
+      { label: "Aplicación HIT incompleta", valor: 29 },
+      { label: "Seguimiento AAR", valor: 27 },
+      { label: "Registro en CRM", valor: 25 },
+      { label: "Formación insuficiente", valor: 23 },
+      { label: "Argumentario comercial", valor: 21 },
+      { label: "Tiempo medio de atención", valor: 19 },
+      { label: "Evaluación cognitiva", valor: 17 },
+      { label: "Uso de ayudas/subvenciones", valor: 16 }
+    ];
 
-      // Faldón inferior
-      const pillBottom = document.createElement('div');
-      pillBottom.className = 'delegado-pill-bottom';
-      pillBottom.innerHTML = `<span class="delegate-color-dot" style="background:${color}"></span>${nombre}`;
-      bottomDelegados.appendChild(pillBottom);
+    // Inicializar select Delegado y Centro
+    const delegadoSelect = document.getElementById('delegadoSelect');
+    const centroSelect = document.getElementById('centroSelect');
+
+    Object.keys(delegados).forEach(nombre => {
+      const opt = document.createElement('option');
+      opt.value = nombre;
+      opt.textContent = `Delegado: ${nombre}`;
+      delegadoSelect.appendChild(opt);
     });
 
-    // ----- RANKING DELEGADOS (DESPLEGABLE) -----
-    const rankingBody = document.getElementById('rankingBody');
+    function rellenarCentros(delegado) {
+      centroSelect.innerHTML = '';
+      const optTodos = document.createElement('option');
+      optTodos.value = 'todos';
+      optTodos.textContent = 'Centro: Todos';
+      centroSelect.appendChild(optTodos);
 
+      if (delegado !== 'global' && centrosPorDelegado[delegado]) {
+        centrosPorDelegado[delegado].forEach(c => {
+          const opt = document.createElement('option');
+          opt.value = c;
+          opt.textContent = c;
+          centroSelect.appendChild(opt);
+        });
+      }
+    }
+
+    rellenarCentros('global');
+
+    // Faldón inferior de delegados (leyenda)
+    const bottomDelegados = document.getElementById('bottomDelegados');
+    Object.entries(delegados).forEach(([nombre, color]) => {
+      const pill = document.createElement('div');
+      pill.className = 'delegado-pill-bottom';
+      pill.innerHTML = `<span class="delegate-color-dot" style="background:${color}"></span>${nombre}`;
+      bottomDelegados.appendChild(pill);
+    });
+
+    // Ranking delegados
+    const rankingBody = document.getElementById('rankingBody');
     Object.entries(kpiDelegados).forEach(([nombre, kpis]) => {
       const row = document.createElement('div');
       row.className = 'ranking-row';
-
       row.innerHTML = `
         <span class="delegado-nombre">
           <span class="ranking-row-color" style="background:${delegados[nombre]}"></span>${nombre}
@@ -812,46 +866,55 @@
         <span>${kpis.aar}%</span>
         <span>${kpis.form.toFixed(1)}</span>
       `;
-
       const details = document.createElement('div');
       details.className = 'ranking-details';
       details.textContent = 'Centros destacados: ejemplo 1, ejemplo 2, ejemplo 3…';
 
       row.addEventListener('click', () => {
-        const visible = details.style.display === 'block';
-        details.style.display = visible ? 'none' : 'block';
+        details.style.display = details.style.display === 'block' ? 'none' : 'block';
       });
 
       rankingBody.appendChild(row);
       rankingBody.appendChild(details);
     });
 
-    // ----- GRÁFICA MENSUAL (Procesos / Aplica / No aplica) -----
+    // BASE para evolución mensual (global)
+    const baseMensual = {
+      procesos: [70,72,73,75,76,78,79,80,80,81,82,83],
+      aplica:   [60,62,63,65,67,69,70,71,72,73,74,75],
+      noAplica:[40,38,37,35,33,31,30,29,28,27,26,25]
+    };
+
+    function escalarSerie(serie, factor) {
+      return serie.map(v => Math.round(v * factor));
+    }
+
+    // GRÁFICA Evolución mensual
     const ctxEvo = document.getElementById('chartEvolucion').getContext('2d');
-    new Chart(ctxEvo, {
+    const chartEvolucion = new Chart(ctxEvo, {
       type: 'line',
       data: {
         labels: ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'],
         datasets: [
           {
-            label: 'Procesos',
-            data: [70,72,73,75,76,78,79,80,80,81,82,83],
+            label: 'Procesos (%)',
+            data: baseMensual.procesos,
             borderWidth: 2,
             tension: 0.35,
             borderColor: '#1d4ed8',
             backgroundColor: 'rgba(37,99,235,0.15)'
           },
           {
-            label: 'Aplica HIT',
-            data: [60,62,63,65,67,69,70,71,72,73,74,75],
+            label: 'Aplica HIT (%)',
+            data: baseMensual.aplica,
             borderWidth: 2,
             tension: 0.35,
             borderColor: '#16a34a',
             backgroundColor: 'rgba(22,163,74,0.15)'
           },
           {
-            label: 'No aplica (áreas de mejora)',
-            data: [40,38,37,35,33,31,30,29,28,27,26,25],
+            label: 'No aplica (%)',
+            data: baseMensual.noAplica,
             borderWidth: 2,
             tension: 0.35,
             borderColor: '#ea580c',
@@ -873,7 +936,7 @@
             grid: { color: 'rgba(148,163,184,0.4)' }
           },
           y: {
-            ticks: { color: '#6b7280', font: { size: 9 } },
+            ticks: { color: '#6b7280', font: { size: 9 }, callback: v => v + '%' },
             grid: { color: 'rgba(148,163,184,0.4)' },
             suggestedMin: 20,
             suggestedMax: 90
@@ -882,16 +945,70 @@
       }
     });
 
-    // ----- DONUT: distribución general Aplica / No aplica / Pendiente -----
-    const ctxDonut = document.getElementById('chartDonut').getContext('2d');
-    new Chart(ctxDonut, {
-      type: 'doughnut',
+    // GRÁFICO Áreas de mejora (barras horizontales)
+    const ctxAreas = document.getElementById('chartAreas').getContext('2d');
+    const chartAreas = new Chart(ctxAreas, {
+      type: 'bar',
       data: {
-        labels: ['Aplica HIT', 'No aplica', 'Pendiente'],
+        labels: areasMejora.map(a => a.label),
         datasets: [{
-          data: [68, 22, 10],
-          borderWidth: 0,
-          backgroundColor: ['#16a34a','#ea580c','#1d4ed8']
+          label: '% de visitas con esta área de mejora',
+          data: areasMejora.map(a => a.valor),
+          backgroundColor: '#ea580c'
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            callbacks: {
+              label: ctx => ctx.parsed.x + '%'
+            }
+          }
+        },
+        scales: {
+          x: {
+            ticks: {
+              color: '#6b7280',
+              font: { size: 9 },
+              callback: v => v + '%'
+            },
+            grid: { color: 'rgba(148,163,184,0.4)' }
+          },
+          y: {
+            ticks: { color: '#6b7280', font: { size: 8 } },
+            grid: { display: false }
+          }
+        }
+      }
+    });
+
+    // RADAR KPIs (una sola línea según contexto)
+    const ctxRadar = document.getElementById('chartRadar').getContext('2d');
+    const radarLabels = ['Procesos','Conv. prueba','Conv. cierre','HIT','Ayudas','AAR','Formaciones'];
+    const chartRadar = new Chart(ctxRadar, {
+      type: 'radar',
+      data: {
+        labels: radarLabels,
+        datasets: [{
+          label: 'KPIs globales',
+          data: [
+            kpiGlobal.procesos,
+            kpiGlobal.prueba,
+            kpiGlobal.cierre,
+            kpiGlobal.hit,
+            kpiGlobal.ayudas,
+            kpiGlobal.aar,
+            kpiGlobal.form * 10
+          ],
+          borderColor: '#16a34a',
+          backgroundColor: 'rgba(22,163,74,0.25)',
+          borderWidth: 2
         }]
       },
       options: {
@@ -900,34 +1017,7 @@
         plugins: {
           legend: {
             position: 'bottom',
-            labels: { color: '#6b7280', font: { size: 10 } }
-          }
-        },
-        cutout: '65%'
-      }
-    });
-
-    // ----- RADAR DELEGADOS (7 KPI) -----
-    const ctxRadar = document.getElementById('chartRadar').getContext('2d');
-    new Chart(ctxRadar, {
-      type: 'radar',
-      data: {
-        labels: ['Procesos','Conv. prueba','Conv. cierre','HIT','Ayudas','AAR','Formaciones'],
-        datasets: Object.entries(kpiDelegados).map(([nombre, kpis]) => ({
-          label: nombre.split(' ')[0], // nombre corto
-          data: [kpis.procesos, kpis.prueba, kpis.cierre, kpis.hit, kpis.ayudas, kpis.aar, kpis.form * 10],
-          borderColor: delegados[nombre],
-          backgroundColor: delegados[nombre] + '33',
-          borderWidth: 1
-        }))
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: 'bottom',
-            labels: { color: '#6b7280', font: { size: 8 } }
+            labels: { color: '#6b7280', font: { size: 9 } }
           }
         },
         scales: {
@@ -937,6 +1027,88 @@
             pointLabels: { color: '#6b7280', font: { size: 8 } },
             ticks: { display: false, beginAtZero: true }
           }
+        }
+      }
+    });
+
+    // Actualizar KPIs y gráficas según contexto (global / delegado / centro)
+    function actualizarDashboard(contextKpi, labelRadar) {
+      // KPIs
+      document.getElementById('kpiProcesos').textContent = contextKpi.procesos + '%';
+      document.getElementById('kpiPrueba').textContent   = contextKpi.prueba + '%';
+      document.getElementById('kpiCierre').textContent   = contextKpi.cierre + '%';
+      document.getElementById('kpiHit').textContent      = contextKpi.hit + '%';
+      document.getElementById('kpiAyudas').textContent   = contextKpi.ayudas + '%';
+      document.getElementById('kpiAar').textContent      = contextKpi.aar + '%';
+      document.getElementById('kpiForm').textContent     = contextKpi.form.toFixed(1);
+
+      // Badges mínimos
+      const procesosBadge = document.getElementById('kpiProcesosBadge');
+      procesosBadge.textContent = `Objetivo 80%`;
+      procesosBadge.className = 'badge ' + (contextKpi.procesos >= 80 ? 'ok' : '');
+
+      const cierreBadge = document.getElementById('kpiCierreBadge');
+      cierreBadge.textContent = contextKpi.cierre >= 30 ? 'Buen cierre' : 'Reforzar cierre';
+
+      // Radar
+      chartRadar.data.datasets[0].label = labelRadar;
+      chartRadar.data.datasets[0].data = [
+        contextKpi.procesos,
+        contextKpi.prueba,
+        contextKpi.cierre,
+        contextKpi.hit,
+        contextKpi.ayudas,
+        contextKpi.aar,
+        contextKpi.form * 10
+      ];
+      chartRadar.update();
+
+      // Evolución mensual: escalamos en función de procesos delegados vs global
+      const factor = contextKpi.procesos / kpiGlobal.procesos;
+      chartEvolucion.data.datasets[0].data = escalarSerie(baseMensual.procesos, factor);
+      chartEvolucion.data.datasets[1].data = escalarSerie(baseMensual.aplica, contextKpi.hit / kpiGlobal.hit);
+      chartEvolucion.data.datasets[2].data = escalarSerie(baseMensual.noAplica, (100 - contextKpi.hit) / (100 - kpiGlobal.hit));
+      chartEvolucion.update();
+    }
+
+    // Estado actual
+    let contextoActual = 'global'; // 'global' | 'delegado' | 'centro'
+    let delegadoActual = null;
+    let centroActual = null;
+
+    // Inicial global
+    actualizarDashboard(kpiGlobal, 'KPIs globales');
+
+    delegadoSelect.addEventListener('change', () => {
+      const val = delegadoSelect.value;
+      if (val === 'global') {
+        contextoActual = 'global';
+        delegadoActual = null;
+        rellenarCentros('global');
+        actualizarDashboard(kpiGlobal, 'KPIs globales');
+      } else {
+        contextoActual = 'delegado';
+        delegadoActual = val;
+        rellenarCentros(val);
+        const kpi = kpiDelegados[val];
+        actualizarDashboard(kpi, `KPIs · ${val}`);
+      }
+    });
+
+    centroSelect.addEventListener('change', () => {
+      const val = centroSelect.value;
+      centroActual = val;
+      if (val === 'todos') {
+        // Volvemos al contexto del delegado o global
+        if (delegadoActual && kpiDelegados[delegadoActual]) {
+          actualizarDashboard(kpiDelegados[delegadoActual], `KPIs · ${delegadoActual}`);
+        } else {
+          actualizarDashboard(kpiGlobal, 'KPIs globales');
+        }
+      } else {
+        // Centro seleccionado -> en demo usamos mismo perfil que su delegado
+        if (delegadoActual && kpiDelegados[delegadoActual]) {
+          actualizarDashboard(kpiDelegados[delegadoActual], `KPIs · ${delegadoActual} · ${val}`);
         }
       }
     });
