@@ -1,444 +1,720 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8" />
+  <title>Control Center Audio - Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Fuente y estilos básicos -->
+  <style>
+    :root {
+      --bg: #050816;
+      --bg-sidebar: #060b26;
+      --bg-card: #0f172a;
+      --bg-card-soft: #111827;
+      --accent: #22c55e;
+      --accent-soft: #bbf7d0;
+      --accent-warn: #f97316;
+      --accent-danger: #ef4444;
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --border-soft: #1f2937;
+      --radius-lg: 14px;
+      --radius-xl: 18px;
+      --shadow-soft: 0 14px 30px rgba(0,0,0,.45);
+    }
 
-<title>Gestión Audio - Plataforma Mejorada</title>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    }
 
-<!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    body {
+      background: radial-gradient(circle at top left, #1f2937, #020617 45%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+    }
 
-<style>
-/* ===========================
-   ESTILOS GENERALES
-   =========================== */
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f4f4f4;
-}
+    /* Layout principal */
+    .sidebar {
+      width: 250px;
+      background: linear-gradient(180deg, #020617, #020617 40%, #020617);
+      border-right: 1px solid var(--border-soft);
+      padding: 18px 18px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
 
-/* Colores corporativos */
-:root {
-    --rojo: #E60000;
-    --negro: #111;
-    --gris: #d9d9d9;
-    --blanco: #fff;
-}
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-/* ===========================
-   SIDEBAR
-   =========================== */
-.sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 240px;
-    height: 100vh;
-    background: var(--negro);
-    color: var(--blanco);
-    padding-top: 20px;
-}
+    .logo-badge {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 20%, #fde68a, #22c55e);
+      box-shadow: 0 0 15px rgba(34,197,94,.5);
+    }
 
-.sidebar h2 {
-    text-align: center;
-    color: var(--rojo);
-    margin-bottom: 30px;
-    font-size: 20px;
-    font-weight: bold;
-}
+    .logo-text {
+      display: flex;
+      flex-direction: column;
+    }
 
-.sidebar a {
-    display: block;
-    padding: 14px 22px;
-    color: var(--blanco);
-    text-decoration: none;
-    font-size: 16px;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    cursor: pointer;
-}
+    .logo-title {
+      font-weight: 700;
+      font-size: 1.05rem;
+    }
 
-.sidebar a:hover,
-.sidebar a.active {
-    background: var(--rojo);
-}
+    .logo-subtitle {
+      font-size: .7rem;
+      color: var(--text-muted);
+    }
 
-/* ===========================
-   HEADER
-   =========================== */
-.header {
-    margin-left: 240px;
-    height: 60px;
-    background: var(--blanco);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 25px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
+    .section-title {
+      font-size: .75rem;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: .12em;
+      margin-bottom: 8px;
+    }
 
-/* ===========================
-   CONTENIDO PRINCIPAL
-   =========================== */
-.main {
-    margin-left: 240px;
-    padding: 30px;
-}
+    .nav-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
 
-/* Tarjetas KPI */
-.kpi-box {
-    background: var(--blanco);
-    width: 180px;
-    padding: 18px;
-    border-radius: 12px;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.15);
-    border-left: 6px solid var(--rojo);
-}
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-size: .88rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all .18s ease;
+    }
 
-.kpi-title {
-    font-size: 14px;
-    font-weight: bold;
-    color: var(--negro);
-}
+    .nav-item span.icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      background: #0f172a;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .75rem;
+    }
 
-.kpi-value {
-    font-size: 26px;
-    margin-top: 8px;
-    color: var(--rojo);
-}
+    .nav-item.active {
+      background: linear-gradient(90deg, #22c55e, #4ade80);
+      color: #022c22;
+      font-weight: 600;
+    }
 
-/* Titulares */
-.section-title {
-    font-size: 22px;
-    font-weight: bold;
-    margin: 20px 0 10px 0;
-    color: var(--rojo);
-}
+    .nav-item.active span.icon {
+      background: rgba(15,23,42,.15);
+    }
 
-/* Gráficos */
-.chart-container {
-    background: var(--blanco);
-    padding: 20px;
-    border-radius: 12px;
-    margin-top: 20px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-}
+    .nav-item:hover:not(.active) {
+      background: rgba(15,23,42,.8);
+      color: #e5e7eb;
+    }
 
-</style>
+    .sidebar-footer {
+      margin-top: auto;
+      font-size: .78rem;
+      color: var(--text-muted);
+    }
+
+    .delegate-filters {
+      background: rgba(15,23,42,.9);
+      border-radius: var(--radius-lg);
+      padding: 12px;
+      margin-top: 4px;
+      border: 1px solid rgba(148,163,184,.3);
+    }
+
+    .delegate-filters-title {
+      font-size: .8rem;
+      margin-bottom: 6px;
+    }
+
+    .delegate-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .delegate-pill {
+      font-size: .7rem;
+      padding: 3px 7px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,.4);
+      cursor: pointer;
+      opacity: .7;
+    }
+
+    .delegate-pill.active {
+      border-color: #22c55e;
+      background: rgba(34,197,94,.12);
+      opacity: 1;
+    }
+
+    /* Contenido principal */
+    .main {
+      flex: 1;
+      padding: 18px 22px 26px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .search-input-wrapper {
+      flex: 1;
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      background: rgba(15,23,42,.95);
+      border-radius: 999px;
+      padding: 10px 12px 10px 34px;
+      border: 1px solid var(--border-soft);
+      color: var(--text-main);
+      font-size: .86rem;
+      outline: none;
+    }
+
+    .search-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: .8rem;
+      color: var(--text-muted);
+    }
+
+    .btn {
+      border-radius: 999px;
+      padding: 8px 14px;
+      border: 1px solid transparent;
+      font-size: .8rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #0f172a;
+      color: var(--text-main);
+    }
+
+    .btn-cta {
+      background: linear-gradient(90deg, #22c55e, #4ade80);
+      color: #022c22;
+      font-weight: 600;
+      box-shadow: 0 10px 25px rgba(34,197,94,.35);
+    }
+
+    .btn-outline {
+      border-color: var(--border-soft);
+    }
+
+    .btn span.icon {
+      font-size: .85rem;
+    }
+
+    .filters-row {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      font-size: .8rem;
+    }
+
+    .select {
+      background: rgba(15,23,42,.95);
+      border-radius: 999px;
+      padding: 6px 12px;
+      border: 1px solid var(--border-soft);
+      color: var(--text-main);
+      outline: none;
+      font-size: .8rem;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .section-header h2 {
+      font-size: 1.08rem;
+      font-weight: 600;
+    }
+
+    .section-header span.sub {
+      font-size: .78rem;
+      color: var(--text-muted);
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 12px;
+    }
+
+    .card {
+      background: radial-gradient(circle at top left, #111827, #020617 55%);
+      border-radius: var(--radius-xl);
+      padding: 14px 14px 12px;
+      border: 1px solid rgba(15,23,42,.9);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .card-header {
+      font-size: .8rem;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .kpi-main {
+      font-size: 1.4rem;
+      font-weight: 700;
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+
+    .kpi-tag {
+      font-size: .72rem;
+      border-radius: 999px;
+      padding: 3px 8px;
+      background: rgba(34,197,94,.12);
+      color: #4ade80;
+    }
+
+    .kpi-tag.warn {
+      background: rgba(234,179,8,.12);
+      color: #facc15;
+    }
+
+    .kpi-secondary {
+      font-size: .76rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Grid central: gráficos + ranking */
+    .grid-main {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1.4fr);
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .card h3 {
+      font-size: .9rem;
+      margin-bottom: 8px;
+    }
+
+    .card-sub {
+      font-size: .76rem;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 230px;
+      width: 100%;
+    }
+
+    /* Ranking tabla */
+    .ranking-grid {
+      margin-top: 12px;
+    }
+
+    .ranking-header,
+    .ranking-row {
+      display: grid;
+      grid-template-columns: 2fr 1.2fr .8fr .8fr .9fr;
+      font-size: .76rem;
+      column-gap: 10px;
+      align-items: center;
+      padding: 4px 0;
+    }
+
+    .ranking-header {
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-soft);
+      margin-bottom: 4px;
+    }
+
+    .ranking-row {
+      border-radius: 9px;
+      padding-inline: 6px;
+    }
+
+    .ranking-row:nth-child(even) {
+      background: rgba(15,23,42,.6);
+    }
+
+    .chip {
+      border-radius: 999px;
+      padding: 2px 7px;
+      font-size: .7rem;
+      background: rgba(15,23,42,.9);
+      border: 1px solid rgba(148,163,184,.4);
+    }
+
+    .chip.success {
+      background: rgba(34,197,94,.12);
+      border-color: rgba(34,197,94,.6);
+      color: #4ade80;
+    }
+
+    .chip.warn {
+      background: rgba(234,179,8,.12);
+      border-color: rgba(234,179,8,.6);
+      color: #facc15;
+    }
+
+    /* Responsivo */
+    @media (max-width: 960px) {
+      .sidebar {
+        display: none;
+      }
+      body {
+        display: block;
+      }
+      .main {
+        padding: 14px;
+      }
+      .grid-main {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-<!-- ===========================
-     SIDEBAR LATERAL
-     =========================== -->
-<div class="sidebar">
-    <h2>GESTIÓN AUDIO</h2>
-
-    <a class="active" onclick="showPage('dashboard')">📊 Dashboard</a>
-    <a onclick="showPage('centros')">📍 Centros</a>
-    <a onclick="showPage('visitas')">📅 Visitas</a>
-    <a onclick="showPage('exclusivos')">⭐ Exclusivos</a>
-    <a onclick="showPage('aar')">🎧 Servicio AAR</a>
-    <a onclick="showPage('proyectos')">📂 Proyectos</a>
-</div>
-
-<!-- ===========================
-     HEADER SUPERIOR
-     =========================== -->
-<div class="header">
-    <div style="font-size: 18px; font-weight: bold; color: var(--negro);">
-        Plataforma Gestión Audio
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-badge"></div>
+      <div class="logo-text">
+        <span class="logo-title">Control Center Audio</span>
+        <span class="logo-subtitle">Dashboard de centros, visitas y KPIs</span>
+      </div>
     </div>
 
     <div>
-        <button onclick="toggleTheme()" 
-            style="background: var(--rojo); color: white; border:none; padding:8px 14px; border-radius:8px; cursor:pointer;">
-            Modo Claro/Oscuro
-        </button>
+      <div class="section-title">Secciones</div>
+      <nav class="nav-list">
+        <div class="nav-item active">
+          <span class="icon">🏠</span> Dashboard
+        </div>
+        <div class="nav-item">
+          <span class="icon">🏢</span> Centros
+        </div>
+        <div class="nav-item">
+          <span class="icon">👣</span> Visitas
+        </div>
+        <div class="nav-item">
+          <span class="icon">🛠</span> Servicios
+        </div>
+        <div class="nav-item">
+          <span class="icon">💳</span> Ventas
+        </div>
+        <div class="nav-item">
+          <span class="icon">📊</span> Proyectos
+        </div>
+      </nav>
     </div>
-</div>
 
-<!-- ===========================
-     CONTENEDOR PRINCIPAL
-     =========================== -->
-<div class="main">
-
-    <!-- DASHBOARD (Módulo principal) -->
-    <section id="dashboard" style="display:block;">
-        <h1 class="section-title">📊 Dashboard General</h1>
-
-        <!-- KPIs SUPERIORES -->
-        <div style="display:flex; gap:20px; flex-wrap:wrap;">
-            <div class="kpi-box">
-                <div class="kpi-title">Procesos</div>
-                <div class="kpi-value" id="kpiProcesos">87%</div>
-            </div>
-
-            <div class="kpi-box">
-                <div class="kpi-title">Formaciones</div>
-                <div class="kpi-value" id="kpiFormaciones">82%</div>
-            </div>
-
-            <div class="kpi-box">
-                <div class="kpi-title">Conv. Prueba</div>
-                <div class="kpi-value" id="kpiPrueba">78%</div>
-            </div>
-
-            <div class="kpi-box">
-                <div class="kpi-title">Conv. Venta</div>
-                <div class="kpi-value" id="kpiVenta">81%</div>
-            </div>
-
-            <div class="kpi-box">
-                <div class="kpi-title">HIT</div>
-                <div class="kpi-value" id="kpiHit">SI</div>
-            </div>
-
-            <div class="kpi-box">
-                <div class="kpi-title">Implantación</div>
-                <div class="kpi-value" id="kpiImplantacion">Completa</div>
-            </div>
+    <div class="sidebar-footer">
+      <div class="delegate-filters">
+        <div class="delegate-filters-title">Filtros rápidos · Delegados</div>
+        <div class="delegate-pills">
+          <div class="delegate-pill active">Blanca</div>
+          <div class="delegate-pill">Cecilia</div>
+          <div class="delegate-pill">Daniel</div>
+          <div class="delegate-pill">Eneritz</div>
         </div>
+      </div>
+      <p style="margin-top:10px;">Versión demo · Datos ficticios</p>
+    </div>
+  </aside>
 
-        <!-- GRÁFICA EVOLUTIVA -->
+  <!-- MAIN -->
+  <main class="main">
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="search-input-wrapper">
+        <span class="search-icon">🔍</span>
+        <input class="search-input" placeholder="Busca centros, visitas, servicios..." />
+      </div>
+      <button class="btn btn-outline">
+        <span class="icon">💾</span> Guardar vista
+      </button>
+      <button class="btn btn-outline">
+        <span class="icon">⬇️</span> Exportar HTML
+      </button>
+      <button class="btn btn-cta">
+        <span class="icon">☁️</span> Actualizar datos nube
+      </button>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filters-row">
+      <select class="select">
+        <option>Periodo: Últimos 12 meses</option>
+        <option>Últimos 3 meses</option>
+        <option>Último mes</option>
+      </select>
+      <select class="select">
+        <option>Tipo centro: Todos</option>
+        <option>Centro propio</option>
+        <option>Franquicia</option>
+      </select>
+    </div>
+
+    <!-- Resumen general -->
+    <div>
+      <div class="section-header">
+        <h2>Resumen general KPIs</h2>
+        <span class="sub">Visión rápida de aplicaciones, visitas, servicios y ventas</span>
+      </div>
+    </div>
+
+    <!-- KPIs -->
+    <section class="kpi-grid">
+      <article class="card">
+        <div class="card-header">
+          <span>Aplicaciones HIT (global)</span>
+        </div>
+        <div class="kpi-main">
+          <span>82%</span>
+          <span class="kpi-tag">Objetivo 90%</span>
+        </div>
+        <div class="kpi-secondary">
+          +4 pts vs periodo anterior
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-header">
+          <span>Visitas realizadas / planificadas</span>
+        </div>
+        <div class="kpi-main">
+          <span>316</span>
+          <span style="font-size:.9rem; color:var(--text-muted)">/ 384</span>
+        </div>
+        <div class="kpi-secondary">
+          82% ejecución · 12 centros por debajo del 70%
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-header">
+          <span>Servicios realizados</span>
+        </div>
+        <div class="kpi-main">
+          <span>497</span>
+          <span class="kpi-tag">+18% crecimiento</span>
+        </div>
+        <div class="kpi-secondary">
+          Revisiones 52% · Ajustes 31% · Otros 17%
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-header">
+          <span>Conversión a venta</span>
+        </div>
+        <div class="kpi-main">
+          <span>27%</span>
+          <span class="kpi-tag warn">Potencial seguimiento</span>
+        </div>
+        <div class="kpi-secondary">
+          Ticket medio: 1.430 € · Devoluciones 3,2%
+        </div>
+      </article>
+    </section>
+
+    <!-- Gráficos y estado visitas -->
+    <section class="grid-main">
+      <!-- Evolución mensual -->
+      <article class="card">
+        <h3>Evolución mensual</h3>
+        <p class="card-sub">
+          Visitas, aplicaciones en prueba y conversión a venta
+        </p>
         <div class="chart-container">
-            <h3 class="section-title">Evolución Mensual (Ago–Jul)</h3>
-            <canvas id="chartEvolucion"></canvas>
+          <canvas id="chartEvolucion"></canvas>
         </div>
+      </article>
 
-        <!-- ÁREAS DE MEJORA -->
+      <!-- Estado visitas -->
+      <article class="card">
+        <h3>Estado de visitas</h3>
+        <p class="card-sub">
+          Distribución de visitas realizadas, pendientes y anuladas
+        </p>
         <div class="chart-container">
-            <h3 class="section-title">Áreas de Mejora (Top 5)</h3>
-            <canvas id="chartMejora"></canvas>
+          <canvas id="chartVisitas"></canvas>
+        </div>
+      </article>
+    </section>
+
+    <!-- Ranking centros -->
+    <section class="card">
+      <h3>Ranking rápido de centros</h3>
+      <p class="card-sub">
+        Mejores conversiones a venta y aplicación de procesos
+      </p>
+      <div class="ranking-grid">
+        <div class="ranking-header">
+          <span>Centro</span>
+          <span>Delegado</span>
+          <span>Conv. prueba</span>
+          <span>Conv. venta</span>
+          <span>% Procesos</span>
         </div>
 
-        <!-- RANKING -->
-        <div class="chart-container">
-            <h3 class="section-title">Ranking KPI</h3>
-            <table id="tablaRanking" style="width:100%; border-collapse:collapse;">
-                <thead>
-                    <tr style="background:#eee;">
-                        <th>Centro</th>
-                        <th>Delegado</th>
-                        <th>Procesos</th>
-                        <th>Formación</th>
-                        <th>Conv. Prueba</th>
-                        <th>Conv. Venta</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Pamplona</td>
-                        <td>Eneritz</td>
-                        <td>92%</td>
-                        <td>85%</td>
-                        <td>81%</td>
-                        <td>83%</td>
-                    </tr>
-                    <tr>
-                        <td>Delicias</td>
-                        <td>Blanca</td>
-                        <td>89%</td>
-                        <td>82%</td>
-                        <td>78%</td>
-                        <td>80%</td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="ranking-row">
+          <span>Madrid · Reina Mercedes</span>
+          <span>Cecilia</span>
+          <span>64%</span>
+          <span><span class="chip success">34%</span></span>
+          <span>91%</span>
         </div>
+        <div class="ranking-row">
+          <span>Madrid · Tetuán</span>
+          <span>Blanca</span>
+          <span>58%</span>
+          <span><span class="chip">29%</span></span>
+          <span>87%</span>
+        </div>
+        <div class="ranking-row">
+          <span>Sevilla · Nervión</span>
+          <span>Daniel</span>
+          <span>51%</span>
+          <span><span class="chip warn">22%</span></span>
+          <span>72%</span>
+        </div>
+        <div class="ranking-row">
+          <span>Bilbao · Gran Vía</span>
+          <span>Eneritz</span>
+          <span>47%</span>
+          <span><span class="chip">25%</span></span>
+          <span>69%</span>
+        </div>
+      </div>
     </section>
+  </main>
 
-    <!-- MÓDULO CENTROS -->
-    <section id="centros" style="display:none;">
-        <h1 class="section-title">📍 Centros</h1>
-        <p>Aquí irá el módulo de Centros completo.</p>
-    </section>
-
-    <!-- MÓDULO VISITAS -->
-    <section id="visitas" style="display:none;">
-        <h1 class="section-title">📅 Visitas</h1>
-        <p>Calendario y edición de visitas.</p>
-    </section>
-
-    <!-- MÓDULO EXCLUSIVOS -->
-    <section id="exclusivos" style="display:none;">
-        <h1 class="section-title">⭐ Centros Exclusivos</h1>
-        <p>Acciones exclusivas, KPIs y checklist.</p>
-    </section>
-
-    <!-- MÓDULO AAR -->
-    <section id="aar" style="display:none;">
-        <h1 class="section-title">🎧 Servicio AAR</h1>
-        <p>Formación, perfiles y estado AAR.</p>
-    </section>
-
-    <!-- MÓDULO PROYECTOS -->
-    <section id="proyectos" style="display:none;">
-        <h1 class="section-title">📂 Proyectos</h1>
-        <p>Módulo de proyectos.</p>
-    </section>
-
-</div>
-<!-- ===========================
-     SCRIPTS DE NAVEGACIÓN
-     =========================== -->
-<script>
-function showPage(pageName) {
-    const pages = ["dashboard", "centros", "visitas", "exclusivos", "aar", "proyectos"];
-
-    pages.forEach(p => {
-        document.getElementById(p).style.display = (p === pageName ? "block" : "none");
+  <script>
+    // Datos demo para la evolución mensual
+    const ctxEvo = document.getElementById('chartEvolucion').getContext('2d');
+    const chartEvolucion = new Chart(ctxEvo, {
+      type: 'line',
+      data: {
+        labels: ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'],
+        datasets: [
+          {
+            label: 'Visitas realizadas',
+            data: [120,138,156,172,149,181,196,205,212,231,224,238],
+            borderWidth: 2,
+            tension: 0.35
+          },
+          {
+            label: '% Aplicaciones a prueba',
+            data: [32,34,35,37,39,40,41,43,44,43,42,44],
+            borderWidth: 2,
+            borderDash: [4,4],
+            tension: 0.35
+          },
+          {
+            label: '% Conversión venta',
+            data: [21,22,23,24,25,26,27,28,29,27,26,27],
+            borderWidth: 2,
+            tension: 0.35
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            labels: {
+              color: '#e5e7eb',
+              font: { size: 11 }
+            }
+          }
+        },
+        scales: {
+          x: {
+            ticks: { color: '#9ca3af', font: { size: 10 } },
+            grid: { color: 'rgba(31,41,55,0.5)' }
+          },
+          y: {
+            ticks: { color: '#9ca3af', font: { size: 10 } },
+            grid: { color: 'rgba(31,41,55,0.5)' }
+          }
+        }
+      }
     });
 
-    // Actualiza estado activo en el sidebar
-    const links = document.querySelectorAll(".sidebar a");
-    links.forEach(link => link.classList.remove("active"));
-
-    event.target.classList.add("active");
-}
-
-/* ===========================
-   TEMA CLARO / OSCURO
-   =========================== */
-let darkMode = false;
-
-function toggleTheme() {
-    darkMode = !darkMode;
-
-    if (darkMode) {
-        document.body.style.background = "#1a1a1a";
-        document.querySelector(".header").style.background = "#333";
-        document.querySelector(".header").style.color = "white";
-        document.querySelectorAll(".kpi-box").forEach(b => b.style.background = "#2a2a2a");
-        document.querySelectorAll(".chart-container").forEach(c => c.style.background = "#2a2a2a");
-    } else {
-        document.body.style.background = "#f4f4f4";
-        document.querySelector(".header").style.background = "white";
-        document.querySelector(".header").style.color = "black";
-        document.querySelectorAll(".kpi-box").forEach(b => b.style.background = "white");
-        document.querySelectorAll(".chart-container").forEach(c => c.style.background = "white");
-    }
-}
-</script>
-<!-- ===========================
-     DASHBOARD — GRÁFICAS
-     =========================== -->
-<script>
-/* ===========================
-   GRÁFICA EVOLUCIÓN MENSUAL
-   =========================== */
-const ctxEvo = document.getElementById("chartEvolucion");
-
-new Chart(ctxEvo, {
-    type: "line",
-    data: {
-        labels: ["Ago", "Sep", "Oct", "Nov", "Dic", "Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul"],
-        datasets: [
-            {
-                label: "Procesos",
-                data: [80, 82, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93],
-                borderColor: "#E60000",
-                borderWidth: 3,
-                tension: 0.3
-            },
-            {
-                label: "Formaciones",
-                data: [70, 72, 73, 74, 76, 77, 78, 79, 80, 81, 82, 83],
-                borderColor: "#ff7b00",
-                borderWidth: 3,
-                tension: 0.3
-            },
-            {
-                label: "Conv. Prueba",
-                data: [68, 70, 72, 73, 75, 76, 77, 78, 79, 80, 80, 81],
-                borderColor: "#0099ff",
-                borderWidth: 3,
-                tension: 0.3
-            },
-            {
-                label: "Conv. Venta",
-                data: [67, 69, 70, 72, 73, 75, 77, 78, 79, 80, 80, 82],
-                borderColor: "#00c853",
-                borderWidth: 3,
-                tension: 0.3
-            },
-            {
-                label: "Áreas de Mejora (Top 5)",
-                data: [35, 33, 32, 30, 29, 27, 25, 24, 23, 22, 21, 20],
-                borderColor: "#555",
-                borderWidth: 3,
-                borderDash: [5, 5],
-                tension: 0.3
-            }
-        ]
-    },
-    options: {
+    // Donut estado de visitas
+    const ctxVis = document.getElementById('chartVisitas').getContext('2d');
+    const chartVisitas = new Chart(ctxVis, {
+      type: 'doughnut',
+      data: {
+        labels: ['Realizadas', 'Pendientes', 'Anuladas'],
+        datasets: [{
+          data: [72, 19, 9],
+          borderWidth: 0
+        }]
+      },
+      options: {
         responsive: true,
-        plugins: { legend: { labels: { color: "#000" } } },
-        scales: {
-            x: { ticks: { color: "#000" } },
-            y: { ticks: { color: "#000", suggestedMin: 0, suggestedMax: 100 } }
-        }
-    }
-});
-
-
-/* ===========================
-   GRÁFICA ÁREAS DE MEJORA
-   =========================== */
-const ctxMej = document.getElementById("chartMejora");
-
-new Chart(ctxMej, {
-    type: "line",
-    data: {
-        labels: ["Ago", "Sep", "Oct", "Nov", "Dic", "Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul"],
-        datasets: [
-            {
-                label: "Videotoscopia",
-                data: [10, 9, 9, 8, 8, 7, 7, 6, 6, 6, 5, 5],
-                borderColor: "#E60000",
-                borderWidth: 3,
-                tension: 0.3
-            },
-            {
-                label: "Anamnesis",
-                data: [8, 8, 7, 7, 6, 6, 6, 5, 5, 5, 4, 4],
-                borderColor: "#ff7b00",
-                borderWidth: 3,
-                tension: 0.3
-            },
-            {
-                label: "Logoaudiometría",
-                data: [7, 7, 6, 6, 5, 5, 5, 4, 4, 4, 3, 3],
-                borderColor: "#0099ff",
-                borderWidth: 3,
-                tension: 0.3
-            },
-            {
-                label: "Explicar HIT",
-                data: [9, 8, 8, 7, 7, 6, 6, 6, 5, 5, 4, 4],
-                borderColor: "#00c853",
-                borderWidth: 3,
-                tension: 0.3
-            },
-            {
-                label: "Agenda Inteligente",
-                data: [11, 10, 10, 9, 9, 8, 8, 7, 7, 6, 6, 6],
-                borderColor: "#555",
-                borderWidth: 3,
-                tension: 0.3
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              color: '#e5e7eb',
+              font: { size: 11 }
             }
-        ]
-    },
-    options: {
-        responsive: true,
-        plugins: { legend: { labels: { color: "#000" } } },
-        scales: {
-            x: { ticks: { color: "#000" } },
-            y: { ticks: { color: "#000" } }
-        }
-    }
-});
-</script>
+          }
+        },
+        cutout: '65%'
+      }
+    });
+  </script>
 </body>
 </html>
