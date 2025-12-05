@@ -1,720 +1,522 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <title>Control Center Audio - Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- Fuente y estilos básicos -->
-  <style>
-    :root {
-      --bg: #050816;
-      --bg-sidebar: #060b26;
-      --bg-card: #0f172a;
-      --bg-card-soft: #111827;
-      --accent: #22c55e;
-      --accent-soft: #bbf7d0;
-      --accent-warn: #f97316;
-      --accent-danger: #ef4444;
-      --text-main: #f9fafb;
-      --text-muted: #9ca3af;
-      --border-soft: #1f2937;
-      --radius-lg: 14px;
-      --radius-xl: 18px;
-      --shadow-soft: 0 14px 30px rgba(0,0,0,.45);
-    }
+<meta charset="UTF-8" />
+<title>Control Center Audio – Dashboard Compacto</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
-    }
-
+<!-- ============================
+     ESTILOS GLOBALES
+=============================== -->
+<style>
     body {
-      background: radial-gradient(circle at top left, #1f2937, #020617 45%);
-      color: var(--text-main);
-      min-height: 100vh;
-      display: flex;
+        margin: 0;
+        padding: 0;
+        font-family: "Inter", system-ui, sans-serif;
+        background: #0d0f16;
+        color: #f2f2f2;
+        overflow: hidden; /* 🔒 SIN SCROLL */
     }
 
-    /* Layout principal */
-    .sidebar {
-      width: 250px;
-      background: linear-gradient(180deg, #020617, #020617 40%, #020617);
-      border-right: 1px solid var(--border-soft);
-      padding: 18px 18px 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
+    .layout {
+        width: 1920px;
+        height: 1080px;
+        display: grid;
+        grid-template-rows: 100px 280px 300px 400px;
+        grid-row-gap: 10px;
+        padding: 10px 20px;
+        box-sizing: border-box;
     }
 
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
+    /* ------------------------------
+       TOP BAR
+    ------------------------------- */
+    .top-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 100px;
     }
 
-    .logo-badge {
-      width: 32px;
-      height: 32px;
-      border-radius: 999px;
-      background: radial-gradient(circle at 30% 20%, #fde68a, #22c55e);
-      box-shadow: 0 0 15px rgba(34,197,94,.5);
+    .title {
+        font-size: 28px;
+        font-weight: 700;
     }
 
-    .logo-text {
-      display: flex;
-      flex-direction: column;
+    .filters {
+        display: flex;
+        gap: 12px;
     }
 
-    .logo-title {
-      font-weight: 700;
-      font-size: 1.05rem;
+    .filters select {
+        background: #1c1f29;
+        border: 1px solid #333;
+        color: #fff;
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-size: 14px;
     }
 
-    .logo-subtitle {
-      font-size: .7rem;
-      color: var(--text-muted);
+    /* ------------------------------
+       KPI BAR
+    ------------------------------- */
+    .kpi-row {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 12px;
     }
 
-    .section-title {
-      font-size: .75rem;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      letter-spacing: .12em;
-      margin-bottom: 8px;
+    .kpi {
+        background: #1a1d25;
+        border-radius: 12px;
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        box-shadow: 0 0 10px rgba(0,0,0,0.3);
     }
 
-    .nav-list {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
+    .kpi .label {
+        font-size: 14px;
+        opacity: 0.7;
     }
 
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 10px;
-      border-radius: 999px;
-      font-size: .88rem;
-      color: var(--text-muted);
-      cursor: pointer;
-      transition: all .18s ease;
+    .kpi .value {
+        font-size: 28px;
+        font-weight: 700;
+        margin-top: 6px;
     }
 
-    .nav-item span.icon {
-      width: 22px;
-      height: 22px;
-      border-radius: 999px;
-      background: #0f172a;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: .75rem;
+    /* ------------------------------
+       GRAFICOS CENTRALES
+    ------------------------------- */
+    .charts {
+        display: grid;
+        grid-template-columns: 350px 350px 1fr;
+        gap: 12px;
     }
 
-    .nav-item.active {
-      background: linear-gradient(90deg, #22c55e, #4ade80);
-      color: #022c22;
-      font-weight: 600;
+    .chart-box {
+        background: #1a1d25;
+        border-radius: 12px;
+        padding: 15px;
+        position: relative;
+        display: flex;
+        flex-direction: column;
     }
 
-    .nav-item.active span.icon {
-      background: rgba(15,23,42,.15);
+    canvas {
+        width: 100% !important;
+        height: 100% !important;
     }
 
-    .nav-item:hover:not(.active) {
-      background: rgba(15,23,42,.8);
-      color: #e5e7eb;
+    .chart-title {
+        font-size: 16px;
+        margin-bottom: 8px;
+        opacity: 0.8;
     }
 
-    .sidebar-footer {
-      margin-top: auto;
-      font-size: .78rem;
-      color: var(--text-muted);
+    /* ------------------------------
+       RADAR DELEGADOS
+    ------------------------------- */
+    .radar-box {
+        background: #1a1d25;
+        border-radius: 12px;
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
     }
 
-    .delegate-filters {
-      background: rgba(15,23,42,.9);
-      border-radius: var(--radius-lg);
-      padding: 12px;
-      margin-top: 4px;
-      border: 1px solid rgba(148,163,184,.3);
+    /* ------------------------------
+       FALDÓN DELEGADOS (OPCIÓN C)
+    ------------------------------- */
+
+    .delegados-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        padding-bottom: 10px;
+        overflow: hidden;
     }
 
-    .delegate-filters-title {
-      font-size: .8rem;
-      margin-bottom: 6px;
+    .delegado-card {
+        background: #1a1d25;
+        border-radius: 12px;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        cursor: pointer;
+        border: 1px solid #2a2d36;
+        transition: transform 0.15s ease;
     }
 
-    .delegate-pills {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
+    .delegado-card:hover {
+        transform: scale(1.01);
     }
 
-    .delegate-pill {
-      font-size: .7rem;
-      padding: 3px 7px;
-      border-radius: 999px;
-      border: 1px solid rgba(148,163,184,.4);
-      cursor: pointer;
-      opacity: .7;
+    .delegado-header {
+        height: 20px;
+        border-radius: 12px 12px 0 0;
     }
 
-    .delegate-pill.active {
-      border-color: #22c55e;
-      background: rgba(34,197,94,.12);
-      opacity: 1;
+    .delegado-body {
+        padding: 10px 12px;
     }
 
-    /* Contenido principal */
-    .main {
-      flex: 1;
-      padding: 18px 22px 26px;
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
+    .delegado-body .name {
+        font-size: 16px;
+        font-weight: 600;
     }
 
-    .topbar {
-      display: flex;
-      align-items: center;
-      gap: 14px;
+    .delegado-body .centros-toggle {
+        margin-top: 4px;
+        font-size: 14px;
+        opacity: 0.8;
     }
 
-    .search-input-wrapper {
-      flex: 1;
-      position: relative;
-    }
-
-    .search-input {
-      width: 100%;
-      background: rgba(15,23,42,.95);
-      border-radius: 999px;
-      padding: 10px 12px 10px 34px;
-      border: 1px solid var(--border-soft);
-      color: var(--text-main);
-      font-size: .86rem;
-      outline: none;
-    }
-
-    .search-input::placeholder {
-      color: var(--text-muted);
-    }
-
-    .search-icon {
-      position: absolute;
-      left: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: .8rem;
-      color: var(--text-muted);
-    }
-
-    .btn {
-      border-radius: 999px;
-      padding: 8px 14px;
-      border: 1px solid transparent;
-      font-size: .8rem;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: #0f172a;
-      color: var(--text-main);
-    }
-
-    .btn-cta {
-      background: linear-gradient(90deg, #22c55e, #4ade80);
-      color: #022c22;
-      font-weight: 600;
-      box-shadow: 0 10px 25px rgba(34,197,94,.35);
-    }
-
-    .btn-outline {
-      border-color: var(--border-soft);
-    }
-
-    .btn span.icon {
-      font-size: .85rem;
-    }
-
-    .filters-row {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      font-size: .8rem;
-    }
-
-    .select {
-      background: rgba(15,23,42,.95);
-      border-radius: 999px;
-      padding: 6px 12px;
-      border: 1px solid var(--border-soft);
-      color: var(--text-main);
-      outline: none;
-      font-size: .8rem;
-    }
-
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-    }
-
-    .section-header h2 {
-      font-size: 1.08rem;
-      font-weight: 600;
-    }
-
-    .section-header span.sub {
-      font-size: .78rem;
-      color: var(--text-muted);
-    }
-
-    .kpi-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-      gap: 12px;
-    }
-
-    .card {
-      background: radial-gradient(circle at top left, #111827, #020617 55%);
-      border-radius: var(--radius-xl);
-      padding: 14px 14px 12px;
-      border: 1px solid rgba(15,23,42,.9);
-      box-shadow: var(--shadow-soft);
-    }
-
-    .card-header {
-      font-size: .8rem;
-      color: var(--text-muted);
-      margin-bottom: 6px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .kpi-main {
-      font-size: 1.4rem;
-      font-weight: 700;
-      display: flex;
-      align-items: baseline;
-      gap: 6px;
-    }
-
-    .kpi-tag {
-      font-size: .72rem;
-      border-radius: 999px;
-      padding: 3px 8px;
-      background: rgba(34,197,94,.12);
-      color: #4ade80;
-    }
-
-    .kpi-tag.warn {
-      background: rgba(234,179,8,.12);
-      color: #facc15;
-    }
-
-    .kpi-secondary {
-      font-size: .76rem;
-      color: var(--text-muted);
-      margin-top: 4px;
-    }
-
-    /* Grid central: gráficos + ranking */
-    .grid-main {
-      display: grid;
-      grid-template-columns: minmax(0, 2fr) minmax(0, 1.4fr);
-      gap: 16px;
-      align-items: stretch;
-    }
-
-    .card h3 {
-      font-size: .9rem;
-      margin-bottom: 8px;
-    }
-
-    .card-sub {
-      font-size: .76rem;
-      color: var(--text-muted);
-      margin-bottom: 10px;
-    }
-
-    .chart-container {
-      position: relative;
-      height: 230px;
-      width: 100%;
-    }
-
-    /* Ranking tabla */
-    .ranking-grid {
-      margin-top: 12px;
-    }
-
-    .ranking-header,
-    .ranking-row {
-      display: grid;
-      grid-template-columns: 2fr 1.2fr .8fr .8fr .9fr;
-      font-size: .76rem;
-      column-gap: 10px;
-      align-items: center;
-      padding: 4px 0;
-    }
-
-    .ranking-header {
-      color: var(--text-muted);
-      border-bottom: 1px solid var(--border-soft);
-      margin-bottom: 4px;
-    }
-
-    .ranking-row {
-      border-radius: 9px;
-      padding-inline: 6px;
-    }
-
-    .ranking-row:nth-child(even) {
-      background: rgba(15,23,42,.6);
-    }
-
-    .chip {
-      border-radius: 999px;
-      padding: 2px 7px;
-      font-size: .7rem;
-      background: rgba(15,23,42,.9);
-      border: 1px solid rgba(148,163,184,.4);
-    }
-
-    .chip.success {
-      background: rgba(34,197,94,.12);
-      border-color: rgba(34,197,94,.6);
-      color: #4ade80;
-    }
-
-    .chip.warn {
-      background: rgba(234,179,8,.12);
-      border-color: rgba(234,179,8,.6);
-      color: #facc15;
-    }
-
-    /* Responsivo */
-    @media (max-width: 960px) {
-      .sidebar {
+    .centros-list {
         display: none;
-      }
-      body {
-        display: block;
-      }
-      .main {
-        padding: 14px;
-      }
-      .grid-main {
-        grid-template-columns: 1fr;
-      }
+        padding: 10px 12px;
+        font-size: 13px;
+        max-height: 180px;
+        overflow-y: auto;
     }
-  </style>
 
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    .centro-item {
+        margin-bottom: 6px;
+        opacity: 0.8;
+    }
+</style>
+
+<!-- CHART.JS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 </head>
 <body>
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="logo">
-      <div class="logo-badge"></div>
-      <div class="logo-text">
-        <span class="logo-title">Control Center Audio</span>
-        <span class="logo-subtitle">Dashboard de centros, visitas y KPIs</span>
-      </div>
+
+<div class="layout">
+
+    <!-- ============================
+         TOP BAR
+    =============================== -->
+    <div class="top-bar">
+        <div class="title">Control Center Audio · Dashboard Compacto</div>
+
+        <div class="filters">
+            <select>
+                <option>Últimos 12 meses</option>
+                <option>Últimos 6 meses</option>
+                <option>Últimos 30 días</option>
+            </select>
+
+            <select>
+                <option>Todos los centros</option>
+                <option>Propios</option>
+                <option>Franquicia</option>
+            </select>
+        </div>
     </div>
 
-    <div>
-      <div class="section-title">Secciones</div>
-      <nav class="nav-list">
-        <div class="nav-item active">
-          <span class="icon">🏠</span> Dashboard
-        </div>
-        <div class="nav-item">
-          <span class="icon">🏢</span> Centros
-        </div>
-        <div class="nav-item">
-          <span class="icon">👣</span> Visitas
-        </div>
-        <div class="nav-item">
-          <span class="icon">🛠</span> Servicios
-        </div>
-        <div class="nav-item">
-          <span class="icon">💳</span> Ventas
-        </div>
-        <div class="nav-item">
-          <span class="icon">📊</span> Proyectos
-        </div>
-      </nav>
+    <!-- ============================
+         KPI ROW
+    =============================== -->
+    <div class="kpi-row">
+        <div class="kpi"><span class="label">Visitas</span><span class="value">316</span></div>
+        <div class="kpi"><span class="label">Servicios</span><span class="value">497</span></div>
+        <div class="kpi"><span class="label">Ventas</span><span class="value">27%</span></div>
+        <div class="kpi"><span class="label">Aplicación HIT</span><span class="value">82%</span></div>
+        <div class="kpi"><span class="label">AAR</span><span class="value">64%</span></div>
+        <div class="kpi"><span class="label">Ayudas</span><span class="value">41%</span></div>
     </div>
 
-    <div class="sidebar-footer">
-      <div class="delegate-filters">
-        <div class="delegate-filters-title">Filtros rápidos · Delegados</div>
-        <div class="delegate-pills">
-          <div class="delegate-pill active">Blanca</div>
-          <div class="delegate-pill">Cecilia</div>
-          <div class="delegate-pill">Daniel</div>
-          <div class="delegate-pill">Eneritz</div>
-        </div>
-      </div>
-      <p style="margin-top:10px;">Versión demo · Datos ficticios</p>
-    </div>
-  </aside>
+    <!-- ============================
+         GRAFICOS
+    =============================== -->
+    <div class="charts">
 
-  <!-- MAIN -->
-  <main class="main">
-    <!-- Topbar -->
-    <div class="topbar">
-      <div class="search-input-wrapper">
-        <span class="search-icon">🔍</span>
-        <input class="search-input" placeholder="Busca centros, visitas, servicios..." />
-      </div>
-      <button class="btn btn-outline">
-        <span class="icon">💾</span> Guardar vista
-      </button>
-      <button class="btn btn-outline">
-        <span class="icon">⬇️</span> Exportar HTML
-      </button>
-      <button class="btn btn-cta">
-        <span class="icon">☁️</span> Actualizar datos nube
-      </button>
+        <!-- DONUT VISITAS -->
+        <div class="chart-box">
+            <div class="chart-title">Estado de Visitas</div>
+            <canvas id="donutVisitas"></canvas>
+        </div>
+
+        <!-- DONUT SERVICIOS -->
+        <div class="chart-box">
+            <div class="chart-title">Distribución de Servicios</div>
+            <canvas id="donutServicios"></canvas>
+        </div>
+
+        <!-- RADAR -->
+        <div class="radar-box">
+            <div class="chart-title">Comparativa Delegados (Radar)</div>
+            <canvas id="radarDelegados"></canvas>
+        </div>
     </div>
 
-    <!-- Filtros -->
-    <div class="filters-row">
-      <select class="select">
-        <option>Periodo: Últimos 12 meses</option>
-        <option>Últimos 3 meses</option>
-        <option>Último mes</option>
-      </select>
-      <select class="select">
-        <option>Tipo centro: Todos</option>
-        <option>Centro propio</option>
-        <option>Franquicia</option>
-      </select>
+    <!-- ============================
+         FALDÓN DELEGADOS (OPCIÓN C)
+    =============================== -->
+    <div class="delegados-grid" id="delegadosGrid">
+        <!-- Las tarjetas se rellenan con JS -->
     </div>
 
-    <!-- Resumen general -->
-    <div>
-      <div class="section-header">
-        <h2>Resumen general KPIs</h2>
-        <span class="sub">Visión rápida de aplicaciones, visitas, servicios y ventas</span>
-      </div>
-    </div>
+</div>
 
-    <!-- KPIs -->
-    <section class="kpi-grid">
-      <article class="card">
-        <div class="card-header">
-          <span>Aplicaciones HIT (global)</span>
-        </div>
-        <div class="kpi-main">
-          <span>82%</span>
-          <span class="kpi-tag">Objetivo 90%</span>
-        </div>
-        <div class="kpi-secondary">
-          +4 pts vs periodo anterior
-        </div>
-      </article>
+<!-- ============================
+     SCRIPT PRINCIPAL
+=============================== -->
+<script>
 
-      <article class="card">
-        <div class="card-header">
-          <span>Visitas realizadas / planificadas</span>
-        </div>
-        <div class="kpi-main">
-          <span>316</span>
-          <span style="font-size:.9rem; color:var(--text-muted)">/ 384</span>
-        </div>
-        <div class="kpi-secondary">
-          82% ejecución · 12 centros por debajo del 70%
-        </div>
-      </article>
+    /* =======================================================
+       COLORES ASIGNADOS AUTOMÁTICAMENTE A CADA DELEGADO
+    ======================================================== */
+    const delegadosColores = {
+        "Eneritz Aranguren": "#2ECC71",
+        "Laura Plazas": "#3498DB",
+        "Daniel Chazo": "#9B59B6",
+        "Manuel Cánovas": "#E67E22",
+        "Cecilia Pérez": "#1ABC9C",
+        "Martin Sebastián": "#E74C3C",
+        "Marisa Carmona": "#F1C40F",
+        "Laura Ramos": "#2E86C1",
+        "Blanca Fdez. de la Pradilla": "#A569BD",
+        "Maribel Amezcua": "#D35400",
+        "Sonia Godino": "#7DCEA0",
+        "Verónica Alfonsín": "#5DADE2",
+        "Sergio Perán": "#CD6155"
+    };
 
-      <article class="card">
-        <div class="card-header">
-          <span>Servicios realizados</span>
-        </div>
-        <div class="kpi-main">
-          <span>497</span>
-          <span class="kpi-tag">+18% crecimiento</span>
-        </div>
-        <div class="kpi-secondary">
-          Revisiones 52% · Ajustes 31% · Otros 17%
-        </div>
-      </article>
-
-      <article class="card">
-        <div class="card-header">
-          <span>Conversión a venta</span>
-        </div>
-        <div class="kpi-main">
-          <span>27%</span>
-          <span class="kpi-tag warn">Potencial seguimiento</span>
-        </div>
-        <div class="kpi-secondary">
-          Ticket medio: 1.430 € · Devoluciones 3,2%
-        </div>
-      </article>
-    </section>
-
-    <!-- Gráficos y estado visitas -->
-    <section class="grid-main">
-      <!-- Evolución mensual -->
-      <article class="card">
-        <h3>Evolución mensual</h3>
-        <p class="card-sub">
-          Visitas, aplicaciones en prueba y conversión a venta
-        </p>
-        <div class="chart-container">
-          <canvas id="chartEvolucion"></canvas>
-        </div>
-      </article>
-
-      <!-- Estado visitas -->
-      <article class="card">
-        <h3>Estado de visitas</h3>
-        <p class="card-sub">
-          Distribución de visitas realizadas, pendientes y anuladas
-        </p>
-        <div class="chart-container">
-          <canvas id="chartVisitas"></canvas>
-        </div>
-      </article>
-    </section>
-
-    <!-- Ranking centros -->
-    <section class="card">
-      <h3>Ranking rápido de centros</h3>
-      <p class="card-sub">
-        Mejores conversiones a venta y aplicación de procesos
-      </p>
-      <div class="ranking-grid">
-        <div class="ranking-header">
-          <span>Centro</span>
-          <span>Delegado</span>
-          <span>Conv. prueba</span>
-          <span>Conv. venta</span>
-          <span>% Procesos</span>
-        </div>
-
-        <div class="ranking-row">
-          <span>Madrid · Reina Mercedes</span>
-          <span>Cecilia</span>
-          <span>64%</span>
-          <span><span class="chip success">34%</span></span>
-          <span>91%</span>
-        </div>
-        <div class="ranking-row">
-          <span>Madrid · Tetuán</span>
-          <span>Blanca</span>
-          <span>58%</span>
-          <span><span class="chip">29%</span></span>
-          <span>87%</span>
-        </div>
-        <div class="ranking-row">
-          <span>Sevilla · Nervión</span>
-          <span>Daniel</span>
-          <span>51%</span>
-          <span><span class="chip warn">22%</span></span>
-          <span>72%</span>
-        </div>
-        <div class="ranking-row">
-          <span>Bilbao · Gran Vía</span>
-          <span>Eneritz</span>
-          <span>47%</span>
-          <span><span class="chip">25%</span></span>
-          <span>69%</span>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <script>
-    // Datos demo para la evolución mensual
-    const ctxEvo = document.getElementById('chartEvolucion').getContext('2d');
-    const chartEvolucion = new Chart(ctxEvo, {
-      type: 'line',
-      data: {
-        labels: ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'],
-        datasets: [
-          {
-            label: 'Visitas realizadas',
-            data: [120,138,156,172,149,181,196,205,212,231,224,238],
-            borderWidth: 2,
-            tension: 0.35
-          },
-          {
-            label: '% Aplicaciones a prueba',
-            data: [32,34,35,37,39,40,41,43,44,43,42,44],
-            borderWidth: 2,
-            borderDash: [4,4],
-            tension: 0.35
-          },
-          {
-            label: '% Conversión venta',
-            data: [21,22,23,24,25,26,27,28,29,27,26,27],
-            borderWidth: 2,
-            tension: 0.35
-          }
+    /* =======================================================
+       CENTROS POR DELEGADO (EXTRAÍDOS DE TU TABLA)
+       ⚠️ SIN CAMBIOS - fiel al documento
+    ======================================================== */
+    const centrosPorDelegado = {
+        "Eneritz Aranguren": [
+            "Avenida Diagonal - Barcelona",
+            "Barcelona CC Vilamarina",
+            "Girona - Plaza Santaló",
+            "Tarragona - Calle Comte de Rius",
+            "Terrassa",
+            "Soria Las Camaretas",
+            "Vilanova",
+            "Zaragoza (varios centros)",
+            "Huesca",
+            "Lleida Carrefour",
+            "Tárrega",
+            "Manresa Carrefour",
+            "Figueras Carrefour"
+        ],
+        "Laura Plazas": [
+            "Cerdanyola",
+            "Barcelona CC Diagonal Mar",
+            "Barcelona Via Augusta",
+            "Cardedeu",
+            "Cornellá",
+            "Granollers",
+            "Gavá",
+            "Hospitalet Carrefour",
+            "Vic",
+            "Andorra / Tortosa",
+            "Barcelona Avenida Augusta",
+            "Tarragona Cambrils"
+        ],
+        "Daniel Chazo": [
+            "Narón",
+            "Ferrol Alcampo",
+            "Melide",
+            "Lugo (dos centros)",
+            "Santiago de Compostela",
+            "La Coruña Juan Flórez",
+            "Bilbao zona Galicia",
+            "Ourense Ponte Vella"
+        ],
+        "Manuel Cánovas": [
+            "Águilas",
+            "Alhama-Murcia",
+            "Alicante General Lacy",
+            "El Palmar",
+            "Ciudad Nueva Condomina",
+            "Tarragona Carrefour",
+            "Ondara CC",
+            "Elche L'Aljub",
+            "Castellón Gran Turia"
+        ],
+        "Cecilia Pérez": [
+            "Carlet",
+            "Burjassot",
+            "Alzira",
+            "Paterna",
+            "Marqués de Sotelo",
+            "Nuevo Centro",
+            "Onda",
+            "Orihuela",
+            "Mallorca Can Picafort",
+            "Valencia Sagunto"
+        ],
+        "Martin Sebastián": [
+            "Alameda Málaga",
+            "Algeciras",
+            "Almería (dos centros)",
+            "Estepona",
+            "Córdoba Carrefour / Jesús Rescatado",
+            "Málaga Calle Victoria",
+            "Mislata"
+        ],
+        "Marisa Carmona": [
+            "Albacete Los Llanos",
+            "Albacete Albacenter",
+            "Madrid CC La Gavia",
+            "Madrid CC Alisazul",
+            "Ciudad de la Imagen",
+            "Valencia El Manar",
+            "Toledo Reconquista",
+            "Granada Reyes Católicos",
+            "Fuenlabrada"
+        ],
+        "Laura Ramos": [
+            "Alcobendas Constitución",
+            "Getafe Calle Madrid",
+            "Carrefour Alcobendas",
+            "Xanadú",
+            "Leganés Carrefour",
+            "General Ricardos",
+            "Acacias",
+            "Vaguada",
+            "Villaverde"
+        ],
+        "Blanca Fdez. de la Pradilla": [
+            "Aravaca",
+            "Gran Plaza 2",
+            "Alcalá de Henares",
+            "Getafe Madrid",
+            "San Sebastián de los Reyes",
+            "Tres Cantos",
+            "Mostoles Dos de Mayo",
+            "Moratalaz",
+            "Ortega y Gasset"
+        ],
+        "Maribel Amezcua": [
+            "Cáceres CC",
+            "Sevilla Asunción",
+            "Sevilla Macarena",
+            "Sevilla San Pablo",
+            "Huelva",
+            "Plasencia Carrefour",
+            "Melide"
+        ],
+        "Sonia Godino": [
+            "Bilbao Correo",
+            "Bilbondo",
+            "Castro Urdiales",
+            "Vitoria",
+            "Getxo",
+            "Donosti Gros"
+        ],
+        "Verónica Alfonsín": [
+            "Pontevedra Bouzas",
+            "Pontevedra Carrefour",
+            "Ferrol Alcampo",
+            "Vigo",
+            "Marín",
+            "Santiago CC"
+        ],
+        "Sergio Perán": [
+            "Madrid Sur",
+            "Madrid Narváez",
+            "Madrid Delicias",
+            "Toledo Los Alfares",
+            "Salamanca Toro",
+            "Salamanca Carrefour"
         ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            labels: {
-              color: '#e5e7eb',
-              font: { size: 11 }
-            }
-          }
-        },
-        scales: {
-          x: {
-            ticks: { color: '#9ca3af', font: { size: 10 } },
-            grid: { color: 'rgba(31,41,55,0.5)' }
-          },
-          y: {
-            ticks: { color: '#9ca3af', font: { size: 10 } },
-            grid: { color: 'rgba(31,41,55,0.5)' }
-          }
-        }
-      }
+    };
+
+    /* =======================================================
+       RELLENAR TARJETAS DELEGADOS
+    ======================================================== */
+    const grid = document.getElementById("delegadosGrid");
+
+    Object.keys(centrosPorDelegado).forEach(nombre => {
+
+        const tarjeta = document.createElement("div");
+        tarjeta.className = "delegado-card";
+
+        tarjeta.innerHTML = `
+            <div class="delegado-header" style="background:${delegadosColores[nombre]}"></div>
+            <div class="delegado-body">
+                <div class="name">${nombre}</div>
+                <div class="centros-toggle">Centros: ${centrosPorDelegado[nombre].length} ▼</div>
+            </div>
+            <div class="centros-list"></div>
+        `;
+
+        const lista = tarjeta.querySelector(".centros-list");
+        centrosPorDelegado[nombre].forEach(c => {
+            const item = document.createElement("div");
+            item.className = "centro-item";
+            item.textContent = c;
+            lista.appendChild(item);
+        });
+
+        tarjeta.addEventListener("click", () => {
+            lista.style.display = lista.style.display === "block" ? "none" : "block";
+        });
+
+        grid.appendChild(tarjeta);
     });
 
-    // Donut estado de visitas
-    const ctxVis = document.getElementById('chartVisitas').getContext('2d');
-    const chartVisitas = new Chart(ctxVis, {
-      type: 'doughnut',
-      data: {
-        labels: ['Realizadas', 'Pendientes', 'Anuladas'],
-        datasets: [{
-          data: [72, 19, 9],
-          borderWidth: 0
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: 'bottom',
-            labels: {
-              color: '#e5e7eb',
-              font: { size: 11 }
-            }
-          }
+    /* =======================================================
+       GRÁFICOS DONUT Y RADAR
+    ======================================================== */
+    new Chart(document.getElementById("donutVisitas"), {
+        type: "doughnut",
+        data: {
+            labels: ["Realizadas", "Pendientes", "Anuladas"],
+            datasets: [{
+                data: [72, 19, 9],
+                backgroundColor: ["#2ECC71", "#3498DB", "#E74C3C"]
+            }]
         },
-        cutout: '65%'
-      }
+        options: { cutout: "60%" }
     });
-  </script>
+
+    new Chart(document.getElementById("donutServicios"), {
+        type: "doughnut",
+        data: {
+            labels: ["Ajustes", "Revisiones", "AAR", "Otros"],
+            datasets: [{
+                data: [31, 52, 64, 17],
+                backgroundColor: ["#9B59B6", "#1ABC9C", "#F1C40F", "#95A5A6"]
+            }]
+        },
+        options: { cutout: "60%" }
+    });
+
+    new Chart(document.getElementById("radarDelegados"), {
+        type: "radar",
+        data: {
+            labels: ["Visitas", "Servicios", "Ventas", "HIT", "AAR", "Ayudas"],
+            datasets: Object.keys(delegadosColores).map(nombre => ({
+                label: nombre,
+                data: [
+                    Math.random()*100,
+                    Math.random()*100,
+                    Math.random()*100,
+                    Math.random()*100,
+                    Math.random()*100,
+                    Math.random()*100
+                ],
+                borderColor: delegadosColores[nombre],
+                backgroundColor: delegadosColores[nombre] + "33",
+                borderWidth: 2,
+            }))
+        },
+        options: {
+            plugins: { legend: { display: false } },
+            scales: { r: { angleLines: { color: "#2a2d36" }, grid: { color: "#2a2d36" } } }
+        }
+    });
+
+</script>
+
 </body>
 </html>
