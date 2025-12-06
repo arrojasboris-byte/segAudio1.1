@@ -319,7 +319,7 @@
       padding: 2px 6px;
       border-radius: 999px;
       background: #111827;
-      color: var(--text-muted);
+      color: #9ca3af;
       border: 1px solid var(--border-soft);
     }
 
@@ -395,7 +395,7 @@
 
     .dashboard-charts {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0,1fr));
+      grid-template-columns: repeat(3, minmax(0,1fr));
       gap: 8px;
       min-height: 0;
     }
@@ -404,6 +404,12 @@
       flex: 1;
       min-height: 130px;
       max-height: 180px;
+    }
+
+    .chart-container.centered {
+      display:flex;
+      align-items:center;
+      justify-content:center;
     }
 
     .ranking-list {
@@ -441,6 +447,18 @@
       display:block;
       height:100%;
       background: linear-gradient(90deg,#22c55e,#38bdf8);
+    }
+
+    .ranking-row.extra-hidden {
+      display:none;
+    }
+
+    .ranking-toggle {
+      margin-top:6px;
+      font-size:.76rem;
+      color:var(--accent-blue);
+      cursor:pointer;
+      text-align:right;
     }
 
     /* CENTROS PAGE */
@@ -844,6 +862,13 @@
       gap:4px;
     }
 
+    .checklist-heading {
+      margin-top:6px;
+      font-size:.8rem;
+      font-weight:600;
+      color:var(--text-main);
+    }
+
     .imagenes-grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0,1fr));
@@ -994,6 +1019,24 @@
     body.light .card {
       background:#ffffff;
     }
+
+    /* IMPRESIÓN */
+    @media print {
+      body {
+        background:#ffffff;
+      }
+      .sidebar,
+      .topbar {
+        display:none !important;
+      }
+      .main {
+        padding:0 !important;
+      }
+      .card {
+        box-shadow:none !important;
+        border-color:#d1d5db !important;
+      }
+    }
   </style>
 </head>
 
@@ -1112,6 +1155,11 @@
                 <div class="kpi-value" id="kpiAar">–</div>
                 <div class="kpi-caption">Centros con AAR</div>
               </div>
+              <div class="kpi-card">
+                <div class="kpi-label">1os auxilios</div>
+                <div class="kpi-value" id="kpiPrimeros">–</div>
+                <div class="kpi-caption">Centros con formación</div>
+              </div>
             </div>
 
             <div class="dashboard-charts">
@@ -1123,6 +1171,7 @@
                   <canvas id="chartRadarGeneral"></canvas>
                 </div>
               </div>
+
               <div class="card">
                 <div class="card-header-row">
                   <span class="card-title">Procesos y áreas de mejora por mes</span>
@@ -1131,14 +1180,7 @@
                   <canvas id="chartProcesosMes"></canvas>
                 </div>
               </div>
-              <div class="card">
-                <div class="card-header-row">
-                  <span class="card-title">HIT por mes</span>
-                </div>
-                <div class="chart-container">
-                  <canvas id="chartHitMes"></canvas>
-                </div>
-              </div>
+
               <div class="card">
                 <div class="card-header-row">
                   <span class="card-title">Áreas de mejora por mes</span>
@@ -1147,6 +1189,16 @@
                   <canvas id="chartAreasMes"></canvas>
                 </div>
               </div>
+
+              <div class="card">
+                <div class="card-header-row">
+                  <span class="card-title">Primeros auxilios por mes</span>
+                </div>
+                <div class="chart-container">
+                  <canvas id="chartPrimerosMes"></canvas>
+                </div>
+              </div>
+
               <div class="card">
                 <div class="card-header-row">
                   <span class="card-title">Top 10 áreas de mejora</span>
@@ -1155,6 +1207,7 @@
                   <canvas id="chartTopAreas"></canvas>
                 </div>
               </div>
+
               <div class="card">
                 <div class="card-header-row">
                   <span class="card-title">Aplicación AAR / HIT</span>
@@ -1171,8 +1224,9 @@
             <div class="card-header-row">
               <span class="card-title">Ranking de delegados</span>
             </div>
-            <div class="ranking-list" id="rankingDelegados">
-              <!-- Se rellena por JS -->
+            <div class="ranking-list" id="rankingDelegados"></div>
+            <div class="ranking-toggle" id="rankingToggle" style="display:none;">
+              Mostrar todos
             </div>
           </article>
         </div>
@@ -1323,7 +1377,7 @@
                 <div>Conv. a cierre: <strong id="kpiCentroVenta">–</strong></div>
                 <div>Aplicación HIT: <strong id="kpiCentroHit">–</strong></div>
               </div>
-              <div class="chart-container" style="margin-top:6px; max-height:180px;">
+              <div class="chart-container centered" style="margin-top:6px; max-height:180px;">
                 <canvas id="chartCentroRadar"></canvas>
               </div>
             </article>
@@ -1403,7 +1457,7 @@
                 <label><input type="checkbox" data-kpi="infinity" /> Financiación Infinity</label>
                 <label><input type="checkbox" data-kpi="seguros" /> Venta de seguro</label>
                 <label><input type="checkbox" data-kpi="primeros" /> Primeros auxilios (equipo)</label>
-                <label><input type="checkbox" data-kpi="producto" /> Producto y comunicación</label>
+                <div class="checklist-heading">Producto y comunicación</div>
                 <label><input type="checkbox" data-kpi="rt" /> Audiometría RT</label>
                 <label><input type="checkbox" data-kpi="audio_test" /> Test de lectura audio</label>
                 <label><input type="checkbox" data-kpi="audio_screening" /> Screening audio</label>
@@ -1446,6 +1500,39 @@
               </div>
             </article>
           </div>
+
+          <!-- Gráficas resumen debajo de las imágenes -->
+          <article class="card">
+            <div class="card-header-row">
+              <span class="card-title">Resumen de la visita</span>
+            </div>
+            <div class="panel-graficos" style="max-height:none;">
+              <article class="card">
+                <div class="card-header-row">
+                  <span class="card-title">Procesos aplicados</span>
+                </div>
+                <div class="chart-container">
+                  <canvas id="chartCentroProcesosResumen"></canvas>
+                </div>
+              </article>
+              <article class="card">
+                <div class="card-header-row">
+                  <span class="card-title">Áreas de mejora</span>
+                </div>
+                <div class="chart-container">
+                  <canvas id="chartCentroAreasResumen"></canvas>
+                </div>
+              </article>
+              <article class="card">
+                <div class="card-header-row">
+                  <span class="card-title">Conv. prueba / venta</span>
+                </div>
+                <div class="chart-container">
+                  <canvas id="chartCentroConversionResumen"></canvas>
+                </div>
+              </article>
+            </div>
+          </article>
 
           <!-- Observaciones / compromisos -->
           <article class="card">
@@ -1775,6 +1862,8 @@
 
     /* ========= RANKING ========= */
     const rankingDelegadosDiv = $("#rankingDelegados");
+    const rankingToggle = $("#rankingToggle");
+    let rankingExpandido = false;
 
     function renderRankingDelegados(map) {
       rankingDelegadosDiv.innerHTML = "";
@@ -1788,6 +1877,7 @@
       arr.forEach((d, idx) => {
         const row = document.createElement("div");
         row.className = "ranking-row";
+        if (idx >= 5) row.classList.add("extra-hidden");
         const color = getColorForDelegado(d.nombre);
         row.innerHTML = `
           <div class="ranking-main">
@@ -1802,7 +1892,21 @@
         `;
         rankingDelegadosDiv.appendChild(row);
       });
+
+      if (arr.length > 5) {
+        rankingToggle.style.display = "block";
+      } else {
+        rankingToggle.style.display = "none";
+      }
     }
+
+    rankingToggle.addEventListener("click", () => {
+      rankingExpandido = !rankingExpandido;
+      $$(".ranking-row.extra-hidden").forEach(r => {
+        r.style.display = rankingExpandido ? "flex" : "none";
+      });
+      rankingToggle.textContent = rankingExpandido ? "Ocultar" : "Mostrar todos";
+    });
 
     /* ========= BUSCADOR ========= */
     $("#searchGlobal").addEventListener("input", e => {
@@ -2030,6 +2134,7 @@
       formaciones: 0,
       ayuda: 0,
       aar: 0,
+      primeros: 0,
       areas: 0,
       n: 0
     };
@@ -2044,6 +2149,7 @@
       const avgForm = Math.round(dashboardAcum.formaciones / n);
       const ayudaPct = Math.round(100 * dashboardAcum.ayuda / n);
       const aarPct   = Math.round(100 * dashboardAcum.aar / n);
+      const primerosPct = Math.round(100 * dashboardAcum.primeros / n);
 
       $("#kpiProcesos").textContent   = avgProc + "%";
       $("#kpiConvPrueba").textContent = avgPrue + "%";
@@ -2052,6 +2158,7 @@
       $("#kpiFormaciones").textContent = avgForm + "%";
       $("#kpiAyuda").textContent = ayudaPct === 0 ? "No" : `Sí ${ayudaPct}%`;
       $("#kpiAar").textContent   = aarPct === 0 ? "No" : `Sí ${aarPct}%`;
+      $("#kpiPrimeros").textContent = primerosPct === 0 ? "No" : `Sí ${primerosPct}%`;
 
       globalCharts.radarGeneral.data.datasets[0].data = [
         avgProc, avgPrue, avgVent, avgHit
@@ -2088,7 +2195,7 @@
     }
 
     function calcularFormacionesYScreening() {
-      const formKeys = ["wsa","starkey","neuroventas","telecare","pia","telehear","producto","rt"];
+      const formKeys = ["wsa","starkey","neuroventas","telecare","pia","telehear","rt"];
       const totalForm = formKeys.length;
       const checkedForm = formKeys.reduce((acc,k)=>{
         const el = document.querySelector(`input[data-kpi="${k}"]`);
@@ -2287,6 +2394,71 @@
           }
         }
       });
+
+      const procResCtx = document.getElementById("chartCentroProcesosResumen").getContext("2d");
+      centroCharts.procResumen = new Chart(procResCtx, {
+        type:"doughnut",
+        data:{
+          labels:["Aplicados","Pendiente"],
+          datasets:[{
+            data:[90,10],
+            backgroundColor:["#22c55e","#6b7280"],
+            borderWidth:1
+          }]
+        },
+        options:{
+          plugins:{ legend:{ position:"bottom", labels:{ color:getComputedStyle(document.body).getPropertyValue("--text-main"), font:{size:10} } } },
+          responsive:true,
+          maintainAspectRatio:false,
+          cutout:"55%"
+        }
+      });
+
+      const areasResCtx = document.getElementById("chartCentroAreasResumen").getContext("2d");
+      centroCharts.areasResumen = new Chart(areasResCtx, {
+        type:"bar",
+        data:{
+          labels:["Áreas mejora","Correcto"],
+          datasets:[{
+            data:[4,10],
+            backgroundColor:["#ef4444","#22c55e"]
+          }]
+        },
+        options:{
+          plugins:{ legend:{ display:false } },
+          responsive:true,
+          maintainAspectRatio:false,
+          scales:{
+            x:{ ticks:{ color:getComputedStyle(document.body).getPropertyValue("--text-muted"), font:{size:10} },
+                grid:{ display:false } },
+            y:{ ticks:{ color:getComputedStyle(document.body).getPropertyValue("--text-muted"), font:{size:10} },
+                grid:{ color:"rgba(31,41,55,0.3)" } }
+          }
+        }
+      });
+
+      const convResCtx = document.getElementById("chartCentroConversionResumen").getContext("2d");
+      centroCharts.convResumen = new Chart(convResCtx, {
+        type:"bar",
+        data:{
+          labels:["Prueba","Venta"],
+          datasets:[{
+            data:[82,78],
+            backgroundColor:["#38bdf8","#22c55e"]
+          }]
+        },
+        options:{
+          plugins:{ legend:{ display:false } },
+          responsive:true,
+          maintainAspectRatio:false,
+          scales:{
+            x:{ ticks:{ color:getComputedStyle(document.body).getPropertyValue("--text-muted"), font:{size:10} },
+                grid:{ display:false } },
+            y:{ ticks:{ color:getComputedStyle(document.body).getPropertyValue("--text-muted"), font:{size:10} },
+                grid:{ color:"rgba(31,41,55,0.3)" }, max:100, min:0 }
+          }
+        }
+      });
     }
 
     function actualizarChartsCentro() {
@@ -2295,8 +2467,9 @@
       const procesos = 90;
       const convPrueba = 82;
       const convVenta = 78;
-      const hitVal = getChecklistFlags().hit ? 90 : 70;
-      const areasMejora = 4; // demo, se sustituirá por cálculo real
+      const flags = getChecklistFlags();
+      const hitVal = flags.hit ? 90 : 70;
+      const areasMejora = 4; // demo
 
       centroMetricsActual = { procesos, convPrueba, convVenta, hit: hitVal, formaciones, screening, areasMejora };
 
@@ -2314,10 +2487,9 @@
       ];
       centroCharts.radar.update();
 
-      const f = getChecklistFlags();
       const valores = [
-        f.aar, f.hit, f.primeros, f.infinity, f.seguros,
-        f.tchin, f.rt, f.elemAudio, f.mgm
+        flags.aar, flags.hit, flags.primeros, flags.infinity, flags.seguros,
+        flags.tchin, flags.rt, flags.elemAudio, flags.mgm
       ].map(b => b ? 1 : 0);
       centroCharts.barras.data.datasets[0].data = valores;
       centroCharts.barras.update();
@@ -2326,6 +2498,16 @@
       const noCount = valores.length - siCount;
       centroCharts.donut.data.datasets[0].data = [siCount, noCount];
       centroCharts.donut.update();
+
+      // Resumen
+      centroCharts.procResumen.data.datasets[0].data = [procesos, 100-procesos];
+      centroCharts.procResumen.update();
+
+      centroCharts.areasResumen.data.datasets[0].data = [areasMejora, 10-areasMejora];
+      centroCharts.areasResumen.update();
+
+      centroCharts.convResumen.data.datasets[0].data = [convPrueba, convVenta];
+      centroCharts.convResumen.update();
     }
 
     document.addEventListener("change", e => {
@@ -2418,6 +2600,7 @@
         dashboardAcum.formaciones+= centroMetricsActual.formaciones;
         dashboardAcum.ayuda      += flags.ayuda ? 1 : 0;
         dashboardAcum.aar        += flags.aar ? 1 : 0;
+        dashboardAcum.primeros   += flags.primeros ? 1 : 0;
         dashboardAcum.areas      += centroMetricsActual.areasMejora || 0;
         dashboardAcum.n += 1;
         actualizarDashboardDesdeAcum();
@@ -2505,30 +2688,6 @@
         }
       });
 
-      const hitCtx = document.getElementById("chartHitMes").getContext("2d");
-      globalCharts.hitMes = new Chart(hitCtx, {
-        type:"bar",
-        data:{
-          labels:["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"],
-          datasets:[{
-            label:"HIT %",
-            data:[72,73,74,75,76,77,78,79,80,81,82,83],
-            backgroundColor:"#f97316"
-          }]
-        },
-        options:{
-          plugins:{ legend:{ display:false } },
-          responsive:true,
-          maintainAspectRatio:false,
-          scales:{
-            x:{ ticks:{ color:getComputedStyle(document.body).getPropertyValue("--text-muted"), font:{size:10} },
-                grid:{ display:false } },
-            y:{ ticks:{ color:getComputedStyle(document.body).getPropertyValue("--text-muted"), font:{size:10} },
-                grid:{ color:"rgba(31,41,55,0.3)" } }
-          }
-        }
-      });
-
       const areasCtx = document.getElementById("chartAreasMes").getContext("2d");
       globalCharts.areasMes = new Chart(areasCtx, {
         type:"bar",
@@ -2549,6 +2708,30 @@
                 grid:{ display:false } },
             y:{ ticks:{ color:getComputedStyle(document.body).getPropertyValue("--text-muted"), font:{size:10} },
                 grid:{ color:"rgba(31,41,55,0.3)" } }
+          }
+        }
+      });
+
+      const primerosCtx = document.getElementById("chartPrimerosMes").getContext("2d");
+      globalCharts.primerosMes = new Chart(primerosCtx, {
+        type:"bar",
+        data:{
+          labels:["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"],
+          datasets:[{
+            label:"1os auxilios %",
+            data:[40,45,50,55,60,65,70,72,74,76,78,80],
+            backgroundColor:"#22c55e"
+          }]
+        },
+        options:{
+          plugins:{ legend:{ display:false } },
+          responsive:true,
+          maintainAspectRatio:false,
+          scales:{
+            x:{ ticks:{ color:getComputedStyle(document.body).getPropertyValue("--text-muted"), font:{size:10} },
+                grid:{ display:false } },
+            y:{ ticks:{ color:getComputedStyle(document.body).getPropertyValue("--text-muted"), font:{size:10} },
+                grid:{ color:"rgba(31,41,55,0.3)" }, max:100, min:0 }
           }
         }
       });
