@@ -49,7 +49,7 @@
       display: flex;
     }
 
-    /* SIDEBAR SIEMPRE OSCURA */
+    /* SIDEBAR, siempre oscura */
     .sidebar {
       width: 250px;
       background: #020617;
@@ -242,7 +242,7 @@
       font-size: .85rem;
     }
 
-    /* VISTAS GENERALES */
+    /* VISTAS */
     .view {
       flex: 1;
       display: none;
@@ -251,6 +251,11 @@
       min-height: 0;
     }
     .view.active { display:flex; }
+
+    /* Dashboard con scroll propio para evitar desbordes */
+    #view-dashboard {
+      overflow: auto;
+    }
 
     .card {
       background: var(--bg-card);
@@ -276,21 +281,22 @@
     }
 
     .kpi-card {
-      padding:8px 10px;
+      padding:6px 8px;
       border-radius: var(--radius-lg);
       background: var(--bg-card);
       border:1px solid var(--border-soft);
       display:flex;
       flex-direction:column;
-      gap:4px;
+      gap:3px;
+      min-width:0;
     }
     .kpi-label {font-size:.75rem;color:var(--text-muted);}
-    .kpi-value {font-size:1.2rem;font-weight:700;}
+    .kpi-value {font-size:1.1rem;font-weight:700;}
     .kpi-sub {font-size:.7rem;color:var(--text-muted);}
 
-    .dashboard-charts {
+    .dashboard-bottom {
       display:grid;
-      grid-template-columns: minmax(0,1.2fr) minmax(0,1.2fr) minmax(0,0.9fr);
+      grid-template-columns: repeat(2,minmax(0,1fr));
       gap:8px;
       min-height:0;
     }
@@ -298,7 +304,7 @@
     .chart-container {
       position:relative;
       width:100%;
-      height:180px;
+      height:150px; /* más compacto para que todo quepa */
     }
 
     /* CENTROS */
@@ -539,7 +545,7 @@
 
     .table-footer {padding:4px 10px 6px;font-size:.72rem;color:var(--text-muted);text-align:right;}
 
-    /* MODALES GENERALES */
+    /* MODALES */
     .modal-backdrop {
       position:fixed;
       inset:0;
@@ -634,7 +640,8 @@
     .informe-header-actions {display:flex;gap:6px;align-items:center;}
 
     @media (max-width:1100px){
-      .dashboard-charts {grid-template-columns:1fr;}
+      .dashboard-top {grid-template-columns:repeat(2,minmax(0,1fr));}
+      .dashboard-bottom {grid-template-columns:1fr;}
       .view-row {grid-template-columns:1.3fr 1.3fr;grid-auto-rows:auto;grid-template-rows:auto auto;}
       .view-row> :last-child {grid-column:1 / -1;}
       .informe-top {grid-template-columns:1fr;}
@@ -713,18 +720,33 @@
       </div>
     </div>
 
-    <!-- VISTA DASHBOARD -->
+    <!-- DASHBOARD -->
     <section class="view active" id="view-dashboard">
       <section class="dashboard-top">
         <article class="kpi-card">
           <div class="kpi-label">Total centros</div>
           <div class="kpi-value" id="kpiTotalCentros">0</div>
-          <div class="kpi-sub" id="kpiDetalleCentros"></div>
+          <div class="kpi-sub">Centros activos</div>
+        </article>
+        <article class="kpi-card">
+          <div class="kpi-label">Exclusivos</div>
+          <div class="kpi-value" id="kpiExclusivo">0</div>
+          <div class="kpi-sub">Centros exclusivos</div>
+        </article>
+        <article class="kpi-card">
+          <div class="kpi-label">Corner</div>
+          <div class="kpi-value" id="kpiCorner">0</div>
+          <div class="kpi-sub">Centros corner</div>
         </article>
         <article class="kpi-card">
           <div class="kpi-label">Visitas mes</div>
           <div class="kpi-value" id="kpiVisitasMes">0</div>
-          <div class="kpi-sub" id="kpiVisitasPend"></div>
+          <div class="kpi-sub">Agendadas este mes</div>
+        </article>
+        <article class="kpi-card">
+          <div class="kpi-label">Pendientes</div>
+          <div class="kpi-value" id="kpiVisitasPend">0</div>
+          <div class="kpi-sub">Sin realizar</div>
         </article>
         <article class="kpi-card">
           <div class="kpi-label">Cobertura AAR</div>
@@ -738,7 +760,7 @@
         </article>
       </section>
 
-      <section class="dashboard-charts">
+      <section class="dashboard-bottom">
         <article class="card">
           <span class="section-title-main" style="margin-bottom:4px;">KPIs globales</span>
           <div class="chart-container"><canvas id="chartDashRadar"></canvas></div>
@@ -751,10 +773,14 @@
           <span class="section-title-main" style="margin-bottom:4px;">Centros AAR</span>
           <div class="chart-container"><canvas id="chartDashAAR"></canvas></div>
         </article>
+        <article class="card">
+          <span class="section-title-main" style="margin-bottom:4px;">Ranking de delegados</span>
+          <div class="chart-container"><canvas id="chartDashRanking"></canvas></div>
+        </article>
       </section>
     </section>
 
-    <!-- VISTA CENTROS -->
+    <!-- CENTROS -->
     <section class="view" id="view-centros">
       <section class="view-row">
         <!-- Delegados -->
@@ -792,7 +818,7 @@
           <div class="calendar-grid" id="calendarGrid"></div>
         </article>
 
-        <!-- Visitas agendadas -->
+        <!-- Visitas -->
         <article class="card">
           <div class="delegados-header">
             <span class="section-title-main">Visitas agendadas</span>
@@ -805,7 +831,7 @@
         </article>
       </section>
 
-      <!-- TABLA CENTROS -->
+      <!-- Tabla centros -->
       <section class="table-wrapper">
         <div class="table-header">
           <div><h3>Listado de centros</h3></div>
@@ -832,7 +858,7 @@
       </section>
     </section>
 
-    <!-- VISTA INFORME DE LA VISITA -->
+    <!-- INFORME VISITA -->
     <section class="view" id="view-informe">
       <div class="delegados-header">
         <span class="section-title-main">Informe de la visita</span>
@@ -842,9 +868,8 @@
         </div>
       </div>
 
-      <!-- PANEL SUPERIOR -->
       <section class="informe-top">
-        <!-- Info centro y responsable -->
+        <!-- Info centro -->
         <article class="card">
           <table class="info-table">
             <tbody>
@@ -879,7 +904,6 @@
         <!-- Checklist + gráficas -->
         <article class="card">
           <div class="informe-layout">
-            <!-- Checklist lateral -->
             <div class="checklist-column">
               <div class="check-item"><input type="checkbox" id="chkFormaciones" /> <label for="chkFormaciones">Formaciones y habilidades</label></div>
               <div class="check-item"><input type="checkbox" id="chkWSA" /> <label for="chkWSA">WSA</label></div>
@@ -905,7 +929,6 @@
               <div class="check-item"><input type="checkbox" id="chkTchin" /> <label for="chkTchin">Tchin Tchin</label></div>
             </div>
 
-            <!-- Gráficas del centro -->
             <div class="chart-column">
               <div class="card chart-card">
                 <span class="section-title-main" style="margin-bottom:4px;">KPIs del centro</span>
@@ -930,7 +953,6 @@
         </article>
       </section>
 
-      <!-- IMÁGENES + OBSERVACIONES -->
       <section class="card" style="margin-top:6px;">
         <div class="imagenes-row">
           <div class="card imagen-slot">
@@ -971,7 +993,7 @@
     </section>
   </main>
 
-  <!-- MODAL NUEVO CENTRO -->
+  <!-- MODALES (centro, visita, informes) -->
   <div class="modal-backdrop" id="modalCentro">
     <div class="modal">
       <div class="modal-header">
@@ -1002,7 +1024,6 @@
     </div>
   </div>
 
-  <!-- MODAL NUEVA VISITA -->
   <div class="modal-backdrop" id="modalVisita">
     <div class="modal">
       <div class="modal-header">
@@ -1030,7 +1051,6 @@
     </div>
   </div>
 
-  <!-- MODAL INFORMES CENTRO -->
   <div class="modal-backdrop" id="modalInformesCentro">
     <div class="modal">
       <div class="modal-header">
@@ -1059,7 +1079,7 @@
       localStorage.setItem('cca_theme', body.classList.contains('light')?'light':'dark');
     });
 
-    // NAV VISTAS
+    // NAV
     document.querySelectorAll('.nav-item[data-view-target]').forEach(nav=>{
       nav.addEventListener('click',()=>{
         const target=nav.dataset.viewTarget;
@@ -1070,7 +1090,7 @@
       });
     });
 
-    // DATOS
+    // Datos
     const delegadosColores = {
       "ENERITZ ARANGUREN":"#22c55e",
       "LAURA PLAZAS":"#2563eb",
@@ -1113,7 +1133,7 @@
     function getAarEstado(nombreCentro){return aarPorCentro[nombreCentro]||"No";}
     function getInformesCentro(nombreCentro){return informesPorCentro[nombreCentro]||[];}
 
-    // TABLA CENTROS
+    // Tabla centros
     const tablaBody = document.getElementById('tablaCentrosBody');
     const centrosCounter = document.getElementById('centrosCounter');
     const tableFooter = document.getElementById('tableFooter');
@@ -1123,8 +1143,8 @@
       tablaBody.innerHTML="";
       const filtrados = centros.filter(c=>{
         const cad=(c.centro+" "+c.propietario+" "+c.delegado).toLowerCase();
-        const pasaTexto = cad.includes(texto);
-        const pasaDelegado = !filtroDelegadoActual || c.delegado.toLowerCase().includes(filtroDelegadoActual.toLowerCase());
+        const pasaTexto=cad.includes(texto);
+        const pasaDelegado=!filtroDelegadoActual || c.delegado.toLowerCase().includes(filtroDelegadoActual.toLowerCase());
         return pasaTexto && pasaDelegado;
       });
 
@@ -1158,7 +1178,7 @@
       tableFooter.textContent=`Centros mostrados: ${filtrados.length}`;
     }
 
-    // DELEGADOS
+    // Delegados
     const delegadosList=document.getElementById('delegadosList');
     const delegadosCount=document.getElementById('delegadosCount');
 
@@ -1193,21 +1213,21 @@
       });
     }
 
-    // BUSCADOR GLOBAL
+    // Buscador
     document.getElementById('buscadorGlobal').addEventListener('input',e=>{
       filtroTextoActual=e.target.value||"";
       renderTablaCentros();
       renderVisitas();
     });
 
-    // MODALES
+    // Modales
     function abrirModal(id){document.getElementById(id).style.display='flex';}
     function cerrarModal(id){document.getElementById(id).style.display='none';}
     document.querySelectorAll('[data-close]').forEach(el=>{
       el.addEventListener('click',()=>cerrarModal(el.dataset.close));
     });
 
-    // NUEVO CENTRO
+    // Nuevo centro
     document.getElementById('btnAddCentro').addEventListener('click',()=>{
       const sel=document.getElementById('nuevoDelegado');
       sel.innerHTML="";
@@ -1234,7 +1254,7 @@
       actualizarTodo();
     });
 
-    // EXCEL CENTROS
+    // Excel centros
     const inputExcel=document.getElementById('inputExcel');
     document.getElementById('btnAdjuntarExcel').addEventListener('click',()=>inputExcel.click());
 
@@ -1265,7 +1285,7 @@
       reader.readAsArrayBuffer(file);
     });
 
-    // CALENDARIO
+    // Calendario
     const calendarTitle=document.getElementById('calendarTitle');
     const calendarGrid=document.getElementById('calendarGrid');
     let currentMonth=new Date().getMonth();
@@ -1340,7 +1360,7 @@
       currentMonth++;if(currentMonth>11){currentMonth=0;currentYear++;}renderCalendar();
     });
 
-    // VISITAS
+    // Visitas
     const visitasList=document.getElementById('visitasList');
     document.getElementById('guardarVisita').addEventListener('click',()=>{
       const fecha=document.getElementById('visFecha').value;
@@ -1458,7 +1478,7 @@
       actualizarDashboardCharts();
     }
 
-    // INFORMES DESDE TABLA
+    // Informes desde tabla
     document.addEventListener('click',e=>{
       if(e.target.matches('.btn-informe-centro')){
         const centro=e.target.dataset.centro;
@@ -1490,8 +1510,8 @@
       }
     });
 
-    // CHARTS
-    let chartDashRadar=null, chartDashEstados=null, chartDashAAR=null;
+    // Charts
+    let chartDashRadar=null, chartDashEstados=null, chartDashAAR=null, chartDashRanking=null;
     let chartInformeRadar=null, chartInformeEstados=null, chartInformeDonut=null;
 
     function actualizarDashboardCharts(){
@@ -1506,27 +1526,31 @@
       const visitasMes=visitas.filter(v=>new Date(v.fecha).getMonth()===mesActual).length;
       const visitasPend=visitas.filter(v=>v.estado==='pendiente').length;
 
-      document.getElementById('kpiTotalCentros').textContent=totalCentros;
-      document.getElementById('kpiDetalleCentros').textContent=`${numExclusivo} exclusivos · ${numCorner} corner`;
-      document.getElementById('kpiVisitasMes').textContent=visitasMes;
-      document.getElementById('kpiVisitasPend').textContent=`${visitasPend} pendientes`;
-
-      const totalAAR=aarSi+aarEnForm;
-      const porcAAR=totalCentros?Math.round((totalAAR/totalCentros)*100):0;
-      document.getElementById('kpiAAR').textContent=`${porcAAR}%`;
-      document.getElementById('kpiAARDetalle').textContent=`${aarSi} Sí · ${aarEnForm} En formación`;
-
       const checklistCentros = visitas.filter(v=>v.checklistAdjunto).map(v=>v.centro);
       const numChecklist = new Set(checklistCentros).size;
       const porcChecklist = totalCentros?Math.round((numChecklist/totalCentros)*100):0;
+
+      const totalAAR=aarSi+aarEnForm;
+      const porcAAR=totalCentros?Math.round((totalAAR/totalCentros)*100):0;
+
+      document.getElementById('kpiTotalCentros').textContent=totalCentros;
+      document.getElementById('kpiExclusivo').textContent=numExclusivo;
+      document.getElementById('kpiCorner').textContent=numCorner;
+      document.getElementById('kpiVisitasMes').textContent=visitasMes;
+      document.getElementById('kpiVisitasPend').textContent=visitasPend;
+      document.getElementById('kpiAAR').textContent=`${porcAAR}%`;
+      document.getElementById('kpiAARDetalle').textContent=`${aarSi} Sí · ${aarEnForm} En formación`;
       document.getElementById('kpiChecklist').textContent=`${porcChecklist}%`;
 
       const ctxR=document.getElementById('chartDashRadar').getContext('2d');
       const ctxE=document.getElementById('chartDashEstados').getContext('2d');
       const ctxA=document.getElementById('chartDashAAR').getContext('2d');
+      const ctxRank=document.getElementById('chartDashRanking').getContext('2d');
+
       if(chartDashRadar) chartDashRadar.destroy();
       if(chartDashEstados) chartDashEstados.destroy();
       if(chartDashAAR) chartDashAAR.destroy();
+      if(chartDashRanking) chartDashRanking.destroy();
 
       const procesos=70 + (numExclusivo%20);
       const convPrueba=60 + (visitas.length%25);
@@ -1572,6 +1596,24 @@
         options:{
           plugins:{legend:{position:'bottom',labels:{font:{size:10}}}},
           cutout:'60%'
+        }
+      });
+
+      const delegadoCounts={};
+      centros.forEach(c=>{
+        delegadoCounts[c.delegado]=(delegadoCounts[c.delegado]||0)+1;
+      });
+      const entries=Object.entries(delegadoCounts).sort((a,b)=>b[1]-a[1]).slice(0,7);
+      const labelsRank=entries.map(e=>e[0]);
+      const dataRank=entries.map(e=>e[1]);
+
+      chartDashRanking=new Chart(ctxRank,{
+        type:'bar',
+        data:{labels:labelsRank,datasets:[{data:dataRank}]},
+        options:{
+          indexAxis:'y',
+          plugins:{legend:{display:false}},
+          scales:{x:{beginAtZero:true,precision:0}}
         }
       });
     }
@@ -1624,7 +1666,7 @@
       }
     }
 
-    // CHECKLIST E INFORME
+    // Checklist e informe
     document.getElementById('btnAdjuntarChecklist').addEventListener('click',()=>{
       if(!visitaEnEdicion) return;
       visitaEnEdicion.checklistAdjunto=true;
@@ -1651,7 +1693,7 @@
     document.getElementById('btnGuardarInforme').addEventListener('click',guardarInformeVisita);
     document.getElementById('btnGuardarInformeBottom').addEventListener('click',guardarInformeVisita);
 
-    // BOTONES GUARDAR/EXPORTAR/IMPRIMIR
+    // Botones superiores
     document.getElementById('btnGuardarVista').addEventListener('click',()=>alert('Guardado de vista (demo).'));
     document.getElementById('btnExportHtml').addEventListener('click',()=>{
       const blob=new Blob([document.documentElement.outerHTML],{type:'text/html'});
@@ -1665,7 +1707,7 @@
     document.getElementById('btnSaveVisitas').addEventListener('click',()=>alert('Visitas guardadas (demo).'));
     document.getElementById('btnPrintInforme').addEventListener('click',()=>window.print());
 
-    // ACTUALIZAR TODO
+    // Actualizar todo
     function actualizarTodo(){
       renderDelegados();
       renderTablaCentros();
@@ -1674,7 +1716,7 @@
       actualizarDashboardCharts();
     }
 
-    // DEMO INICIAL
+    // DEMO inicial
     (function cargaDemoInicial(){
       const demo=[
         {codigo:"4ABB",propietario:"MAZA Oriol",centro:"PAMPLONA C. Exclusivo",provincia:"NAVARRA",delegado:"Sonia Godino"},
