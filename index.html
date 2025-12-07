@@ -6,15 +6,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     :root {
-      --primary: #f97373;          /* rojo suave para botones / barras */
+      --primary: #f97373;
       --primary-strong: #f43f5e;
-      --bg: #020617;               /* fondo muy oscuro */
+      --bg: #020617;
       --bg-card: #020617;
-      --bg-elevated: #020617;
-      --border: #1e293b;
+      --border: #020617;
       --text-main: #e5e7eb;
       --text-muted: #9ca3af;
-      --amber: #facc15;
     }
 
     * { box-sizing: border-box; }
@@ -131,7 +129,7 @@
     }
 
     .main-header {
-      padding: 14px 18px;
+      padding: 12px 18px;
       border-bottom: 1px solid #020617;
       background: #020617;
       display: flex;
@@ -213,7 +211,7 @@
       background: var(--bg-card);
       border-radius: 16px;
       padding: 12px 14px 14px;
-      border: 1px solid #020617;
+      border: 1px solid var(--border);
       box-shadow: 0 0 0 1px #020617;
       margin-bottom: 10px;
     }
@@ -239,38 +237,89 @@
       color: var(--text-muted);
     }
 
-    .summary-grid {
+    .text-muted { color: var(--text-muted); font-size: 11px; }
+
+    /* DASHBOARD TOP: GRAFICA + CALENDARIO */
+
+    .dashboard-top {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr);
       gap: 8px;
     }
 
-    .summary-card {
+    .mini-chart {
       border-radius: 12px;
-      padding: 8px 10px;
-      border: 1px solid #0f172a;
+      border: 1px solid #020617;
       background: #020617;
-      font-size: 11px;
+      padding: 6px 8px;
     }
 
-    .summary-label {
+    .mini-chart canvas { max-height: 150px; }
+
+    .mini-calendar {
+      border-radius: 12px;
+      border: 1px solid #020617;
+      background: #020617;
+      padding: 6px 8px;
+      font-size: 10px;
+    }
+
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       font-size: 10px;
       color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
+      margin-bottom: 2px;
     }
 
-    .summary-value {
-      font-size: 17px;
-      font-weight: 600;
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 2px;
     }
 
-    .summary-detail {
-      font-size: 10px;
+    .calendar-day-header {
+      text-align: center;
+      font-size: 9px;
       color: var(--text-muted);
     }
 
-    /* TABLE CENTROS */
+    .calendar-cell {
+      min-height: 16px;
+      border-radius: 4px;
+      border: 1px solid #020617;
+      text-align: right;
+      padding: 1px 3px;
+      font-size: 9px;
+    }
+
+    .calendar-cell-pendiente { background: rgba(234,179,8,0.9); color: #020617; }
+    .calendar-cell-realizada { background: rgba(22,163,74,0.9); color: #f9fafb; }
+    .calendar-cell-anulada { background: rgba(239,68,68,0.95); color: #f9fafb; }
+
+    .calendar-legend {
+      display: flex;
+      gap: 6px;
+      margin-top: 4px;
+      font-size: 9px;
+      color: var(--text-muted);
+      flex-wrap: wrap;
+    }
+
+    .calendar-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .calendar-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+    }
+
+    /* TABLA CENTROS */
 
     .table-wrapper { overflow-x: auto; }
 
@@ -281,9 +330,7 @@
       min-width: 900px;
     }
 
-    thead {
-      background: #020617;
-    }
+    thead { background: #020617; }
 
     th, td {
       padding: 5px 6px;
@@ -313,10 +360,11 @@
 
     .col-centro { font-weight: 500; }
 
-    .col-visit-cell { min-width: 120px; }
+    .col-visit-cell { min-width: 150px; }
 
     .visita-group {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       gap: 3px;
     }
@@ -333,12 +381,12 @@
 
     .visita-input:focus {
       outline: none;
-      border-color: var(--amber);
+      border-color: #facc15;
     }
 
     .visita-guardada .visita-input {
-      background: #1e293b;
-      border-color: #eab308;
+      background: #1f2937;
+      border-color: #facc15;
     }
 
     .pill {
@@ -388,7 +436,14 @@
 
     .input-text:focus { outline: none; border-color: var(--primary-strong); }
 
-    .text-muted { color: var(--text-muted); font-size: 11px; }
+    .estado-select {
+      font-size: 10px;
+      border-radius: 999px;
+      border: 1px solid #1e293b;
+      background: #020617;
+      color: var(--text-main);
+      padding: 2px 4px;
+    }
 
     /* INFORME DE VISITA */
 
@@ -675,7 +730,7 @@
       background: #020617;
       border-radius: 12px;
       padding: 10px 12px;
-      max-width: 620px;
+      max-width: 720px;
       width: 90%;
       max-height: 80vh;
       overflow: auto;
@@ -724,11 +779,9 @@
       border-radius: 10px;
     }
 
-    /* DETALLES CHECKLIST (2ª PÁGINA EN IMPRESIÓN) */
+    /* DETALLES CHECKLIST (PÁGINA 2 IMPRESIÓN) */
 
-    #cardChecklistDetalles {
-      margin-top: 8px;
-    }
+    #cardChecklistDetalles { margin-top: 8px; }
 
     #checklistDetallesTabla {
       width: 100%;
@@ -747,6 +800,49 @@
       font-size: 10px;
       text-transform: uppercase;
       color: var(--text-muted);
+    }
+
+    /* MODO CLARO (override rápido) */
+
+    body.light-mode {
+      background: #f3f4f6;
+      color: #111827;
+    }
+
+    body.light-mode .main-header,
+    body.light-mode .card {
+      background: #ffffff;
+      border-color: #e5e7eb;
+      box-shadow: 0 1px 3px rgba(15,23,42,0.1);
+    }
+
+    body.light-mode .mini-chart,
+    body.light-mode .mini-calendar,
+    body.light-mode .chart-card-inner,
+    body.light-mode .img-card,
+    body.light-mode .obs-card {
+      background: #ffffff;
+      border-color: #e5e7eb;
+    }
+
+    body.light-mode .table-wrapper thead th {
+      background: #f9fafb;
+      border-color: #e5e7eb;
+    }
+
+    body.light-mode .visita-input,
+    body.light-mode .input-text,
+    body.light-mode .meta-input,
+    body.light-mode .meta-select,
+    body.light-mode .textarea-base,
+    body.light-mode .estado-select {
+      background: #ffffff;
+      color: #111827;
+      border-color: #d1d5db;
+    }
+
+    body.light-mode .sidebar {
+      background: #111827;
     }
 
     /* PRINT */
@@ -786,13 +882,13 @@
 
     @media (max-width: 900px) {
       .sidebar { display: none; }
-      .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .chart-grid { grid-template-columns: minmax(0, 1fr); }
       .img-row { grid-template-columns: minmax(0, 1fr); }
       .img-notes-row { grid-template-columns: minmax(0, 1fr); }
       .obs-grid { grid-template-columns: minmax(0, 1fr); }
       .informe-meta-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .informe-centro-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .dashboard-top { grid-template-columns: minmax(0, 1fr); }
     }
   </style>
 </head>
@@ -809,15 +905,12 @@
     <div class="sidebar-nav">
       <div class="nav-section-title">Módulos</div>
       <div class="nav-item active">
-        <span class="icon">📝</span><span>Pre-informe</span>
+        <span class="icon">📝</span><span>Informe de visita</span>
       </div>
-      <div class="nav-item">
+      <div class="nav-item" id="navDashboard">
         <span class="icon">📊</span><span>Dashboard general</span>
       </div>
-      <div class="nav-item">
-        <span class="icon">📁</span><span>Informes</span>
-      </div>
-      <div class="nav-item">
+      <div class="nav-item" id="navHistorico">
         <span class="icon">📆</span><span>Histórico visitas</span>
       </div>
     </div>
@@ -830,9 +923,9 @@
   <main class="main">
     <header class="main-header">
       <div class="main-header-left">
-        <div class="main-title">Pre-informe y planificación</div>
+        <div class="main-title">Centros auditivos · visitas</div>
         <div class="main-subtitle">
-          Programa visitas, crea informes y controla los resultados de audiología.
+          Programa visitas, crea informes y alimenta el dashboard general.
         </div>
       </div>
       <div class="main-header-actions">
@@ -841,37 +934,44 @@
         </label>
         <input type="file" id="excelInput" accept=".xlsx,.xls" />
         <button class="btn btn-primary btn-sm" id="btnExport">⬇️ Exportar estado</button>
+        <button class="btn btn-icon btn-outline" id="btnTheme" title="Modo claro / oscuro">☀️</button>
         <button class="btn btn-icon btn-outline" id="btnReset" title="Borrar estado">🗑️</button>
       </div>
     </header>
 
     <section class="main-content">
-      <!-- Resumen -->
+      <!-- Resumen + calendario -->
       <section class="card">
         <div class="card-header">
           <div>
-            <div class="card-title">Resumen rápido</div>
+            <div class="card-title">Visión general</div>
             <div class="card-subtitle">
-              Calculado sobre los centros cargados y los informes finalizados.
+              Alimentado automáticamente por las visitas e informes del módulo Informe de visita.
             </div>
           </div>
           <span class="badge">INFORME AUDIO</span>
         </div>
-        <div class="summary-grid">
-          <div class="summary-card">
-            <div class="summary-label">Centros</div>
-            <div class="summary-value" id="sumCentros">0</div>
-            <div class="summary-detail" id="sumDelegados"></div>
+
+        <div class="dashboard-top">
+          <div class="mini-chart">
+            <canvas id="miniSummaryChart"></canvas>
           </div>
-          <div class="summary-card">
-            <div class="summary-label">Visitas programadas</div>
-            <div class="summary-value" id="sumVisitas">0</div>
-            <div class="summary-detail" id="sumVisitasDetalle"></div>
-          </div>
-          <div class="summary-card">
-            <div class="summary-label">Informes finalizados</div>
-            <div class="summary-value" id="sumInformes">0</div>
-            <div class="summary-detail" id="sumInformesDetalle"></div>
+          <div class="mini-calendar">
+            <div class="calendar-header">
+              <span>Calendario visitas (mes actual)</span>
+            </div>
+            <div class="calendar-grid" id="calendarGrid"></div>
+            <div class="calendar-legend">
+              <div class="calendar-legend-item">
+                <span class="calendar-dot" style="background:#eab308;"></span><span>Pendiente</span>
+              </div>
+              <div class="calendar-legend-item">
+                <span class="calendar-dot" style="background:#22c55e;"></span><span>Realizada (con informe)</span>
+              </div>
+              <div class="calendar-legend-item">
+                <span class="calendar-dot" style="background:#ef4444;"></span><span>Anulada</span>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -880,15 +980,15 @@
       <section class="card">
         <div class="card-header">
           <div>
-            <div class="card-title">Centros y visitas</div>
+            <div class="card-title">Centros auditivos · visitas</div>
             <div class="card-subtitle">
-              Carga tu Excel o usa los datos demo. Programa la visita y crea el informe.
+              Carga tu Excel o usa los datos demo. Programa la visita, marca el estado y crea el informe.
             </div>
           </div>
         </div>
         <div class="filter-row">
           <input id="searchInput" class="input-text" placeholder="Buscar por código, centro, provincia..." />
-          <span class="text-muted">Truco: programa la visita y pulsa “Crear” para generar el informe.</span>
+          <span class="text-muted">Visita pendiente: ámbar · con informe: verde · anulada: rojo (en el calendario).</span>
         </div>
         <div class="table-wrapper">
           <table id="tablaCentros">
@@ -902,7 +1002,7 @@
                 <th>Tipología</th>
                 <th>Centro AAR</th>
                 <th>Visita</th>
-                <th>Informe</th>
+                <th>Informe / histórico</th>
                 <th>Audiólogo</th>
                 <th>Horas servicio</th>
                 <th>Resp. Audio</th>
@@ -1121,7 +1221,7 @@
         </div>
       </section>
 
-      <!-- DETALLES CHECKLIST (PÁGINA 2 EN IMPRESIÓN) -->
+      <!-- DETALLES CHECKLIST (PÁGINA 2 IMPRESIÓN) -->
       <section class="card" id="cardChecklistDetalles">
         <div class="card-header">
           <div>
@@ -1150,11 +1250,11 @@
     </section>
   </main>
 
-  <!-- MODAL HISTÓRICO -->
+  <!-- MODAL HISTÓRICO GLOBAL -->
   <div class="modal-overlay" id="historicoModal">
     <div class="modal-card">
       <div class="modal-header">
-        <div class="modal-title" id="historicoTitulo">Histórico de informes</div>
+        <div class="modal-title" id="historicoTitulo">Histórico de visitas e informes</div>
         <button class="btn btn-icon btn-outline" id="historicoCerrar">✖️</button>
       </div>
       <div class="modal-body" id="historicoLista"></div>
@@ -1242,16 +1342,17 @@
       },
     ];
 
-    const STORAGE_KEY = "InformeAudio_v1";
+    const STORAGE_KEY = "InformeAudio_v2";
 
     let centros = [];
-    let estado = {}; // {CODIGO: {visita, centroAAR, respAudio, informes: [...]}}
+    let estado = {}; // {CODIGO: {visita, visitaEstado, centroAAR, respAudio, informes: [...]}}
     let centroSeleccionadoCodigo = null;
     let currentInformeId = null;
 
     let radarChart = null;
     let mejoraChart = null;
     let kpiChart = null;
+    let miniSummaryChart = null;
 
     function cargarEstado() {
       try {
@@ -1285,6 +1386,7 @@
           c.VISITA = e.visita || "";
           c.CENTRO_AAR = e.centroAAR || c.CENTRO_AAR || "";
           c.RESP_AUDIO = e.respAudio || c.RESP_AUDIO || "";
+          c.VISITA_ESTADO = e.visitaEstado || "pendiente";
           const infs = e.informes || [];
           c.NUM_INFORMES = infs.length;
           c.INFORME_ESTADO = estadoCentroDesdeInformes(infs);
@@ -1295,6 +1397,7 @@
           c.NUM_INFORMES = 0;
           c.INFORME_ESTADO = "";
           c.ULTIMO_INFORME_FECHA = "";
+          c.VISITA_ESTADO = "pendiente";
         }
       });
     }
@@ -1392,7 +1495,6 @@
           guardarEstado();
           if (centroSeleccionadoCodigo === code) {
             document.getElementById("metaCentroAAR").value = selAar.value || "";
-            document.getElementById("infCentroAAR").textContent = selAar.value || "—";
           }
         });
         tdAar.appendChild(selAar);
@@ -1412,6 +1514,13 @@
         const btnSave = document.createElement("button");
         btnSave.className = "btn btn-outline btn-sm";
         btnSave.textContent = "Guardar";
+
+        const selEstado = document.createElement("select");
+        selEstado.className = "estado-select";
+        selEstado.innerHTML =
+          '<option value="pendiente">Pendiente</option><option value="anulada">Anulada</option>';
+        selEstado.value = c.VISITA_ESTADO || "pendiente";
+
         btnSave.addEventListener("click", () => {
           const valor = inputDate.value;
           if (!valor) {
@@ -1421,13 +1530,25 @@
           const code = c.CODIGO;
           if (!estado[code]) estado[code] = { informes: [] };
           estado[code].visita = valor;
+          estado[code].visitaEstado = selEstado.value || "pendiente";
           guardarEstado();
           aplicarEstadoALosCentros();
           renderTabla(document.getElementById("searchInput").value);
           actualizarResumen();
         });
+
+        selEstado.addEventListener("change", () => {
+          const code = c.CODIGO;
+          if (!estado[code]) estado[code] = { informes: [] };
+          estado[code].visitaEstado = selEstado.value;
+          c.VISITA_ESTADO = selEstado.value;
+          guardarEstado();
+          actualizarResumen();
+        });
+
         vGroup.appendChild(inputDate);
         vGroup.appendChild(btnSave);
+        vGroup.appendChild(selEstado);
         tdVisita.appendChild(vGroup);
         tr.appendChild(tdVisita);
 
@@ -1538,7 +1659,7 @@
       }
     }
 
-    /* ========= RESUMEN ========= */
+    /* ========= RESUMEN / GRAFICA + CALENDARIO ========= */
 
     function actualizarResumen() {
       const total = centros.length;
@@ -1550,20 +1671,105 @@
         if (c.INFORME_ESTADO === "finalizado") informesFinal++;
       });
 
-      document.getElementById("sumCentros").textContent = total;
-      const delegadosUnicos = [...new Set(centros.map((c) => c.DELEGADOS).filter(Boolean))];
-      document.getElementById("sumDelegados").textContent =
-        delegadosUnicos.length > 0 ? `Delegados: ${delegadosUnicos.length}` : "";
-      document.getElementById("sumVisitas").textContent = visitas;
-      document.getElementById("sumVisitasDetalle").textContent =
-        total > 0
-          ? `Cobertura: ${Math.round((visitas / Math.max(total, 1)) * 100)}%`
-          : "";
-      document.getElementById("sumInformes").textContent = informesFinal;
-      document.getElementById("sumInformesDetalle").textContent =
-        visitas > 0
-          ? `${Math.round((informesFinal / Math.max(visitas, 1)) * 100)}% de visitas con informe finalizado`
-          : "Aún no hay visitas programadas.";
+      actualizarMiniSummaryChart(total, visitas, informesFinal);
+      actualizarCalendarioVisitas();
+    }
+
+    function actualizarMiniSummaryChart(total, visitas, informesFinal) {
+      const ctx = document.getElementById("miniSummaryChart").getContext("2d");
+      if (miniSummaryChart) miniSummaryChart.destroy();
+      miniSummaryChart = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: ["Centros", "Visitas", "Informes"],
+          datasets: [
+            {
+              data: [total, visitas, informesFinal],
+              backgroundColor: [
+                "rgba(59,130,246,0.9)",   // azul
+                "rgba(234,179,8,0.9)",    // ámbar
+                "rgba(34,197,94,0.9)",    // verde
+              ],
+            },
+          ],
+        },
+        options: {
+          plugins: { legend: { display: false } },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { color: "#9ca3af", font: { size: 9 } },
+              grid: { color: "#1f2937" },
+            },
+            x: {
+              ticks: { color: "#9ca3af", font: { size: 9 } },
+              grid: { display: false },
+            },
+          },
+        },
+      });
+    }
+
+    function obtenerMapaEstadosVisitas() {
+      const map = {};
+      const priority = { anulada: 1, pendiente: 2, realizada: 3 };
+
+      centros.forEach((c) => {
+        if (!c.VISITA) return;
+        const code = c.CODIGO;
+        const e = estado[code] || {};
+        let st = e.visitaEstado || "pendiente";
+        if (c.INFORME_ESTADO === "finalizado") st = "realizada";
+        const dateStr = c.VISITA; // YYYY-MM-DD
+        if (!map[dateStr] || priority[st] > priority[map[dateStr]]) {
+          map[dateStr] = st;
+        }
+      });
+      return map;
+    }
+
+    function actualizarCalendarioVisitas() {
+      const grid = document.getElementById("calendarGrid");
+      if (!grid) return;
+      grid.innerHTML = "";
+
+      const statusMap = obtenerMapaEstadosVisitas();
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = today.getMonth(); // 0-11
+
+      const weekdayNames = ["L", "M", "X", "J", "V", "S", "D"];
+      weekdayNames.forEach((d) => {
+        const div = document.createElement("div");
+        div.className = "calendar-day-header";
+        div.textContent = d;
+        grid.appendChild(div);
+      });
+
+      const firstDay = (new Date(year, month, 1).getDay() + 6) % 7; // lunes=0
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+      for (let i = 0; i < firstDay; i++) {
+        const div = document.createElement("div");
+        grid.appendChild(div);
+      }
+
+      for (let d = 1; d <= daysInMonth; d++) {
+        const div = document.createElement("div");
+        div.className = "calendar-cell";
+        div.textContent = d;
+        const dateStr =
+          year +
+          "-" +
+          String(month + 1).padStart(2, "0") +
+          "-" +
+          String(d).padStart(2, "0");
+        const st = statusMap[dateStr];
+        if (st === "pendiente") div.classList.add("calendar-cell-pendiente");
+        else if (st === "realizada") div.classList.add("calendar-cell-realizada");
+        else if (st === "anulada") div.classList.add("calendar-cell-anulada");
+        grid.appendChild(div);
+      }
     }
 
     /* ========= CARGA EXCEL CENTROS ========= */
@@ -1730,7 +1936,7 @@
 
       actualizarTipoVisitaUI(inf.tipoVisita || {});
 
-      limpiarImagenesYChecklist(); // limpia gráficos + detalles
+      limpiarImagenesYChecklist();
       if (inf.checklistMetrics && inf.checklistDetalles) {
         renderChecklistCharts(inf.checklistMetrics, inf.checklistDetalles);
         document.getElementById("checklistResumen").textContent =
@@ -1761,7 +1967,6 @@
         estado: "borrador",
         audiologo: "",
         horasServicio: "",
-        delegadoFormacion: "",
         tipoVisita: { apertura: false, seguimiento: false },
         observaciones: "",
         recomendaciones: "",
@@ -1782,7 +1987,9 @@
       cargarCentroEnInforme(code, id, false);
 
       document.getElementById("infAudiologo").focus();
-      document.getElementById("cardInformeVisita").scrollIntoView({ behavior: "smooth" });
+      document
+        .getElementById("cardInformeVisita")
+        .scrollIntoView({ behavior: "smooth" });
     }
 
     /* ========= CHECKLIST Y GRÁFICOS ========= */
@@ -1799,7 +2006,7 @@
       const aplic = metrics && metrics.aplicProc != null ? metrics.aplicProc : 0;
       const convP = metrics && metrics.convPrueba != null ? metrics.convPrueba : 0;
       const convV = metrics && metrics.convVenta != null ? metrics.convVenta : 0;
-      const formaciones = aplic; // por ahora usamos el mismo dato como proxy
+      const formaciones = aplic;
 
       radarChart = new Chart(radarCtx, {
         type: "radar",
@@ -1835,6 +2042,7 @@
       if (!mejoras.length) {
         mejoras = [{ criterio: "Sin procesos pendientes", aplica: 0 }];
       }
+
       mejoraChart = new Chart(mejoraCtx, {
         type: "bar",
         data: {
@@ -1944,18 +2152,23 @@
         const wb = XLSX.read(data, { type: "array" });
         const sheet = wb.Sheets[wb.SheetNames[0]];
 
+        // Tipo desde el desplegable
+        let tipo = document.getElementById("metaTipoCentro").value || null;
+
         const nameUpper = file.name.toUpperCase();
-        let tipo = null;
-        if (nameUpper.includes("CORNER")) tipo = "CORNER";
-        else if (nameUpper.includes("EXCLUSIVO")) tipo = "EXCLUSIVO";
-        else {
+        if (!tipo) {
+          if (nameUpper.includes("CORNER")) tipo = "CORNER";
+          else if (nameUpper.includes("EXCLUSIVO")) tipo = "EXCLUSIVO";
+        }
+        if (!tipo) {
           const centro = centros.find((c) => c.CODIGO === centroSeleccionadoCodigo);
           const t = (centro?.TIPOLOGIA || "").toUpperCase();
           if (t.includes("CORNER") || t.includes("CÓRNER")) tipo = "CORNER";
           else if (t.includes("EXCLUSIVO")) tipo = "EXCLUSIVO";
         }
+        if (!tipo) tipo = "CORNER"; // último recurso
 
-        if (!tipo) tipo = "CORNER"; // fallback
+        document.getElementById("metaTipoCentro").value = tipo;
 
         let metrics = {};
         let detalles = [];
@@ -2092,12 +2305,16 @@
     function abrirHistoricoCentro(codigo) {
       const modal = document.getElementById("historicoModal");
       const lista = document.getElementById("historicoLista");
-      const titulo = document.getElementById("historicoTitulo");
       const centro = centros.find((c) => c.CODIGO === codigo);
       const e = estado[codigo] || { informes: [] };
       const informes = e.informes || [];
 
-      titulo.textContent = `Histórico de informes · ${codigo} · ${(centro && centro.CENTRO) || ""}`;
+      document.getElementById("historicoTitulo").textContent =
+        "Histórico de visitas e informes · " +
+        codigo +
+        " · " +
+        (centro ? centro.CENTRO : "");
+
       lista.innerHTML = "";
 
       if (!informes.length) {
@@ -2107,57 +2324,99 @@
         lista.appendChild(p);
       } else {
         informes.forEach((inf) => {
-          const item = document.createElement("div");
-          item.className = "historico-item";
-
-          const text = document.createElement("div");
-          text.className = "historico-text";
-          const l1 = document.createElement("div");
-          const fechaVisita = inf.fechaVisita
-            ? formatearFechaCorta(inf.fechaVisita)
-            : "sin fecha";
-          l1.textContent = `Visita: ${fechaVisita} · Estado: ${
-            inf.estado === "finalizado" ? "Finalizado" : "Borrador"
-          }`;
-          const l2 = document.createElement("div");
-          l2.className = "historico-tag";
-          l2.textContent = `Creado: ${formatearFechaCorta(inf.fechaCreacion)}`;
-          text.appendChild(l1);
-          text.appendChild(l2);
-
-          const acc = document.createElement("div");
-          acc.style.display = "flex";
-          acc.style.gap = "4px";
-
-          const btnVer = document.createElement("button");
-          btnVer.className = "btn btn-outline btn-sm";
-          btnVer.textContent = "Ver";
-          btnVer.addEventListener("click", () => {
-            modal.style.display = "none";
-            cargarCentroEnInforme(codigo, inf.id, inf.estado === "finalizado");
-            document
-              .getElementById("cardInformeVisita")
-              .scrollIntoView({ behavior: "smooth" });
-          });
-
-          const btnImp = document.createElement("button");
-          btnImp.className = "btn btn-primary btn-sm";
-          btnImp.textContent = "Imprimir";
-          btnImp.addEventListener("click", () => {
-            modal.style.display = "none";
-            cargarCentroEnInforme(codigo, inf.id, true);
-            setTimeout(() => window.print(), 300);
-          });
-
-          acc.appendChild(btnVer);
-          acc.appendChild(btnImp);
-          item.appendChild(text);
-          item.appendChild(acc);
+          const item = construirFilaHistorico(centro, inf);
           lista.appendChild(item);
         });
       }
 
       modal.style.display = "flex";
+    }
+
+    function abrirHistoricoGlobal() {
+      const modal = document.getElementById("historicoModal");
+      const lista = document.getElementById("historicoLista");
+      const titulo = document.getElementById("historicoTitulo");
+      titulo.textContent = "Histórico global de visitas e informes";
+
+      lista.innerHTML = "";
+      let totalRegistros = 0;
+
+      centros.forEach((c) => {
+        const e = estado[c.CODIGO] || { informes: [] };
+        const infs = e.informes || [];
+        infs.forEach((inf) => {
+          const item = construirFilaHistorico(c, inf);
+          lista.appendChild(item);
+          totalRegistros++;
+        });
+      });
+
+      if (!totalRegistros) {
+        const p = document.createElement("p");
+        p.className = "text-muted";
+        p.textContent = "Todavía no hay visitas ni informes registrados.";
+        lista.appendChild(p);
+      }
+
+      modal.style.display = "flex";
+    }
+
+    function construirFilaHistorico(centro, inf) {
+      const item = document.createElement("div");
+      item.className = "historico-item";
+
+      const text = document.createElement("div");
+      text.className = "historico-text";
+
+      const l1 = document.createElement("div");
+      const fechaVisita = inf.fechaVisita
+        ? formatearFechaCorta(inf.fechaVisita)
+        : "sin fecha";
+      l1.textContent = `${centro.CODIGO} · ${centro.CENTRO} · Visita: ${fechaVisita} · Estado: ${
+        inf.estado === "finalizado" ? "Finalizado" : "Borrador"
+      }`;
+
+      const l2 = document.createElement("div");
+      l2.className = "historico-tag";
+      l2.textContent = `Creado: ${formatearFechaCorta(
+        inf.fechaCreacion
+      )} · Última actualización: ${
+        inf.fechaFinalizacion ? formatearFechaCorta(inf.fechaFinalizacion) : "-"
+      }`;
+
+      text.appendChild(l1);
+      text.appendChild(l2);
+
+      const acc = document.createElement("div");
+      acc.style.display = "flex";
+      acc.style.gap = "4px";
+
+      const btnVer = document.createElement("button");
+      btnVer.className = "btn btn-outline btn-sm";
+      btnVer.textContent = "Ver";
+      btnVer.addEventListener("click", () => {
+        document.getElementById("historicoModal").style.display = "none";
+        cargarCentroEnInforme(centro.CODIGO, inf.id, inf.estado === "finalizado");
+        document
+          .getElementById("cardInformeVisita")
+          .scrollIntoView({ behavior: "smooth" });
+      });
+
+      const btnImp = document.createElement("button");
+      btnImp.className = "btn btn-primary btn-sm";
+      btnImp.textContent = "Imprimir";
+      btnImp.addEventListener("click", () => {
+        document.getElementById("historicoModal").style.display = "none";
+        cargarCentroEnInforme(centro.CODIGO, inf.id, true);
+        setTimeout(() => window.print(), 300);
+      });
+
+      acc.appendChild(btnVer);
+      acc.appendChild(btnImp);
+
+      item.appendChild(text);
+      item.appendChild(acc);
+      return item;
     }
 
     function cerrarHistorico() {
@@ -2198,6 +2457,25 @@
       });
     }
 
+    /* ========= TEMA CLARO/OSCURO ========= */
+
+    function aplicarTemaDesdeStorage() {
+      const saved = localStorage.getItem("InformeAudioThemeMode") || "dark";
+      if (saved === "light") {
+        document.body.classList.add("light-mode");
+        document.getElementById("btnTheme").textContent = "🌙";
+      } else {
+        document.body.classList.remove("light-mode");
+        document.getElementById("btnTheme").textContent = "☀️";
+      }
+    }
+
+    function toggleTheme() {
+      const isLight = document.body.classList.toggle("light-mode");
+      localStorage.setItem("InformeAudioThemeMode", isLight ? "light" : "dark");
+      document.getElementById("btnTheme").textContent = isLight ? "🌙" : "☀️";
+    }
+
     /* ========= INIT ========= */
 
     document.addEventListener("DOMContentLoaded", () => {
@@ -2206,6 +2484,7 @@
       aplicarEstadoALosCentros();
       renderTabla();
       actualizarResumen();
+      aplicarTemaDesdeStorage();
 
       document
         .getElementById("searchInput")
@@ -2298,6 +2577,24 @@
       document
         .getElementById("imgZoomOverlay")
         .addEventListener("click", cerrarZoomImagen);
+
+      document
+        .getElementById("btnTheme")
+        .addEventListener("click", toggleTheme);
+
+      document
+        .getElementById("navHistorico")
+        .addEventListener("click", abrirHistoricoGlobal);
+
+      // El dashboard general (navDashboard) usa los mismos datos; por ahora no cambia la vista,
+      // solo sirve como recordatorio de que todo se alimenta del módulo Informe.
+      document
+        .getElementById("navDashboard")
+        .addEventListener("click", () => {
+          document
+            .getElementById("cardInformeVisita")
+            .scrollIntoView({ behavior: "smooth" });
+        });
     });
   </script>
 </body>
