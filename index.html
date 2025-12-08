@@ -29,7 +29,7 @@
     /* SIDEBAR */
 
     .sidebar {
-      width: 240px;
+      width: 220px;
       background: #020617;
       color: #e5e7eb;
       display: flex;
@@ -38,7 +38,7 @@
     }
 
     .sidebar-header {
-      padding: 16px 18px;
+      padding: 14px 16px;
       border-bottom: 1px solid #0f172a;
       display: flex;
       align-items: center;
@@ -46,15 +46,15 @@
     }
 
     .logo-circle {
-      width: 32px;
-      height: 32px;
+      width: 30px;
+      height: 30px;
       border-radius: 999px;
       background: var(--primary-strong);
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 700;
-      font-size: 16px;
+      font-size: 15px;
       color: #0b1120;
     }
 
@@ -65,7 +65,7 @@
 
     .sidebar-title span:first-child {
       font-weight: 600;
-      font-size: 15px;
+      font-size: 14px;
       letter-spacing: 0.03em;
     }
 
@@ -76,7 +76,7 @@
     }
 
     .sidebar-nav {
-      padding: 10px 8px;
+      padding: 8px 6px;
       flex: 1;
     }
 
@@ -84,23 +84,23 @@
       font-size: 11px;
       text-transform: uppercase;
       color: var(--text-muted);
-      padding: 8px 12px;
+      padding: 6px 10px;
     }
 
     .nav-item {
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 8px 12px;
+      padding: 7px 10px;
       border-radius: 999px;
       cursor: pointer;
       font-size: 13px;
       color: #e5e7eb;
-      margin: 2px 4px;
+      margin: 1px 2px;
       border: 1px solid transparent;
     }
 
-    .nav-item span.icon { font-size: 16px; }
+    .nav-item span.icon { font-size: 15px; }
 
     .nav-item.active {
       background: #111827;
@@ -113,7 +113,7 @@
     }
 
     .sidebar-footer {
-      padding: 10px 14px;
+      padding: 8px 12px;
       border-top: 1px solid #0f172a;
       font-size: 11px;
       color: var(--text-muted);
@@ -129,14 +129,14 @@
     }
 
     .main-header {
-      padding: 12px 18px;
+      padding: 10px 16px;
       border-bottom: 1px solid #020617;
       background: #020617;
       display: flex;
       flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
+      gap: 8px;
     }
 
     .main-header-left {
@@ -146,7 +146,7 @@
     }
 
     .main-title {
-      font-size: 19px;
+      font-size: 18px;
       font-weight: 600;
     }
 
@@ -165,8 +165,8 @@
     .btn {
       border-radius: 999px;
       border: 1px solid #1e293b;
-      padding: 6px 12px;
-      font-size: 12px;
+      padding: 5px 11px;
+      font-size: 11px;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
@@ -175,7 +175,7 @@
       color: var(--text-main);
     }
 
-    .btn-sm { padding: 4px 10px; font-size: 11px; }
+    .btn-sm { padding: 4px 9px; font-size: 11px; }
 
     .btn-primary {
       background: var(--primary-strong);
@@ -189,48 +189,48 @@
     .btn-outline:hover { background: #0b1120; }
 
     .btn-icon {
-      width: 30px;
-      height: 30px;
+      width: 28px;
+      height: 28px;
       padding: 0;
       border-radius: 999px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 15px;
+      font-size: 14px;
     }
 
     input[type="file"] { display: none; }
 
     .main-content {
-      padding: 10px 16px 18px;
+      padding: 8px 14px 14px;
       overflow: auto;
       flex: 1;
     }
 
     .card {
       background: var(--bg-card);
-      border-radius: 16px;
-      padding: 12px 14px 14px;
+      border-radius: 12px;
+      padding: 9px 10px 10px;
       border: 1px solid var(--border);
       box-shadow: 0 0 0 1px #020617;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
     .card-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 8px;
-      gap: 6px;
+      margin-bottom: 6px;
+      gap: 4px;
       flex-wrap: wrap;
     }
 
-    .card-title { font-size: 14px; font-weight: 600; }
+    .card-title { font-size: 13px; font-weight: 600; }
     .card-subtitle { font-size: 11px; color: var(--text-muted); }
 
     .badge {
       font-size: 10px;
-      padding: 2px 7px;
+      padding: 2px 6px;
       border-radius: 999px;
       border: 1px solid #1e293b;
       background: #020617;
@@ -239,28 +239,25 @@
 
     .text-muted { color: var(--text-muted); font-size: 11px; }
 
-    /* DASHBOARD TOP: GRAFICA + CALENDARIO */
+    /* DASHBOARD TOP: VISION GENERAL + CALENDARIO */
 
     .dashboard-top {
       display: grid;
       grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr);
-      gap: 8px;
+      gap: 6px;
     }
 
-    .mini-chart {
-      border-radius: 12px;
+    .mini-chart,
+    .mini-calendar {
+      border-radius: 10px;
       border: 1px solid #020617;
       background: #020617;
-      padding: 6px 8px;
+      padding: 6px 7px;
     }
 
-    .mini-chart canvas { max-height: 150px; }
+    .mini-chart canvas { max-height: 140px; }
 
     .mini-calendar {
-      border-radius: 12px;
-      border: 1px solid #020617;
-      background: #020617;
-      padding: 6px 8px;
       font-size: 10px;
     }
 
@@ -276,32 +273,38 @@
     .calendar-grid {
       display: grid;
       grid-template-columns: repeat(7, minmax(0, 1fr));
-      gap: 2px;
+      gap: 1px;
+      background: #020617;
+      border-radius: 6px;
+      padding: 2px;
+      border: 1px solid #1e293b;
     }
 
     .calendar-day-header {
       text-align: center;
       font-size: 9px;
-      color: var(--text-muted);
+      color: #64748b;
     }
 
     .calendar-cell {
       min-height: 16px;
-      border-radius: 4px;
-      border: 1px solid #020617;
+      border-radius: 3px;
+      border: 1px solid #1e293b;
       text-align: right;
       padding: 1px 3px;
       font-size: 9px;
+      background: #020617;
+      color: var(--text-main);
     }
 
-    .calendar-cell-pendiente { background: rgba(234,179,8,0.9); color: #020617; }
-    .calendar-cell-realizada { background: rgba(22,163,74,0.9); color: #f9fafb; }
-    .calendar-cell-anulada { background: rgba(239,68,68,0.95); color: #f9fafb; }
+    .calendar-cell-pendiente { background: #78350f; color: #fbbf24; }
+    .calendar-cell-realizada { background: #064e3b; color: #bbf7d0; }
+    .calendar-cell-anulada { background: #7f1d1d; color: #fecaca; }
 
     .calendar-legend {
       display: flex;
       gap: 6px;
-      margin-top: 4px;
+      margin-top: 3px;
       font-size: 9px;
       color: var(--text-muted);
       flex-wrap: wrap;
@@ -319,30 +322,31 @@
       border-radius: 999px;
     }
 
-    /* TABLA CENTROS */
+    /* TABLA CENTROS (ESTILO EXCEL COMPACTO) */
 
-    .table-wrapper { overflow-x: auto; }
+    .table-wrapper { overflow-x: visible; }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 12px;
-      min-width: 900px;
+      font-size: 11px;
+      table-layout: fixed;
     }
 
     thead { background: #020617; }
 
     th, td {
-      padding: 5px 6px;
+      padding: 4px 4px;
       border-bottom: 1px solid #020617;
       text-align: left;
-      white-space: nowrap;
+      white-space: normal;
+      word-wrap: break-word;
     }
 
     th {
-      font-size: 10px;
+      font-size: 9px;
       text-transform: uppercase;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.03em;
       color: var(--text-muted);
       background: #020617;
       position: sticky;
@@ -356,27 +360,36 @@
       font-weight: 600;
       font-size: 11px;
       color: var(--primary);
+      width: 7%;
     }
 
-    .col-centro { font-weight: 500; }
-
-    .col-visit-cell { min-width: 150px; }
+    .col-centro { font-weight: 500; width: 16%; }
+    .col-prov { width: 10%; }
+    .col-prop { width: 14%; }
+    .col-del { width: 14%; }
+    .col-tip { width: 8%; }
+    .col-aar { width: 7%; }
+    .col-visita { width: 16%; }
+    .col-inf { width: 12%; }
+    .col-aud { width: 8%; }
+    .col-hor { width: 6%; }
+    .col-resp { width: 8%; }
 
     .visita-group {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 3px;
+      gap: 2px;
     }
 
     .visita-input {
-      font-size: 11px;
-      padding: 3px 6px;
+      font-size: 10px;
+      padding: 2px 5px;
       border-radius: 999px;
       border: 1px solid #1e293b;
       background: #020617;
       color: var(--text-main);
-      min-width: 100px;
+      min-width: 90px;
     }
 
     .visita-input:focus {
@@ -390,7 +403,7 @@
     }
 
     .pill {
-      padding: 2px 7px;
+      padding: 2px 6px;
       border-radius: 999px;
       font-size: 10px;
       border: 1px solid #1e293b;
@@ -413,36 +426,36 @@
       cursor: pointer;
     }
 
-    .icon-finalizado { color: #22c55e; font-size: 16px; }
+    .icon-finalizado { color: #22c55e; font-size: 14px; }
 
     .filter-row {
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
       align-items: center;
       justify-content: space-between;
     }
 
     .input-text {
       font-size: 11px;
-      padding: 4px 8px;
+      padding: 3px 8px;
       border-radius: 999px;
       border: 1px solid #1e293b;
       background: #020617;
       color: var(--text-main);
-      min-width: 160px;
+      min-width: 200px;
     }
 
     .input-text:focus { outline: none; border-color: var(--primary-strong); }
 
     .estado-select {
-      font-size: 10px;
+      font-size: 9px;
       border-radius: 999px;
       border: 1px solid #1e293b;
       background: #020617;
       color: var(--text-main);
-      padding: 2px 4px;
+      padding: 1px 4px;
     }
 
     /* INFORME DE VISITA */
@@ -454,9 +467,9 @@
     }
 
     .informe-banner {
-      border-radius: 12px;
+      border-radius: 10px;
       overflow: hidden;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       border: 1px solid #020617;
       display: flex;
       background: linear-gradient(90deg, #020617 0%, #020617 60%, #0f172a 100%);
@@ -465,32 +478,32 @@
     .informe-banner-left {
       background: #ef4444;
       color: #020617;
-      padding: 8px 12px;
+      padding: 7px 11px;
       display: flex;
       align-items: center;
       font-weight: 700;
-      font-size: 16px;
+      font-size: 14px;
       letter-spacing: 0.06em;
       text-transform: uppercase;
     }
 
     .informe-banner-right {
       flex: 1;
-      padding: 6px 12px;
+      padding: 5px 10px;
       display: flex;
       flex-direction: column;
       justify-content: center;
       color: #e5e7eb;
     }
 
-    .informe-banner-title { font-size: 15px; font-weight: 600; }
+    .informe-banner-title { font-size: 14px; font-weight: 600; }
     .informe-banner-subtitle { font-size: 11px; color: var(--text-muted); }
 
     .informe-meta-grid {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 6px 8px;
-      margin-bottom: 8px;
+      gap: 5px 6px;
+      margin-bottom: 6px;
       font-size: 11px;
     }
 
@@ -508,7 +521,7 @@
       font-size: 11px;
       border-radius: 999px;
       border: 1px solid #1f2937;
-      padding: 4px 8px;
+      padding: 3px 7px;
       background: #020617;
       color: var(--text-main);
     }
@@ -525,12 +538,12 @@
       display: flex;
       gap: 4px;
       flex-wrap: wrap;
-      margin-bottom: 6px;
+      margin-bottom: 5px;
       font-size: 11px;
     }
 
     .pill-toggle {
-      padding: 3px 9px;
+      padding: 3px 8px;
       border-radius: 999px;
       border: 1px solid #1f2937;
       background: #020617;
@@ -548,8 +561,8 @@
     .informe-centro-grid {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 6px 8px;
-      margin-bottom: 8px;
+      gap: 5px 6px;
+      margin-bottom: 6px;
       font-size: 11px;
     }
 
@@ -566,8 +579,8 @@
     }
 
     .informe-section {
-      margin-top: 8px;
-      padding-top: 6px;
+      margin-top: 6px;
+      padding-top: 5px;
       border-top: 1px dashed #1f2937;
     }
 
@@ -576,8 +589,8 @@
       flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
-      gap: 6px;
-      margin-bottom: 6px;
+      gap: 4px;
+      margin-bottom: 4px;
     }
 
     .informe-section-title {
@@ -588,15 +601,15 @@
     .chart-grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 8px;
+      gap: 6px;
     }
 
     .chart-card-inner {
-      border-radius: 12px;
+      border-radius: 10px;
       border: 1px solid #020617;
       background: #020617;
-      padding: 8px 8px 6px;
-      height: 170px;
+      padding: 6px 6px 5px;
+      height: 165px;
       display: flex;
       flex-direction: column;
     }
@@ -606,7 +619,7 @@
       justify-content: space-between;
       align-items: center;
       font-size: 11px;
-      margin-bottom: 4px;
+      margin-bottom: 3px;
     }
 
     .chart-tag {
@@ -630,34 +643,34 @@
 
     .img-row {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 8px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 6px;
       margin-bottom: 4px;
     }
 
     .img-card {
-      border-radius: 12px;
+      border-radius: 10px;
       border: 1px solid #020617;
       background: #020617;
-      padding: 6px 8px;
+      padding: 5px 6px;
       font-size: 11px;
     }
 
     .img-title { font-size: 11px; font-weight: 600; margin-bottom: 2px; }
-    .img-subtitle { font-size: 10px; color: var(--text-muted); margin-bottom: 4px; }
+    .img-subtitle { font-size: 10px; color: var(--text-muted); margin-bottom: 3px; }
 
     .img-preview-row {
       display: flex;
-      gap: 4px;
+      gap: 3px;
       flex-wrap: wrap;
-      margin-top: 4px;
+      margin-top: 3px;
     }
 
     .img-thumb {
       width: 60px;
       height: 60px;
       object-fit: cover;
-      border-radius: 8px;
+      border-radius: 7px;
       border: 1px solid #020617;
       cursor: zoom-in;
     }
@@ -665,16 +678,16 @@
     .img-notes-row {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px;
+      gap: 6px;
       margin-top: 4px;
     }
 
     .textarea-base {
       width: 100%;
-      min-height: 70px;
-      border-radius: 10px;
+      min-height: 60px;
+      border-radius: 9px;
       border: 1px solid #1e293b;
-      padding: 6px 8px;
+      padding: 4px 6px;
       font-size: 11px;
       resize: vertical;
       font-family: inherit;
@@ -687,22 +700,17 @@
       border-color: var(--primary-strong);
     }
 
-    .textarea-wide {
-      margin-top: 4px;
-      min-height: 50px;
-    }
-
     .obs-grid {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 8px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
     }
 
     .obs-card {
-      border-radius: 12px;
+      border-radius: 10px;
       border: 1px solid #020617;
       background: #020617;
-      padding: 6px 8px;
+      padding: 5px 6px;
     }
 
     .obs-title { font-size: 11px; font-weight: 600; margin-bottom: 2px; }
@@ -711,7 +719,7 @@
       display: flex;
       justify-content: flex-end;
       gap: 6px;
-      margin-top: 8px;
+      margin-top: 6px;
     }
 
     /* MODAL HISTÓRICO */
@@ -728,8 +736,8 @@
 
     .modal-card {
       background: #020617;
-      border-radius: 12px;
-      padding: 10px 12px;
+      border-radius: 10px;
+      padding: 8px 9px;
       max-width: 720px;
       width: 90%;
       max-height: 80vh;
@@ -741,24 +749,24 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 6px;
+      margin-bottom: 5px;
     }
 
     .modal-title { font-size: 14px; font-weight: 600; }
     .modal-body { font-size: 11px; }
 
     .historico-item {
-      border-radius: 10px;
+      border-radius: 8px;
       border: 1px solid #1e293b;
-      padding: 6px 7px;
-      margin-bottom: 5px;
+      padding: 5px 6px;
+      margin-bottom: 4px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 6px;
     }
 
-    .historico-text { display: flex; flex-direction: column; gap: 2px; }
+    .historico-text { display: flex; flex-direction: column; gap: 1px; }
     .historico-tag { font-size: 10px; color: var(--text-muted); }
 
     /* ZOOM IMAGEN */
@@ -781,7 +789,7 @@
 
     /* DETALLES CHECKLIST (PÁGINA 2 IMPRESIÓN) */
 
-    #cardChecklistDetalles { margin-top: 8px; }
+    #cardChecklistDetalles { margin-top: 6px; }
 
     #checklistDetallesTabla {
       width: 100%;
@@ -791,7 +799,7 @@
 
     #checklistDetallesTabla th,
     #checklistDetallesTabla td {
-      padding: 4px 6px;
+      padding: 3px 5px;
       border-bottom: 1px solid #020617;
       text-align: left;
     }
@@ -802,7 +810,7 @@
       color: var(--text-muted);
     }
 
-    /* MODO CLARO (override rápido) */
+    /* MODO CLARO */
 
     body.light-mode {
       background: #f3f4f6;
@@ -825,6 +833,16 @@
       border-color: #e5e7eb;
     }
 
+    body.light-mode .calendar-grid {
+      background: #111827;
+      border-color: #475569;
+    }
+
+    body.light-mode .calendar-cell {
+      background: #020617;
+      color: #e5e7eb;
+    }
+
     body.light-mode .table-wrapper thead th {
       background: #f9fafb;
       border-color: #e5e7eb;
@@ -845,7 +863,7 @@
       background: #111827;
     }
 
-    /* PRINT */
+    /* PRINT: SOLO INFORME + DETALLES */
 
     @media print {
       body {
@@ -856,7 +874,9 @@
       .sidebar,
       .main-header,
       #historicoModal,
-      #imgZoomOverlay {
+      #imgZoomOverlay,
+      #cardVisionGeneral,
+      #cardCentros {
         display: none !important;
       }
 
@@ -883,8 +903,7 @@
     @media (max-width: 900px) {
       .sidebar { display: none; }
       .chart-grid { grid-template-columns: minmax(0, 1fr); }
-      .img-row { grid-template-columns: minmax(0, 1fr); }
-      .img-notes-row { grid-template-columns: minmax(0, 1fr); }
+      .img-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .obs-grid { grid-template-columns: minmax(0, 1fr); }
       .informe-meta-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .informe-centro-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -899,16 +918,16 @@
       <div class="logo-circle">IA</div>
       <div class="sidebar-title">
         <span>INFORME AUDIO</span>
-        <span>Panel visitas</span>
+        <span>Centros & visitas</span>
       </div>
     </div>
     <div class="sidebar-nav">
       <div class="nav-section-title">Módulos</div>
-      <div class="nav-item active">
-        <span class="icon">📝</span><span>Informe de visita</span>
+      <div class="nav-item active" id="navCentros">
+        <span class="icon">🏬</span><span>Centros y delegados</span>
       </div>
-      <div class="nav-item" id="navDashboard">
-        <span class="icon">📊</span><span>Dashboard general</span>
+      <div class="nav-item" id="navInforme">
+        <span class="icon">📝</span><span>Informe de visita</span>
       </div>
       <div class="nav-item" id="navHistorico">
         <span class="icon">📆</span><span>Histórico visitas</span>
@@ -923,9 +942,9 @@
   <main class="main">
     <header class="main-header">
       <div class="main-header-left">
-        <div class="main-title">Centros auditivos · visitas</div>
+        <div class="main-title">Centros y delegados</div>
         <div class="main-subtitle">
-          Programa visitas, crea informes y alimenta el dashboard general.
+          Visión general, calendario y tabla compacta tipo Excel. Alimenta el informe y el histórico.
         </div>
       </div>
       <div class="main-header-actions">
@@ -940,13 +959,13 @@
     </header>
 
     <section class="main-content">
-      <!-- Resumen + calendario -->
-      <section class="card">
+      <!-- Visión general + calendario -->
+      <section class="card" id="cardVisionGeneral">
         <div class="card-header">
           <div>
             <div class="card-title">Visión general</div>
             <div class="card-subtitle">
-              Alimentado automáticamente por las visitas e informes del módulo Informe de visita.
+              Se alimenta automáticamente de las visitas e informes del módulo de centros.
             </div>
           </div>
           <span class="badge">INFORME AUDIO</span>
@@ -976,36 +995,38 @@
         </div>
       </section>
 
-      <!-- Tabla centros -->
-      <section class="card">
+      <!-- Listado de centros (tabla tipo Excel) -->
+      <section class="card" id="cardCentros">
         <div class="card-header">
           <div>
-            <div class="card-title">Centros auditivos · visitas</div>
+            <div class="card-title">Listado de centros y delegados</div>
             <div class="card-subtitle">
-              Carga tu Excel o usa los datos demo. Programa la visita, marca el estado y crea el informe.
+              Programa la visita, marca el estado y crea el informe. Estilo compacto tipo tabla Excel.
             </div>
           </div>
         </div>
         <div class="filter-row">
           <input id="searchInput" class="input-text" placeholder="Buscar por código, centro, provincia..." />
-          <span class="text-muted">Visita pendiente: ámbar · con informe: verde · anulada: rojo (en el calendario).</span>
+          <span class="text-muted">
+            Visita pendiente: ámbar · con informe finalizado: verde · anulada: rojo (calendario).
+          </span>
         </div>
         <div class="table-wrapper">
           <table id="tablaCentros">
             <thead>
               <tr>
-                <th>Código</th>
-                <th>Propietario</th>
-                <th>Centro</th>
-                <th>Provincia</th>
-                <th>Delegado</th>
-                <th>Tipología</th>
-                <th>Centro AAR</th>
-                <th>Visita</th>
-                <th>Informe / histórico</th>
-                <th>Audiólogo</th>
-                <th>Horas servicio</th>
-                <th>Resp. Audio</th>
+                <th class="col-codigo">Código</th>
+                <th class="col-prop">Propietario</th>
+                <th class="col-centro">Centro</th>
+                <th class="col-prov">Provincia</th>
+                <th class="col-del">Delegado</th>
+                <th class="col-tip">Tipología</th>
+                <th class="col-aar">Centro AAR</th>
+                <th class="col-visita">Visita</th>
+                <th class="col-inf">Informe</th>
+                <th class="col-aud">Audiólogo</th>
+                <th class="col-hor">Horas</th>
+                <th class="col-resp">Resp. Audio</th>
               </tr>
             </thead>
             <tbody></tbody>
@@ -1070,14 +1091,6 @@
               </select>
             </div>
             <div>
-              <div class="meta-label">Responsable Audio</div>
-              <select id="infRespAudioSelect" class="meta-select">
-                <option value="">Selecciona responsable...</option>
-                <option value="Ariannys Rojas">Ariannys Rojas</option>
-                <option value="Sonia Guasque">Sonia Guasque</option>
-              </select>
-            </div>
-            <div>
               <div class="meta-label">Fecha visita</div>
               <input id="metaFechaVisita" class="meta-input" readonly placeholder="dd/mm/aaaa" />
             </div>
@@ -1117,7 +1130,7 @@
               <div class="informe-centro-item-value" id="infPropietario"></div>
             </div>
             <div>
-              <div class="informe-centro-item-label">Resp. Audio (centro)</div>
+              <div class="informe-centro-item-label">Resp. Audio</div>
               <div class="informe-centro-item-value" id="infRespAudioCentro"></div>
             </div>
           </div>
@@ -1153,7 +1166,7 @@
                 </div>
               </div>
             </div>
-            <div id="checklistResumen" class="text-muted" style="margin-top:4px;">
+            <div id="checklistResumen" class="text-muted" style="margin-top:3px;">
               Checklist no adjuntado todavía.
             </div>
           </div>
@@ -1167,42 +1180,44 @@
             </div>
             <div class="img-row">
               <div class="img-card">
-                <div class="img-title">Imagen 1 · Exterior</div>
+                <div class="img-title">Exterior</div>
                 <div class="img-subtitle">Escaparate, fachada, visibilidad desde el exterior.</div>
                 <label class="btn btn-outline btn-sm" for="imgInput1">🖼️ Seleccionar</label>
                 <input type="file" id="imgInput1" accept="image/*" />
                 <div id="imgPreview1" class="img-preview-row"></div>
               </div>
               <div class="img-card">
-                <div class="img-title">Imagen 2 · Interior</div>
-                <div class="img-subtitle">Zona de recepción, sala de espera, visibilidad de audio.</div>
+                <div class="img-title">Interior</div>
+                <div class="img-subtitle">Recepción, sala de espera, visibilidad de audio.</div>
                 <label class="btn btn-outline btn-sm" for="imgInput2">🖼️ Seleccionar</label>
                 <input type="file" id="imgInput2" accept="image/*" />
                 <div id="imgPreview2" class="img-preview-row"></div>
               </div>
               <div class="img-card">
-                <div class="img-title">Imagen 3 · Gabinete técnico</div>
-                <div class="img-subtitle">Equipamiento, insonorización, ergonomía.</div>
+                <div class="img-title">Gabinete 1</div>
+                <div class="img-subtitle">Zona técnica: equipamiento, ergonomía.</div>
                 <label class="btn btn-outline btn-sm" for="imgInput3">🖼️ Seleccionar</label>
-                <input type="file" id="imgInput3" accept="image/*" multiple />
+                <input type="file" id="imgInput3" accept="image/*" />
                 <div id="imgPreview3" class="img-preview-row"></div>
+              </div>
+              <div class="img-card">
+                <div class="img-title">Gabinete 2</div>
+                <div class="img-subtitle">Segundo ángulo gabinete o detalle técnico.</div>
+                <label class="btn btn-outline btn-sm" for="imgInput4">🖼️ Seleccionar</label>
+                <input type="file" id="imgInput4" accept="image/*" />
+                <div id="imgPreview4" class="img-preview-row"></div>
               </div>
             </div>
 
             <div class="img-notes-row">
-              <textarea id="imgObs12" class="textarea-base" placeholder="Observaciones imágenes 1 y 2..."></textarea>
+              <textarea id="imgObs12" class="textarea-base" placeholder="Observaciones exterior e interior..."></textarea>
               <textarea id="imgObs3" class="textarea-base" placeholder="Observaciones gabinete técnico..."></textarea>
             </div>
-            <textarea id="imgObsGeneral" class="textarea-base textarea-wide" placeholder="Observaciones generales sobre las imágenes y documentación fotográfica..."></textarea>
           </div>
 
-          <!-- OBS / RECOM / COMPROMISOS -->
+          <!-- RECOMENDACIONES / COMPROMISOS -->
           <div class="informe-section">
             <div class="obs-grid">
-              <div class="obs-card">
-                <div class="obs-title">Observaciones</div>
-                <textarea id="informeObservaciones" class="textarea-base" placeholder="Observaciones relevantes de la visita..."></textarea>
-              </div>
               <div class="obs-card">
                 <div class="obs-title">Recomendaciones</div>
                 <textarea id="informeRecomendaciones" class="textarea-base" placeholder="Recomendaciones de mejora, acciones sugeridas..."></textarea>
@@ -1342,7 +1357,7 @@
       },
     ];
 
-    const STORAGE_KEY = "InformeAudio_v2";
+    const STORAGE_KEY = "InformeAudio_v3";
 
     let centros = [];
     let estado = {}; // {CODIGO: {visita, visitaEstado, centroAAR, respAudio, informes: [...]}}
@@ -1458,6 +1473,7 @@
         tr.appendChild(tdCodigo);
 
         const tdProp = document.createElement("td");
+        tdProp.className = "col-prop";
         tdProp.textContent = c.PROPIETARIO || "";
         tr.appendChild(tdProp);
 
@@ -1467,14 +1483,17 @@
         tr.appendChild(tdCentro);
 
         const tdProv = document.createElement("td");
+        tdProv.className = "col-prov";
         tdProv.textContent = c.PROVINCIA || "";
         tr.appendChild(tdProv);
 
         const tdDel = document.createElement("td");
+        tdDel.className = "col-del";
         tdDel.textContent = c.DELEGADOS || "";
         tr.appendChild(tdDel);
 
         const tdTip = document.createElement("td");
+        tdTip.className = "col-tip";
         const spanTip = document.createElement("span");
         spanTip.className = "pill pill-corner";
         spanTip.textContent = c.TIPOLOGIA || "";
@@ -1482,9 +1501,10 @@
         tr.appendChild(tdTip);
 
         const tdAar = document.createElement("td");
+        tdAar.className = "col-aar";
         const selAar = document.createElement("select");
         selAar.className = "meta-select";
-        selAar.style.fontSize = "11px";
+        selAar.style.fontSize = "10px";
         selAar.innerHTML = `<option value="">—</option><option value="Sí">Sí</option><option value="No">No</option>`;
         selAar.value = c.CENTRO_AAR || "";
         selAar.addEventListener("change", () => {
@@ -1501,7 +1521,7 @@
         tr.appendChild(tdAar);
 
         const tdVisita = document.createElement("td");
-        tdVisita.className = "col-visit-cell";
+        tdVisita.className = "col-visita";
         const vGroup = document.createElement("div");
         vGroup.className = "visita-group";
         const inputDate = document.createElement("input");
@@ -1553,10 +1573,11 @@
         tr.appendChild(tdVisita);
 
         const tdInforme = document.createElement("td");
+        tdInforme.className = "col-inf";
         const cont = document.createElement("div");
         cont.style.display = "flex";
         cont.style.flexDirection = "column";
-        cont.style.gap = "3px";
+        cont.style.gap = "2px";
         const filaA = document.createElement("div");
         filaA.style.display = "flex";
         filaA.style.gap = "4px";
@@ -1588,7 +1609,7 @@
             span.textContent =
               "  (" +
               numInf +
-              " en histórico, último " +
+              " en hist., último " +
               (c.ULTIMO_INFORME_FECHA ? formatearFechaCorta(c.ULTIMO_INFORME_FECHA) : "-") +
               ")";
             filaB.appendChild(span);
@@ -1617,17 +1638,20 @@
         tr.appendChild(tdInforme);
 
         const tdAud = document.createElement("td");
+        tdAud.className = "col-aud";
         tdAud.textContent = c.AUDIOLOGO || "";
         tr.appendChild(tdAud);
 
         const tdHoras = document.createElement("td");
+        tdHoras.className = "col-hor";
         tdHoras.textContent = c.HORAS_SERVICIO || "";
         tr.appendChild(tdHoras);
 
         const tdResp = document.createElement("td");
+        tdResp.className = "col-resp";
         const selResp = document.createElement("select");
         selResp.className = "meta-select";
-        selResp.style.fontSize = "11px";
+        selResp.style.fontSize = "10px";
         selResp.innerHTML =
           '<option value="">—</option><option value="Ariannys Rojas">Ariannys Rojas</option><option value="Sonia Guasque">Sonia Guasque</option>';
         selResp.value = c.RESP_AUDIO || "";
@@ -1639,7 +1663,6 @@
           guardarEstado();
           if (centroSeleccionadoCodigo === code) {
             document.getElementById("infRespAudioCentro").textContent = selResp.value || "—";
-            document.getElementById("infRespAudioSelect").value = selResp.value || "";
           }
         });
         tdResp.appendChild(selResp);
@@ -1806,14 +1829,16 @@
     /* ========= INFORME ========= */
 
     function limpiarImagenesYChecklist() {
-      ["imgPreview1", "imgPreview2", "imgPreview3"].forEach((id) => {
+      ["imgPreview1", "imgPreview2", "imgPreview3", "imgPreview4"].forEach((id) => {
         const el = document.getElementById(id);
         if (el) el.innerHTML = "";
       });
-      ["imgInput1", "imgInput2", "imgInput3", "checklistInput"].forEach((id) => {
-        const el = document.getElementById(id);
-        if (el) el.value = "";
-      });
+      ["imgInput1", "imgInput2", "imgInput3", "imgInput4", "checklistInput"].forEach(
+        (id) => {
+          const el = document.getElementById(id);
+          if (el) el.value = "";
+        }
+      );
       document.getElementById("checklistResumen").textContent =
         "Checklist no adjuntado todavía.";
 
@@ -1845,17 +1870,15 @@
       const ids = [
         "metaTipoCentro",
         "metaCentroAAR",
-        "infRespAudioSelect",
         "infAudiologo",
         "infHorasServicio",
         "checklistInput",
         "imgInput1",
         "imgInput2",
         "imgInput3",
+        "imgInput4",
         "imgObs12",
         "imgObs3",
-        "imgObsGeneral",
-        "informeObservaciones",
         "informeRecomendaciones",
         "informeCompromisos",
       ];
@@ -1912,7 +1935,6 @@
 
       const respAudio =
         (estado[codigo] && estado[codigo].respAudio) || centro.RESP_AUDIO || "";
-      document.getElementById("infRespAudioSelect").value = respAudio;
       document.getElementById("infRespAudioCentro").textContent = respAudio || "—";
 
       document.getElementById("infCodigo").textContent = centro.CODIGO || "";
@@ -1924,9 +1946,6 @@
         inf.horasServicio || centro.HORAS_SERVICIO || "";
       document.getElementById("imgObs12").value = inf.imgObs12 || "";
       document.getElementById("imgObs3").value = inf.imgObs3 || "";
-      document.getElementById("imgObsGeneral").value = inf.imgObsGeneral || "";
-      document.getElementById("informeObservaciones").value =
-        inf.observaciones || "";
       document.getElementById("informeRecomendaciones").value =
         inf.recomendaciones || "";
       document.getElementById("informeCompromisos").value =
@@ -1947,6 +1966,9 @@
       setInformeEditable(!soloLectura);
       badge.textContent =
         inf.estado === "finalizado" ? "Informe finalizado" : "Informe en edición";
+
+      // Scroll al módulo de informe
+      document.getElementById("cardInformeVisita").scrollIntoView({ behavior: "smooth" });
     }
 
     function crearInformeParaCentro(c) {
@@ -1968,7 +1990,6 @@
         audiologo: "",
         horasServicio: "",
         tipoVisita: { apertura: false, seguimiento: false },
-        observaciones: "",
         recomendaciones: "",
         compromisos: "",
         checklistResumen: "",
@@ -1977,7 +1998,6 @@
         checklistDetalles: null,
         imgObs12: "",
         imgObs3: "",
-        imgObsGeneral: "",
       };
       e.informes.push(nuevo);
       guardarEstado();
@@ -1987,12 +2007,9 @@
       cargarCentroEnInforme(code, id, false);
 
       document.getElementById("infAudiologo").focus();
-      document
-        .getElementById("cardInformeVisita")
-        .scrollIntoView({ behavior: "smooth" });
     }
 
-    /* ========= CHECKLIST Y GRÁFICOS ========= */
+    /* ========= CHECKLIST Y GRÁFICOS (LÓGICA CORNER / EXCLUSIVO) ========= */
 
     function renderChecklistCharts(metrics, detalles) {
       const radarCtx = document.getElementById("radarChart").getContext("2d");
@@ -2152,21 +2169,26 @@
         const wb = XLSX.read(data, { type: "array" });
         const sheet = wb.Sheets[wb.SheetNames[0]];
 
-        // Tipo desde el desplegable
+        // 1) Tipo desde desplegable
         let tipo = document.getElementById("metaTipoCentro").value || null;
 
+        // 2) Si falta, por nombre de archivo
         const nameUpper = file.name.toUpperCase();
         if (!tipo) {
           if (nameUpper.includes("CORNER")) tipo = "CORNER";
           else if (nameUpper.includes("EXCLUSIVO")) tipo = "EXCLUSIVO";
         }
+
+        // 3) Si sigue vacío, por tipología del centro
         if (!tipo) {
           const centro = centros.find((c) => c.CODIGO === centroSeleccionadoCodigo);
           const t = (centro?.TIPOLOGIA || "").toUpperCase();
           if (t.includes("CORNER") || t.includes("CÓRNER")) tipo = "CORNER";
           else if (t.includes("EXCLUSIVO")) tipo = "EXCLUSIVO";
         }
-        if (!tipo) tipo = "CORNER"; // último recurso
+
+        // 4) Último recurso
+        if (!tipo) tipo = "CORNER";
 
         document.getElementById("metaTipoCentro").value = tipo;
 
@@ -2174,6 +2196,7 @@
         let detalles = [];
 
         if (tipo === "CORNER") {
+          // Criterios B7-B88, resultados F7-F88 (0/1)
           for (let row = 7; row <= 88; row++) {
             const critCell = sheet["B" + row];
             const valCell = sheet["F" + row];
@@ -2182,17 +2205,21 @@
             if (v !== 0 && v !== 1) continue;
             detalles.push({ criterio: String(critCell.v), aplica: v });
           }
+          // % aplicación procesos F90
           let aplicProc = leerNumeroCelda(sheet, "F90");
           if (aplicProc == null && detalles.length) {
             const total = detalles.length;
             const aplica = detalles.filter((d) => d.aplica === 1).length;
             aplicProc = (aplica / total) * 100;
           }
+          // Aplica HIT F63
           const aplicaHIT = boolDesdeCelda(sheet["F63"]);
+          // Conv prueba B92, conv venta B93
           const convPrueba = leerNumeroCelda(sheet, "B92");
           const convVenta = leerNumeroCelda(sheet, "B93");
           metrics = { aplicProc, aplicaHIT, convPrueba, convVenta };
         } else {
+          // EXCLUSIVO: criterios B8-B102, resultados F8-F102 (1=aplica,0=no)
           for (let row = 8; row <= 102; row++) {
             const critCell = sheet["B" + row];
             const valCell = sheet["F" + row];
@@ -2201,13 +2228,16 @@
             if (v !== 0 && v !== 1) continue;
             detalles.push({ criterio: String(critCell.v), aplica: v });
           }
+          // % aplicación procesos F104
           let aplicProc = leerNumeroCelda(sheet, "F104");
           if (aplicProc == null && detalles.length) {
             const total = detalles.length;
             const aplica = detalles.filter((d) => d.aplica === 1).length;
             aplicProc = (aplica / total) * 100;
           }
+          // Aplica HIT F65
           const aplicaHIT = boolDesdeCelda(sheet["F65"]);
+          // Conv prueba I126, conv venta I127
           const convPrueba = leerNumeroCelda(sheet, "I126");
           const convVenta = leerNumeroCelda(sheet, "I127");
           metrics = { aplicProc, aplicaHIT, convPrueba, convVenta };
@@ -2259,21 +2289,12 @@
       inf.audiologo = document.getElementById("infAudiologo").value.trim();
       inf.horasServicio = document.getElementById("infHorasServicio").value.trim();
       inf.tipoVisita = leerTipoVisitaDesdeUI();
-      inf.observaciones = document.getElementById("informeObservaciones").value.trim();
       inf.recomendaciones = document
         .getElementById("informeRecomendaciones")
         .value.trim();
       inf.compromisos = document.getElementById("informeCompromisos").value.trim();
       inf.imgObs12 = document.getElementById("imgObs12").value.trim();
       inf.imgObs3 = document.getElementById("imgObs3").value.trim();
-      inf.imgObsGeneral = document.getElementById("imgObsGeneral").value.trim();
-
-      const respSel = document.getElementById("infRespAudioSelect").value;
-      if (respSel) {
-        e.respAudio = respSel;
-        const centro = centros.find((c) => c.CODIGO === code);
-        if (centro) centro.RESP_AUDIO = respSel;
-      }
 
       if (finalizar) {
         inf.estado = "finalizado";
@@ -2301,6 +2322,61 @@
     }
 
     /* ========= HISTÓRICO ========= */
+
+    function construirFilaHistorico(centro, inf) {
+      const item = document.createElement("div");
+      item.className = "historico-item";
+
+      const text = document.createElement("div");
+      text.className = "historico-text";
+
+      const l1 = document.createElement("div");
+      const fechaVisita = inf.fechaVisita
+        ? formatearFechaCorta(inf.fechaVisita)
+        : "sin fecha";
+      l1.textContent = `${centro.CODIGO} · ${centro.CENTRO} · Visita: ${fechaVisita} · Estado: ${
+        inf.estado === "finalizado" ? "Finalizado" : "Borrador"
+      }`;
+
+      const l2 = document.createElement("div");
+      l2.className = "historico-tag";
+      l2.textContent = `Creado: ${formatearFechaCorta(
+        inf.fechaCreacion
+      )} · Última actualización: ${
+        inf.fechaFinalizacion ? formatearFechaCorta(inf.fechaFinalizacion) : "-"
+      }`;
+
+      text.appendChild(l1);
+      text.appendChild(l2);
+
+      const acc = document.createElement("div");
+      acc.style.display = "flex";
+      acc.style.gap = "4px";
+
+      const btnVer = document.createElement("button");
+      btnVer.className = "btn btn-outline btn-sm";
+      btnVer.textContent = "Ver";
+      btnVer.addEventListener("click", () => {
+        document.getElementById("historicoModal").style.display = "none";
+        cargarCentroEnInforme(centro.CODIGO, inf.id, inf.estado === "finalizado");
+      });
+
+      const btnImp = document.createElement("button");
+      btnImp.className = "btn btn-primary btn-sm";
+      btnImp.textContent = "Imprimir";
+      btnImp.addEventListener("click", () => {
+        document.getElementById("historicoModal").style.display = "none";
+        cargarCentroEnInforme(centro.CODIGO, inf.id, true);
+        setTimeout(() => window.print(), 300);
+      });
+
+      acc.appendChild(btnVer);
+      acc.appendChild(btnImp);
+
+      item.appendChild(text);
+      item.appendChild(acc);
+      return item;
+    }
 
     function abrirHistoricoCentro(codigo) {
       const modal = document.getElementById("historicoModal");
@@ -2361,64 +2437,6 @@
       modal.style.display = "flex";
     }
 
-    function construirFilaHistorico(centro, inf) {
-      const item = document.createElement("div");
-      item.className = "historico-item";
-
-      const text = document.createElement("div");
-      text.className = "historico-text";
-
-      const l1 = document.createElement("div");
-      const fechaVisita = inf.fechaVisita
-        ? formatearFechaCorta(inf.fechaVisita)
-        : "sin fecha";
-      l1.textContent = `${centro.CODIGO} · ${centro.CENTRO} · Visita: ${fechaVisita} · Estado: ${
-        inf.estado === "finalizado" ? "Finalizado" : "Borrador"
-      }`;
-
-      const l2 = document.createElement("div");
-      l2.className = "historico-tag";
-      l2.textContent = `Creado: ${formatearFechaCorta(
-        inf.fechaCreacion
-      )} · Última actualización: ${
-        inf.fechaFinalizacion ? formatearFechaCorta(inf.fechaFinalizacion) : "-"
-      }`;
-
-      text.appendChild(l1);
-      text.appendChild(l2);
-
-      const acc = document.createElement("div");
-      acc.style.display = "flex";
-      acc.style.gap = "4px";
-
-      const btnVer = document.createElement("button");
-      btnVer.className = "btn btn-outline btn-sm";
-      btnVer.textContent = "Ver";
-      btnVer.addEventListener("click", () => {
-        document.getElementById("historicoModal").style.display = "none";
-        cargarCentroEnInforme(centro.CODIGO, inf.id, inf.estado === "finalizado");
-        document
-          .getElementById("cardInformeVisita")
-          .scrollIntoView({ behavior: "smooth" });
-      });
-
-      const btnImp = document.createElement("button");
-      btnImp.className = "btn btn-primary btn-sm";
-      btnImp.textContent = "Imprimir";
-      btnImp.addEventListener("click", () => {
-        document.getElementById("historicoModal").style.display = "none";
-        cargarCentroEnInforme(centro.CODIGO, inf.id, true);
-        setTimeout(() => window.print(), 300);
-      });
-
-      acc.appendChild(btnVer);
-      acc.appendChild(btnImp);
-
-      item.appendChild(text);
-      item.appendChild(acc);
-      return item;
-    }
-
     function cerrarHistorico() {
       document.getElementById("historicoModal").style.display = "none";
     }
@@ -2436,12 +2454,12 @@
       document.getElementById("imgZoomOverlay").style.display = "none";
     }
 
-    function setupImagenInput(inputId, previewId, maxImgs) {
+    function setupImagenInput(inputId, previewId) {
       const input = document.getElementById(inputId);
       const preview = document.getElementById(previewId);
       if (!input || !preview) return;
       input.addEventListener("change", () => {
-        const files = Array.from(input.files || []).slice(0, maxImgs);
+        const files = Array.from(input.files || []).slice(0, 1);
         preview.innerHTML = "";
         files.forEach((file) => {
           const reader = new FileReader();
@@ -2536,9 +2554,10 @@
           if (file) manejarChecklist(file);
         });
 
-      setupImagenInput("imgInput1", "imgPreview1", 1);
-      setupImagenInput("imgInput2", "imgPreview2", 1);
-      setupImagenInput("imgInput3", "imgPreview3", 3);
+      setupImagenInput("imgInput1", "imgPreview1");
+      setupImagenInput("imgInput2", "imgPreview2");
+      setupImagenInput("imgInput3", "imgPreview3");
+      setupImagenInput("imgInput4", "imgPreview4");
 
       document.getElementById("btnApertura").addEventListener("click", (e) => {
         e.target.classList.toggle("active");
@@ -2586,14 +2605,18 @@
         .getElementById("navHistorico")
         .addEventListener("click", abrirHistoricoGlobal);
 
-      // El dashboard general (navDashboard) usa los mismos datos; por ahora no cambia la vista,
-      // solo sirve como recordatorio de que todo se alimenta del módulo Informe.
       document
-        .getElementById("navDashboard")
+        .getElementById("navInforme")
         .addEventListener("click", () => {
           document
             .getElementById("cardInformeVisita")
             .scrollIntoView({ behavior: "smooth" });
+        });
+
+      document
+        .getElementById("navCentros")
+        .addEventListener("click", () => {
+          document.getElementById("cardVisionGeneral").scrollIntoView({ behavior: "smooth" });
         });
     });
   </script>
