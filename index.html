@@ -13,21 +13,20 @@
       --border: #e5e7eb;
       --text-main: #111827;
       --text-muted: #6b7280;
-      --pill-dark: #020617;
     }
 
     * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont,"Segoe UI",sans-serif;
+      font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
       background: var(--bg-main);
       color: var(--text-main);
       display: flex;
       min-height: 100vh;
     }
 
-    /* SIDEBAR */
+    /* SIDEBAR -------------------------------------------------------- */
     .sidebar {
       width: 220px;
       background: #020617;
@@ -90,9 +89,7 @@
       border-color:var(--primary-dark);
       color:#111827;
     }
-    .nav-item.active span.icon {
-      filter:brightness(0.1);
-    }
+    .nav-item.active span.icon { filter:brightness(0.1); }
     .nav-item:hover:not(.active) {
       background:#020617;
       border-color:#1e293b;
@@ -104,7 +101,7 @@
       color:#6b7280;
     }
 
-    /* MAIN */
+    /* MAIN ----------------------------------------------------------- */
     .main {
       flex:1;
       display:flex;
@@ -178,7 +175,7 @@
       margin-bottom:10px;
     }
 
-    /* FALDÓN SOLO PARA INFORME */
+    /* FALDÓN SOLO EN INFORME ---------------------------------------- */
     .faldon {
       display:flex;
       align-items:center;
@@ -240,8 +237,7 @@
 
     input[type="file"]{ display:none; }
 
-    /* MÓDULO CENTROS */
-
+    /* MÓDULO CENTROS ------------------------------------------------ */
     .dashboard-top{
       display:grid;
       grid-template-columns:minmax(0,1.1fr) minmax(0,1.1fr);
@@ -428,9 +424,7 @@
       color:var(--text-muted);
       background:#f9fafb;
     }
-    tbody tr:hover{
-      background:#f3f4f6;
-    }
+    tbody tr:hover{ background:#f3f4f6; }
 
     .col-codigo{ min-width:60px; color:var(--primary); font-weight:700; }
     .col-prop{ min-width:140px; }
@@ -473,18 +467,10 @@
       align-items:center;
       gap:4px;
     }
-    .btn-visita span.icon-cal{
-      font-size:11px;
-    }
-    .btn-visita:hover{
-      background:#f3f4f6;
-    }
-    .visita-guardada{
-      background:#fffbeb;
-    }
-    .visita-anulada{
-      background:#fee2e2;
-    }
+    .btn-visita span.icon-cal{ font-size:11px; }
+    .btn-visita:hover{ background:#f3f4f6; }
+    .visita-guardada{ background:#fffbeb; }
+    .visita-anulada{ background:#fee2e2; }
 
     .cell-input{
       width:100%;
@@ -519,7 +505,7 @@
       color:#f9fafb;
     }
 
-    /* MÓDULO INFORME */
+    /* MÓDULO INFORME ----------------------------------------------- */
 
     #modInforme{ display:none; }
 
@@ -576,7 +562,7 @@
 
     .informe-centro-grid{
       display:grid;
-      grid-template-columns:repeat(4,minmax(0,1fr));
+      grid-template-columns:repeat(2,minmax(0,1fr));
       gap:4px 6px;
       margin-bottom:6px;
     }
@@ -737,7 +723,7 @@
       padding:4px 2px;
     }
 
-    /* MODAL HISTÓRICO / VISITA */
+    /* MODAL HISTÓRICO / VISITA -------------------------------------- */
     .modal-overlay{
       position:fixed;
       inset:0;
@@ -833,7 +819,7 @@
       color:#111827;
     }
 
-    /* ZOOM IMAGEN */
+    /* ZOOM IMAGEN --------------------------------------------------- */
     .img-zoom-overlay{
       position:fixed;
       inset:0;
@@ -849,26 +835,7 @@
       border-radius:10px;
     }
 
-    /* CHECKLIST ANEXO */
-    #checklistDetallesTabla{
-      width:100%;
-      border-collapse:collapse;
-      font-size:10px;
-    }
-    #checklistDetallesTabla th,
-    #checklistDetallesTabla td{
-      padding:3px 4px;
-      border-bottom:1px solid #e5e7eb;
-      text-align:left;
-    }
-    #checklistDetallesTabla th{
-      font-size:9px;
-      text-transform:uppercase;
-      color:var(--text-muted);
-      background:#f9fafb;
-    }
-
-    /* TEMA OSCURO OPCIONAL PARA PANTALLA */
+    /* TEMA OSCURO (pantalla) ---------------------------------------- */
     body.dark {
       --bg-main:#020617;
       --bg-card:#020617;
@@ -901,20 +868,16 @@
       background:#020617;
       border-color:#1f2937;
     }
-    body.dark tbody tr:hover{
-      background:#020617;
-    }
+    body.dark tbody tr:hover{ background:#020617; }
     body.dark .btn-outline{
       background:#020617;
       border-color:#1f2937;
       color:#e5e7eb;
     }
-    body.dark .btn-primary{
-      color:#020617;
-    }
+    body.dark .btn-primary{ color:#020617; }
     body.dark .mini-calendar{ border-color:#111827; }
 
-    /* IMPRESIÓN: SOLO INFORME + ANEXO */
+    /* IMPRESIÓN: SOLO INFORME -------------------------------------- */
     @media print {
       body { background:#ffffff; color:#000; }
       .sidebar,
@@ -930,7 +893,6 @@
         border-color:#d1d5db;
         box-shadow:none;
       }
-      #cardChecklistDetalles{ page-break-before:always; }
     }
 
     @media (max-width:900px){
@@ -990,7 +952,7 @@
 
     <section class="main-content">
 
-      <!-- MÓDULO CENTROS -->
+      <!-- MÓDULO CENTROS --------------------------------------------- -->
       <section id="modCentros">
         <section class="card" id="cardVisionGeneral">
           <div class="card-header">
@@ -1074,7 +1036,7 @@
         </section>
       </section>
 
-      <!-- MÓDULO INFORME -->
+      <!-- MÓDULO INFORME --------------------------------------------- -->
       <section id="modInforme">
         <section class="card" id="cardInformeVisita">
           <div class="faldon">
@@ -1172,14 +1134,6 @@
               <div>
                 <div class="informe-centro-item-label">Propietario</div>
                 <div class="informe-centro-item-value" id="infPropietario"></div>
-              </div>
-              <div>
-                <div class="informe-centro-item-label">Resp. Audio</div>
-                <div class="informe-centro-item-value" id="infRespAudioCentro"></div>
-              </div>
-              <div>
-                <div class="informe-centro-item-label">Audiológ@</div>
-                <div class="informe-centro-item-value" id="infAudiologoResumen"></div>
               </div>
             </div>
 
@@ -1282,32 +1236,6 @@
             </div>
           </div>
         </section>
-
-        <section class="card" id="cardChecklistDetalles">
-          <div class="faldon">
-            <div class="faldon-left">Informe Audio</div>
-            <div class="faldon-right">
-              <div class="faldon-title">Anexo checklist</div>
-              <div class="faldon-subtitle">Detalle de criterios y aplicación de procesos.</div>
-            </div>
-          </div>
-
-          <div id="checklistDetallesVacio" class="text-muted">
-            Aún no se ha cargado ningún checklist para este informe.
-          </div>
-          <div class="table-wrapper" id="checklistDetallesContenido" style="display:none;">
-            <table id="checklistDetallesTabla">
-              <thead>
-              <tr>
-                <th>#</th>
-                <th>Criterio</th>
-                <th>Aplica</th>
-              </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
-        </section>
       </section>
 
     </section>
@@ -1353,7 +1281,8 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
-    const STORAGE_KEY = "InformeAudio_v6";
+    /* ------------------- UTIL ESTADO --------------------- */
+    const STORAGE_KEY = "InformeAudio_v7";
 
     const demoData = [
       {
@@ -1434,7 +1363,6 @@
 
     let calendarYear;
     let calendarMonth;
-
     let visitaModalCodigo = null;
 
     function cargarEstado(){
@@ -1492,11 +1420,11 @@
       const cell = sheet[addr];
       if(!cell) return null;
       let v = cell.v;
+      if(v===undefined || v===null) return null;
       v = String(v).replace("%","").replace(",",".");
       const n = parseFloat(v);
       return isNaN(n) ? null : n;
     }
-
     function boolDesdeCelda(cell){
       if(!cell) return null;
       const v = String(cell.v).trim().toUpperCase();
@@ -1505,7 +1433,7 @@
       return null;
     }
 
-    /* ---------- TABLA CENTROS ---------- */
+    /* ------------------- TABLA CENTROS --------------------- */
 
     function renderTabla(filtro=""){
       const tbody = document.querySelector("#tablaCentros tbody");
@@ -1632,7 +1560,6 @@
           guardarEstado();
           if(centroSeleccionadoCodigo===code){
             document.getElementById("infAudiologo").value=val;
-            document.getElementById("infAudiologoResumen").textContent=val||"—";
           }
         });
         tdAud.appendChild(inputAud);
@@ -1673,7 +1600,6 @@
           c.RESP_AUDIO=selResp.value;
           guardarEstado();
           if(centroSeleccionadoCodigo===code){
-            document.getElementById("infRespAudioCentro").textContent=selResp.value||"—";
             actualizarFaldonVisita();
           }
           actualizarResumen();
@@ -1685,7 +1611,8 @@
       });
     }
 
-    /* ---------- GRÁFICO KPI CENTROS (GAUGES) ---------- */
+    /* ------------- GRÁFICO KPI CENTROS (tipo reloj) --------------- */
+
     function renderKpiCentros(total, pendientes, anuladas){
       const canvas=document.getElementById("kpiCentrosCanvas");
       if(!canvas) return;
@@ -1838,7 +1765,7 @@
       actualizarCalendarioVisitas();
     }
 
-    /* ---------- CARGA EXCEL CENTROS ---------- */
+    /* ----------------- CARGA EXCEL CENTROS ----------------- */
 
     function manejarExcel(file){
       const reader=new FileReader();
@@ -1867,7 +1794,7 @@
       reader.readAsArrayBuffer(file);
     }
 
-    /* ---------- INFORME ---------- */
+    /* ----------------------- INFORME ------------------------ */
 
     function actualizarTipoVisitaUI(tv){
       const btnA=document.getElementById("btnApertura");
@@ -1896,7 +1823,6 @@
       if(mejoraChart) mejoraChart.destroy();
       if(kpiChart) kpiChart.destroy();
       radarChart=mejoraChart=kpiChart=null;
-      renderChecklistDetalles(null);
     }
 
     function setInformeEditable(editable){
@@ -1967,17 +1893,13 @@
       document.getElementById("metaTipoCentro").value=inf.checklistTipo||"";
       document.getElementById("infCodigo").textContent=centro.CODIGO||"";
       document.getElementById("infPropietario").textContent=centro.PROPIETARIO||"";
-      const respAudio=(estado[codigo] && estado[codigo].respAudio) || centro.RESP_AUDIO || "";
-      document.getElementById("infRespAudioCentro").textContent=respAudio||"—";
 
       document.getElementById("infAudiologo").value=inf.audiologo || centro.AUDIOLOGO || "";
-      document.getElementById("infAudiologoResumen").textContent=document.getElementById("infAudiologo").value||"—";
       document.getElementById("infHorasServicio").value=inf.horasServicio || centro.HORAS_SERVICIO || "";
       document.getElementById("infDelFormacion").value=inf.delegadoFormacion || "";
       document.getElementById("informeRecomendaciones").value=inf.recomendaciones||"";
       document.getElementById("informeCompromisos").value=inf.compromisos||"";
       document.getElementById("checklistResumen").textContent=inf.checklistResumen||"Checklist no adjuntado todavía.";
-
       actualizarTipoVisitaUI(inf.tipoVisita||{});
 
       limpiarImagenesYChecklist();
@@ -2018,8 +1940,6 @@
         checklistTipo:null,
         checklistMetrics:null,
         checklistDetalles:null,
-        imgObs12:"",
-        imgObs3:"",
       };
       e.informes.push(nuevo);
       guardarEstado();
@@ -2030,7 +1950,23 @@
       document.getElementById("infAudiologo").focus();
     }
 
-    /* ---------- CHECKLIST Y GRÁFICOS ---------- */
+    /* ---------------- CHECKLIST + GRÁFICOS ---------------- */
+
+    function seleccionarHojaProcesos(workbook){
+      const names=workbook.SheetNames||[];
+      if(!names.length) return null;
+      const norm = s => s.toUpperCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+      let chosen=null;
+      for(const n of names){
+        const nn=norm(n);
+        if(nn.includes("PROCESOS") && nn.includes("BASICOS")){
+          chosen=n; break;
+        }
+      }
+      if(!chosen) chosen=names[0];
+      return workbook.Sheets[chosen];
+    }
 
     function renderChecklistCharts(metrics,detalles){
       const radarCtx=document.getElementById("radarChart").getContext("2d");
@@ -2134,36 +2070,6 @@
           }
         }
       });
-
-      renderChecklistDetalles(detalles);
-    }
-
-    function renderChecklistDetalles(detalles){
-      const cont=document.getElementById("checklistDetallesContenido");
-      const tbody=document.querySelector("#checklistDetallesTabla tbody");
-      const vacio=document.getElementById("checklistDetallesVacio");
-      tbody.innerHTML="";
-
-      if(!detalles || !detalles.length){
-        cont.style.display="none";
-        vacio.style.display="block";
-        return;
-      }
-
-      detalles.forEach((d,idx)=>{
-        const tr=document.createElement("tr");
-        const tdIdx=document.createElement("td");
-        tdIdx.textContent=idx+1;
-        const tdCrit=document.createElement("td");
-        tdCrit.textContent=d.criterio||"";
-        const tdAp=document.createElement("td");
-        tdAp.textContent=(d.aplica===1 || d.aplica==="1") ? "Sí (1)" : "No aplica (0)";
-        tr.appendChild(tdIdx); tr.appendChild(tdCrit); tr.appendChild(tdAp);
-        tbody.appendChild(tr);
-      });
-
-      cont.style.display="block";
-      vacio.style.display="none";
     }
 
     function manejarChecklist(file){
@@ -2177,7 +2083,11 @@
       reader.onload=e=>{
         const data=new Uint8Array(e.target.result);
         const wb=XLSX.read(data,{type:"array"});
-        const sheet=wb.Sheets[wb.SheetNames[0]];
+        const sheet=seleccionarHojaProcesos(wb);
+        if(!sheet){
+          alert("No se ha encontrado la hoja de PROCESOS en el checklist.");
+          return;
+        }
 
         let tipo=document.getElementById("metaTipoCentro").value || null;
         const nameUpper=file.name.toUpperCase();
@@ -2307,13 +2217,11 @@
       actualizarResumen();
 
       document.getElementById("informeEstadoBadge").textContent=finalizar ? "Informe finalizado" : "Informe guardado";
-      document.getElementById("infAudiologoResumen").textContent=inf.audiologo||"—";
-
       if(finalizar) setInformeEditable(false);
       alert(finalizar ? `Informe finalizado para el centro ${code}.` : `Borrador de informe guardado para el centro ${code}.`);
     }
 
-    /* ---------- HISTÓRICO ---------- */
+    /* -------------------- HISTÓRICO ------------------------ */
 
     function construirFilaHistorico(centro,inf){
       const item=document.createElement("div");
@@ -2378,7 +2286,7 @@
       modal.style.display="flex";
     }
 
-    /* ---------- ZOOM IMÁGENES ---------- */
+    /* ------------------ ZOOM IMÁGENES ---------------------- */
     function abrirZoomImagen(src){
       const overlay=document.getElementById("imgZoomOverlay");
       const img=document.getElementById("imgZoomImage");
@@ -2407,7 +2315,7 @@
       });
     }
 
-    /* ---------- TEMA ---------- */
+    /* ---------------------- TEMA --------------------------- */
     function aplicarTemaDesdeStorage(){
       const saved=localStorage.getItem("InformeAudioThemeMode")||"light";
       if(saved==="dark"){
@@ -2424,7 +2332,7 @@
       document.getElementById("btnTheme").textContent=isDark?"☀️":"🌙";
     }
 
-    /* ---------- MODALES VISITA ---------- */
+    /* ---------------------- VISITA ------------------------- */
     function abrirVisitaModal(codigo){
       const centro=centros.find(c=>c.CODIGO===codigo);
       if(!centro) return;
@@ -2439,7 +2347,7 @@
       visitaModalCodigo=null;
     }
 
-    /* ---------- MÓDULOS ---------- */
+    /* ---------------------- MÓDULOS ------------------------ */
     function setActiveModule(mod){
       document.getElementById("modCentros").style.display=mod==="centros"?"block":"none";
       document.getElementById("modInforme").style.display=mod==="informe"?"block":"none";
@@ -2452,11 +2360,11 @@
         sub.textContent="Visión general, calendario y tabla tipo Excel. Alimenta todos los informes.";
       }else{
         title.textContent="Informe de visita";
-        sub.textContent="Edición del informe ejecutivo Informe Audio y anexo checklist.";
+        sub.textContent="Edición del informe ejecutivo Informe Audio.";
       }
     }
 
-    /* ---------- INIT ---------- */
+    /* ------------------------- INIT ------------------------ */
     document.addEventListener("DOMContentLoaded",()=>{
       estado=cargarEstado();
       centros=JSON.parse(JSON.stringify(demoData));
